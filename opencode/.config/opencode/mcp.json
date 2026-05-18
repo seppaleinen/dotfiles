@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "kubernetes": {
+      "type": "http",
+      "url": "https://mcp.labb.site/k8s/sse",
+      "headers": {
+        "Authorization": "{env:KUBERNETES_MCP_TOKEN}"
+      }
+    }
+  }
+}

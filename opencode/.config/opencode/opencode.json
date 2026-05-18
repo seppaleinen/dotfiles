@@ -1,0 +1,159 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "agent": {
+    "docs": {
+      "description": "ALWAYS use this when writing docs",
+      "model": "ollama/qwen-fixed",
+      "name": "docs",
+      "prompt": "You are an expert technical documentation writer\n\nYou are not verbose\n\nThe title of the page should be a word or a 2-3 word phrase\n\nThe description should be one short line, should not start with \"The\", should\navoid repeating the title of the page, should be 5-10 words long\n\nChunks of text should not be more than 2 sentences long\n\nEach section is spearated by a divider of 3 dashes\n\nThe section titles are short with only the first letter of the word capitalized\n\nThe section titles are in the imperative mood\n\nThe section titles should not repeat the term used in the page title, for\nexample, if the page title is \"Models\", avoid using a section title like \"Add\nnew models\". This might be unavoidable in some cases, but try to avoid it.\n\nCheck out the /packages/web/src/content/docs/docs/index.mdx as an example.\n\nFor JS or TS code snippets remove trailing semicolons and any trailing commas\nthat might not be needed.\n\nIf you are making a commit prefix the commit message with `docs:`"
+    },
+    "git-committer": {
+      "description": "Use this agent when you are asked to commit and push code changes to a git repository.",
+      "mode": "subagent",
+      "model": "ollama/qwen-fixed",
+      "name": "git-committer",
+      "prompt": "You commit and push to git\n\nCommit messages should be brief since they are used to generate release notes.\n\nMessages should say WHY the change was made and not WHAT was changed."
+    },
+    "team-lead": {
+      "description": "Orchestrates the Dev and DevOps pillars.",
+      "mode": "primary"
+    }
+  },
+  "mode": {},
+  "permission": {
+    "bash": {
+      "*": "ask",
+      "flux *": "ask",
+      "helm *": "ask",
+      "kubectl *": "ask",
+      "ls *": "allow",
+      "ll *": "allow",
+      "la *": "allow",
+      "cat *": "allow",
+      "tail *": "allow",
+      "head *": "allow",
+      "grep *": "allow",
+      "rg *": "allow",
+      "find *": "allow",
+      "echo *": "allow",
+      "pwd *": "allow",
+      "wc *": "allow",
+      "sort *": "allow",
+      "uniq *": "allow",
+      "diff *": "allow",
+      "which *": "allow",
+      "type *": "allow",
+      "env *": "allow",
+      "printenv *": "allow",
+      "date *": "allow",
+      "uname *": "allow",
+      "tree *": "allow",
+      "jq *": "allow",
+      "file *": "allow",
+      "stat *": "allow",
+      "du *": "allow",
+      "df *": "allow",
+      "ps *": "allow",
+      "whoami *": "allow",
+      "hostname *": "allow",
+      "id *": "allow",
+      "basename *": "allow",
+      "dirname *": "allow",
+      "realpath *": "allow",
+      "readlink *": "allow",
+      "cut *": "allow",
+      "tr *": "allow",
+      "awk *": "allow",
+      "sed *": "allow",
+      "xargs *": "allow",
+      "git log *": "allow",
+      "git status *": "allow",
+      "git diff *": "allow",
+      "git show *": "allow",
+      "git branch *": "allow",
+      "git remote *": "allow",
+      "git fetch *": "allow",
+      "git stash list *": "allow",
+      "flux check *": "allow",
+      "flux diff *": "allow",
+      "flux events *": "allow",
+      "flux get *": "allow",
+      "flux logs *": "allow",
+      "flux reconcile *": "allow",
+      "flux version *": "allow"
+    },
+    "edit": "ask",
+    "read": "allow",
+    "webfetch": "allow",
+    "write": "ask"
+  },
+  "mcp": {
+    "kubernetes": {
+      "type": "remote",
+      "url": "https://mcp.labb.site/k8s/sse",
+      "enabled": true,
+      "oauth": false,
+      "headers": {
+        "Authorization": "{env:KUBERNETES_MCP_TOKEN}"
+      }
+    }
+  },
+  "plugin": [
+    "@cortexkit/opencode-magic-context@latest"
+  ],
+  "provider": {
+    "litellm": {
+      "name": "openai",
+      "options": {
+        "baseURL": "https://litellm.labb.site/v1",
+        "apiKey": "sk-dummy-key-for-local"
+      },
+      "models": {
+        "qwen2.5-coder": {
+          "name": "qwen2.5-coder"
+        },
+        "qwen/qwen3.6-35b-a3b": {
+          "name": "qwen/qwen3.6-35b-a3b"
+        }
+      }
+    },
+    "oMLX": {
+      "name": "oMLX",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "baseURL": "http://localhost:8000/v1"
+      },
+      "models": {
+        "mlx-community/gpt-oss-20b-MXFP4-Q8": {
+          "name": "mlx-community/gpt-oss-20b-MXFP4-Q8"
+        },
+        "unsloth/Qwen3.6-35B-A3B-UD-MLX-4bit": {
+          "name": "unsloth/Qwen3.6-35B-A3B-UD-MLX-4bit"
+        }
+      }
+    },
+    "local lmstudio": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LM Studio",
+      "options": {
+        "baseURL": "http://localhost:1234/v1",
+        "apiKey": "not-needed"
+      },
+      "models": {
+        "qwen/qwen2.5-coder-14b": {
+          "name": "qwen/qwen2.5-coder-14b"
+        },
+        "mistralai/devstral-small-2-2512": {
+          "name": "mistralai/devstral-small-2-2512"
+        },
+        "qwen/qwen3.6-35b-a3b": {
+          "name": "qwen/qwen3.6-35b-a3b"
+        }
+      }
+    }
+  },
+  "compaction": {
+    "auto": false,
+    "prune": false
+  }
+}
