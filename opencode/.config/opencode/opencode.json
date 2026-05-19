@@ -90,7 +90,7 @@
   "mcp": {
     "kubernetes": {
       "type": "remote",
-      "url": "https://mcp.labb.site/k8s/sse",
+      "url": "https://mcp.labb.site/k8s/mcp",
       "enabled": true,
       "oauth": false,
       "headers": {
@@ -99,7 +99,8 @@
     }
   },
   "plugin": [
-    "@cortexkit/opencode-magic-context@latest"
+    "@cortexkit/opencode-magic-context@latest",
+    "opencode-agent-tmux"
   ],
   "provider": {
     "litellm": {
