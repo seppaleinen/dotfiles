@@ -1,12 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/cortexkit/magic-context/master/assets/magic-context.schema.json",
   "historian": {
-    "model": "litellm/qwen/qwen3.6-35b-a3b"
+    "provider": "omlx",
+    "model": "samuelfaj/Qwen3.6-35B-A3B-4bit-MTPLX-Optimized-Speed"
   },
   "dreamer": {
-    "enabled": true
+    "provider": "omlx",
+    "model": "samuelfaj/Qwen3.6-35B-A3B-4bit-MTPLX-Optimized-Speed"
   },
-  "sidekick": {
-    "enabled": true
-  }
+  "sidekick": {}
 }
