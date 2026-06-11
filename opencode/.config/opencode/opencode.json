@@ -4,71 +4,74 @@
   "permission": {
     "bash": {
       "*": "ask",
-      "flux *": "ask",
-      "helm *": "ask",
-      "kubectl *": "ask",
-      "ls *": "allow",
-      "ll *": "allow",
-      "la *": "allow",
-      "cat *": "allow",
-      "tail *": "allow",
-      "head *": "allow",
-      "grep *": "allow",
-      "rg *": "allow",
-      "find *": "allow",
-      "echo *": "allow",
-      "pwd *": "allow",
-      "wc *": "allow",
-      "sort *": "allow",
-      "uniq *": "allow",
-      "diff *": "allow",
-      "which *": "allow",
-      "type *": "allow",
-      "env *": "allow",
-      "printenv *": "allow",
-      "date *": "allow",
-      "uname *": "allow",
-      "tree *": "allow",
-      "jq *": "allow",
-      "file *": "allow",
-      "stat *": "allow",
-      "du *": "allow",
-      "df *": "allow",
-      "ps *": "allow",
-      "whoami *": "allow",
-      "hostname *": "allow",
-      "id *": "allow",
-      "basename *": "allow",
-      "dirname *": "allow",
-      "realpath *": "allow",
-      "readlink *": "allow",
-      "cut *": "allow",
-      "tr *": "allow",
-      "awk *": "allow",
-      "sed *": "allow",
-      "xargs *": "allow",
-      "git log *": "allow",
-      "git status *": "allow",
-      "git diff *": "allow",
-      "git show *": "allow",
-      "git branch *": "allow",
-      "git remote *": "allow",
-      "git fetch *": "allow",
-      "git stash list *": "allow",
-      "flux check *": "allow",
-      "flux diff *": "allow",
-      "flux events *": "allow",
-      "flux get *": "allow",
-      "flux logs *": "allow",
-      "flux reconcile *": "allow",
-      "flux version *": "allow",
-      "flux-local *": "allow",
+      "flux*": "ask",
+      "helm*": "ask",
+      "kubectl*": "ask",
+      "ls*": "allow",
+      "ll*": "allow",
+      "la*": "allow",
+      "cat*": "allow",
+      "tail*": "allow",
+      "head*": "allow",
+      "grep*": "allow",
+      "rg*": "allow",
+      "find*": "allow",
+      "echo*": "allow",
+      "pwd*": "allow",
+      "wc*": "allow",
+      "sort*": "allow",
+      "uniq*": "allow",
+      "diff*": "allow",
+      "which*": "allow",
+      "type*": "allow",
+      "env*": "allow",
+      "printenv*": "allow",
+      "date*": "allow",
+      "uname*": "allow",
+      "tree*": "allow",
+      "jq*": "allow",
+      "file*": "allow",
+      "stat*": "allow",
+      "du*": "allow",
+      "df*": "allow",
+      "ps*": "allow",
+      "whoami*": "allow",
+      "hostname*": "allow",
+      "id*": "allow",
+      "basename*": "allow",
+      "dirname*": "allow",
+      "realpath*": "allow",
+      "readlink*": "allow",
+      "cut*": "allow",
+      "tr*": "allow",
+      "awk*": "allow",
+      "sed*": "allow",
+      "xargs*": "allow",
+      "git log*": "allow",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git show*": "allow",
+      "git branch*": "allow",
+      "git remote*": "allow",
+      "git fetch*": "allow",
+      "git stash list*": "allow",
+      "flux check*": "allow",
+      "flux diff*": "allow",
+      "flux events*": "allow",
+      "flux get*": "allow",
+      "flux logs*": "allow",
+      "flux reconcile*": "allow",
+      "flux version*": "allow",
+      "flux-local*": "allow",
       "source .venv/bin/activate": "allow",
+      "pnpm*": "allow",
+      "turbo*": "allow"
     },
     "edit": "allow",
     "read": "allow",
     "webfetch": "allow",
-    "write": "ask"
+    "write": "ask",
+    "doom_loop": "ask"
   },
   "mcp": {
     "kubernetes": {
@@ -79,6 +82,13 @@
       "headers": {
         "Authorization": "Basic b3BlbmNvZGU6VFVPZ0kzUFNIeU9MMXluaXdWVm1DYnc1VHZlNW1rNUtJZk9MRmV2anUwaDkwQXNTdkQydzFzS21kVDlH"
       }
+    },
+    "ijfw-memory": {
+      "type": "local",
+      "command": [
+        "node",
+        "/Users/daveri/.ijfw/mcp-server/src/server.js"
+      ]
     }
   },
   "plugin": [
@@ -117,6 +127,21 @@
         },
         "samuelfaj/Qwen3.6-35B-A3B-4bit-MTPLX-Optimized-Speed": {
           "name": "samuelfaj/Qwen3.6-35B-A3B-4bit-MTPLX-Optimized-Speed"
+        },
+        "lmstudio-community/Qwen3.6-27B-MLX-4bit": {
+          "name": "lmstudio-community/Qwen3.6-27B-MLX-4bit-dflash"
+        },
+        "gemma-4-26b-a4b-it-UD-MLX-4bit": {
+          "name": "gemma-4-26b-a4b-it-UD-MLX-4bit"
+        },
+        "Devstral-Small-2-24B-Instruct-2512-4bit": {
+          "name": "Devstral-Small-2-24B-Instruct-2512-4bit"
+        },
+        "Mistral-Small-3.2-24B-Instruct-2506-MLX-6bit": {
+          "name": "Mistral-Small-3.2-24B-Instruct-2506-MLX-6bit"
+        },
+        "nightmedia/Qwen3.6-35B-A3B-MTP-Holo3-Qwopus-mxfp4-mlx": {
+          "name": "nightmedia/Qwen3.6-35B-A3B-MTP-Holo3-Qwopus-mxfp4-mlx"
         }
       }
     },
@@ -131,15 +156,31 @@
         "qwen/qwen2.5-coder-14b": {
           "name": "qwen/qwen2.5-coder-14b"
         },
-        "mistralai/devstral-small-2-2512": {
-          "name": "mistralai/devstral-small-2-2512"
-        },
         "qwen/qwen3.6-35b-a3b": {
           "name": "qwen/qwen3.6-35b-a3b"
+        },
+        "google/gemma-4-26b-a4b-qat": {
+          "name": "google/gemma-4-26b-a4b-qat"
+        },
+        "qwopus3.6-35b-a3b-v1-mtp": {
+          "name": "qwopus3.6-35b-a3b-v1-mtp"
+        },
+        "qwopus3.6-35b-a3b-v1-apex-mtp": {
+          "name": "qwopus3.6-35b-a3b-v1-apex-mtp"
+        },
+        "gemma-4-31b-it": {
+          "name": "gemma-4-31b-it"
+        },
+        "glm-4.7-flash-reap-23b-a3b": {
+          "name": "glm-4.7-flash-reap-23b-a3b"
+        },
+        "gemma-4-26b-a4b-it-qat": {
+          "name": "unsloth/gemma-4-26b-a4b-it-qat"
         }
       }
     }
   },
+  "lsp": true,
   "compaction": {
     "auto": false,
     "prune": false

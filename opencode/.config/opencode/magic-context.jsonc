@@ -1,12 +1,22 @@
 {
   "$schema": "https://raw.githubusercontent.com/cortexkit/magic-context/master/assets/magic-context.schema.json",
   "historian": {
-    "provider": "omlx",
-    "model": "samuelfaj/Qwen3.6-35B-A3B-4bit-MTPLX-Optimized-Speed"
+    "provider": "local lmstudio",
+    "model": "local lmstudio/qwen2.5-coder-1.5b-instruct-mlx"
   },
   "dreamer": {
-    "provider": "omlx",
-    "model": "samuelfaj/Qwen3.6-35B-A3B-4bit-MTPLX-Optimized-Speed"
+    "provider": "local lmstudio",
+    "model": "local lmstudio/qwen2.5-coder-1.5b-instruct-mlx"
   },
-  "sidekick": {}
+  "sidekick": {
+    "enabled": true,
+    "maxHints": 3,              // Strict limit to prevent prompt bloating
+    "similarityThreshold": 0.75 // Only inject highly relevant data
+  },
+  "memory": {
+    "enabled": true,
+    // Embeddings should ideally remain bound to a static, stable provider
+    "local lmstudio"
+    "embeddingModel": "local lmstudio/bge-m3-mlx" 
+  }
 }
