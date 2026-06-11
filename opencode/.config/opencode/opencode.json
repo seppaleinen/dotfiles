@@ -80,7 +80,7 @@
       "enabled": true,
       "oauth": false,
       "headers": {
-        "Authorization": "Basic b3BlbmNvZGU6VFVPZ0kzUFNIeU9MMXluaXdWVm1DYnc1VHZlNW1rNUtJZk9MRmV2anUwaDkwQXNTdkQydzFzS21kVDlH"
+        "Authorization": ""
       }
     },
     "ijfw-memory": {
