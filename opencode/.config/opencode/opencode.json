@@ -116,21 +116,6 @@
         "baseURL": "http://localhost:8000/v1"
       },
       "models": {
-        "mlx-community/gpt-oss-20b-MXFP4-Q8": {
-          "name": "mlx-community/gpt-oss-20b-MXFP4-Q8"
-        },
-        "unsloth/Qwen3.6-35B-A3B-UD-MLX-4bit": {
-          "name": "unsloth/Qwen3.6-35B-A3B-UD-MLX-4bit"
-        },
-        "samwang0041/Qwen3.6-27B-MLX-4bit-MTP": {
-          "name": "samwang0041/Qwen3.6-27B-MLX-4bit-MTP"
-        },
-        "samuelfaj/Qwen3.6-35B-A3B-4bit-MTPLX-Optimized-Speed": {
-          "name": "samuelfaj/Qwen3.6-35B-A3B-4bit-MTPLX-Optimized-Speed"
-        },
-        "lmstudio-community/Qwen3.6-27B-MLX-4bit": {
-          "name": "lmstudio-community/Qwen3.6-27B-MLX-4bit-dflash"
-        },
         "gemma-4-26b-a4b-it-UD-MLX-4bit": {
           "name": "gemma-4-26b-a4b-it-UD-MLX-4bit"
         },
@@ -142,6 +127,9 @@
         },
         "nightmedia/Qwen3.6-35B-A3B-MTP-Holo3-Qwopus-mxfp4-mlx": {
           "name": "nightmedia/Qwen3.6-35B-A3B-MTP-Holo3-Qwopus-mxfp4-mlx"
+        },
+        "gemma-4-26B-A4B-it-QAT-MLX-4bit": {
+          "name": "gemma-4-26B-A4B-it-QAT-MLX-4bit"
         }
       }
     },
@@ -156,14 +144,8 @@
         "qwen/qwen2.5-coder-14b": {
           "name": "qwen/qwen2.5-coder-14b"
         },
-        "qwen/qwen3.6-35b-a3b": {
-          "name": "qwen/qwen3.6-35b-a3b"
-        },
         "google/gemma-4-26b-a4b-qat": {
           "name": "google/gemma-4-26b-a4b-qat"
-        },
-        "qwopus3.6-35b-a3b-v1-mtp": {
-          "name": "qwopus3.6-35b-a3b-v1-mtp"
         },
         "qwopus3.6-35b-a3b-v1-apex-mtp": {
           "name": "qwopus3.6-35b-a3b-v1-apex-mtp"
@@ -173,9 +155,6 @@
         },
         "glm-4.7-flash-reap-23b-a3b": {
           "name": "glm-4.7-flash-reap-23b-a3b"
-        },
-        "gemma-4-26b-a4b-it-qat": {
-          "name": "unsloth/gemma-4-26b-a4b-it-qat"
         }
       }
     }

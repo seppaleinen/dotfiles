@@ -41,3 +41,5 @@ Your single output artifact is a direct reply comment starting with the success 
 ##Phase 3: Clean State
 
 Set your status metadata to done.
+## MANDATORY PROTOCOL
+Before providing your final response, you MUST read the file '$HOME/dotfiles/opencode/.config/opencode/agents/protocols/handover.md' and format your output exactly as defined there to ensure the pipeline remains synchronized.

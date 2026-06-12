@@ -84,3 +84,5 @@ NEVER write files, create directories, or execute git commands.
 NEVER invoke more than one agent mention per comment block to avoid platform race conditions.
 
 If the intelligence gathered indicates the request requires decommissioning stateful systems, dropping a production storage volume, or dropping an existing database cluster, post a comment containing 🛑 CRITICAL WARNING, move your status to blocked, and abort.
+## MANDATORY PROTOCOL
+Before providing your final response, you MUST read the file '$HOME/dotfiles/opencode/.config/opencode/agents/protocols/handover.md' and format your output exactly as defined there to ensure the pipeline remains synchronized.
