@@ -80,7 +80,29 @@
       "enabled": true,
       "oauth": false,
       "headers": {
-        "Authorization": ""
+        "Authorization": "{env:K8S_TOKEN}"
+      }
+    },
+    "authentik": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "authentik-mcp",
+        "--base-url", "https://authentik.labb.site",
+        "--token", "{env:MCP_TOKEN}"
+      ]
+    },
+    "grafana": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "mcp-grafana",
+        "-t",
+        "stdio"
+      ],
+      "env": {
+        "GRAFANA_URL": "https://grafana.labb.site",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:MCP_TOKEN}"
       }
     },
     "ijfw-memory": {
