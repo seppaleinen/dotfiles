@@ -16,7 +16,7 @@
   "memory": {
     "enabled": true,
     // Embeddings should ideally remain bound to a static, stable provider
-    "local lmstudio"
+    "provider": "local lmstudio",
     "embeddingModel": "local lmstudio/bge-m3-mlx" 
   }
 }
