@@ -112,6 +112,10 @@
       "which*" : "allow",
       "mkdir*" : "allow",
       "*eslint*" : "allow",
+      "*python*" : "allow",
+      "uv*" : "allow",
+      "uuidgen*": "allow",
+      "pgrep*": "allow",
       "docker*" : "allow"
     },
     "doom_loop" : "ask",
