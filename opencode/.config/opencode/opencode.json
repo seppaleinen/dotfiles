@@ -1,189 +1,228 @@
 {
-  "$schema": "https://opencode.ai/config.json",
-  "mode": {},
-  "permission": {
-    "bash": {
-      "*": "ask",
-      "flux*": "ask",
-      "helm*": "ask",
-      "kubectl*": "ask",
-      "ls*": "allow",
-      "ll*": "allow",
-      "la*": "allow",
-      "cat*": "allow",
-      "tail*": "allow",
-      "head*": "allow",
-      "grep*": "allow",
-      "rg*": "allow",
-      "find*": "allow",
-      "echo*": "allow",
-      "pwd*": "allow",
-      "wc*": "allow",
-      "sort*": "allow",
-      "uniq*": "allow",
-      "diff*": "allow",
-      "which*": "allow",
-      "type*": "allow",
-      "env*": "allow",
-      "printenv*": "allow",
-      "date*": "allow",
-      "uname*": "allow",
-      "tree*": "allow",
-      "jq*": "allow",
-      "file*": "allow",
-      "stat*": "allow",
-      "du*": "allow",
-      "df*": "allow",
-      "ps*": "allow",
-      "whoami*": "allow",
-      "hostname*": "allow",
-      "id*": "allow",
-      "basename*": "allow",
-      "dirname*": "allow",
-      "realpath*": "allow",
-      "readlink*": "allow",
-      "cut*": "allow",
-      "tr*": "allow",
-      "awk*": "allow",
-      "sed*": "allow",
-      "xargs*": "allow",
-      "git log*": "allow",
-      "git status*": "allow",
-      "git diff*": "allow",
-      "git show*": "allow",
-      "git branch*": "allow",
-      "git remote*": "allow",
-      "git fetch*": "allow",
-      "git stash list*": "allow",
-      "flux check*": "allow",
-      "flux diff*": "allow",
-      "flux events*": "allow",
-      "flux get*": "allow",
-      "flux logs*": "allow",
-      "flux reconcile*": "allow",
-      "flux version*": "allow",
-      "flux-local*": "allow",
-      "source .venv/bin/activate": "allow",
-      "pnpm*": "allow",
-      "turbo*": "allow"
-    },
-    "edit": "allow",
-    "read": "allow",
-    "webfetch": "allow",
-    "write": "ask",
-    "doom_loop": "ask"
+  "$schema" : "https:\/\/opencode.ai\/config.json",
+  "compaction" : {
+    "auto" : false,
+    "prune" : false
   },
-  "mcp": {
-    "kubernetes": {
-      "type": "remote",
-      "url": "https://mcp.labb.site/k8s/mcp",
-      "enabled": true,
-      "oauth": false,
-      "headers": {
-        "Authorization": "{env:K8S_TOKEN}"
-      }
-    },
-    "authentik": {
-      "type": "local",
-      "command": [
+  "lsp" : true,
+  "mcp" : {
+    "authentik" : {
+      "command" : [
         "uvx",
         "authentik-mcp",
-        "--base-url", "https://authentik.labb.site",
-        "--token", "{env:MCP_TOKEN}"
-      ]
+        "--base-url",
+        "https:\/\/authentik.labb.site",
+        "--token",
+        "{env:MCP_TOKEN}"
+      ],
+      "type" : "local"
     },
-    "grafana": {
-      "type": "local",
-      "command": [
+    "grafana" : {
+      "command" : [
         "uvx",
         "mcp-grafana",
         "-t",
         "stdio"
       ],
-      "env": {
-        "GRAFANA_URL": "https://grafana.labb.site",
-        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:MCP_TOKEN}"
-      }
+      "env" : {
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN" : "{env:MCP_TOKEN}",
+        "GRAFANA_URL" : "https:\/\/grafana.labb.site"
+      },
+      "type" : "local"
     },
-    "ijfw-memory": {
-      "type": "local",
-      "command": [
+    "ijfw-memory" : {
+      "command" : [
         "node",
-        "/Users/daveri/.ijfw/mcp-server/src/server.js"
-      ]
+        "\/Users\/daveri\/.ijfw\/mcp-server\/src\/server.js"
+      ],
+      "type" : "local"
+    },
+    "kubernetes" : {
+      "enabled" : true,
+      "headers" : {
+        "Authorization" : "{env:K8S_TOKEN}"
+      },
+      "oauth" : false,
+      "type" : "remote",
+      "url" : "https:\/\/mcp.labb.site\/k8s\/mcp"
     }
   },
-  "plugin": [
-    "@cortexkit/opencode-magic-context@latest",
+  "mode" : {
+
+  },
+  "model" : "mtplx\/wang-yang-ornith-1-0-35b-mtplx",
+  "permission" : {
+    "bash" : {
+      "*" : "ask",
+      "awk*" : "allow",
+      "basename*" : "allow",
+      "cat*" : "allow",
+      "cut*" : "allow",
+      "date*" : "allow",
+      "df*" : "allow",
+      "diff*" : "allow",
+      "dirname*" : "allow",
+      "du*" : "allow",
+      "echo*" : "allow",
+      "env*" : "allow",
+      "file*" : "allow",
+      "find*" : "allow",
+      "flux*" : "ask",
+      "flux-local*" : "allow",
+      "gh*" : "allow",
+      "git*" : "allow",
+      "grep*" : "allow",
+      "head*" : "allow",
+      "helm*" : "ask",
+      "hostname*" : "allow",
+      "id*" : "allow",
+      "jq*" : "allow",
+      "kubectl apply*" : "ask",
+      "kubectl delete*" : "ask",
+      "kubectl drain*" : "ask",
+      "kubectl edit*" : "ask",
+      "kubectl patch*" : "ask",
+      "kubectl*" : "allow",
+      "la*" : "allow",
+      "ll*" : "allow",
+      "ls*" : "allow",
+      "pnpm*" : "allow",
+      "printenv*" : "allow",
+      "ps*" : "allow",
+      "pwd*" : "allow",
+      "readlink*" : "allow",
+      "realpath*" : "allow",
+      "rg*" : "allow",
+      "sed*" : "allow",
+      "sort*" : "allow",
+      "source .venv\/bin\/activate" : "allow",
+      "stat*" : "allow",
+      "tail*" : "allow",
+      "tr*" : "allow",
+      "tree*" : "allow",
+      "turbo*" : "allow",
+      "type*" : "allow",
+      "uname*" : "allow",
+      "uniq*" : "allow",
+      "wc*" : "allow",
+      "which*" : "allow",
+      "whoami*" : "allow",
+      "xargs*" : "allow",
+      "act*" : "allow",
+      "which*" : "allow",
+      "mkdir*" : "allow",
+      "*eslint*" : "allow",
+      "docker*" : "allow"
+    },
+    "doom_loop" : "ask",
+    "edit" : "allow",
+    "read" : "allow",
+    "webfetch" : "allow",
+    "write" : "ask"
+  },
+  "plugin" : [
+    "@cortexkit\/opencode-magic-context@latest",
     "opencode-agent-tmux"
   ],
-  "provider": {
-    "litellm": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "LiteLLM Proxy",
-      "options": {
-        "baseURL": "https://litellm.labb.site/v1",
-        "apiKey": "sk-dummy-key-for-local"
-      },
-      "models": {
-        "qwen/qwen3.6-35b-a3b": {
-          "name": "qwen/qwen3.6-35b-a3b"
+  "provider" : {
+    "litellm" : {
+      "models" : {
+        "qwen\/qwen3.6-35b-a3b" : {
+          "name" : "qwen\/qwen3.6-35b-a3b"
         }
+      },
+      "name" : "LiteLLM Proxy",
+      "npm" : "@ai-sdk\/openai-compatible",
+      "options" : {
+        "apiKey" : "sk-dummy-key-for-local",
+        "baseURL" : "https:\/\/litellm.labb.site\/v1"
       }
     },
-    "oMLX": {
-      "name": "oMLX",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "baseURL": "http://localhost:8000/v1"
-      },
-      "models": {
-        "gemma-4-26b-a4b-it-UD-MLX-4bit": {
-          "name": "gemma-4-26b-a4b-it-UD-MLX-4bit"
+    "local lmstudio" : {
+      "models" : {
+        "diffusiongemma-26b-a4b-it" : {
+          "name" : "diffusiongemma-26b-a4b-it"
         },
-        "Devstral-Small-2-24B-Instruct-2512-4bit": {
-          "name": "Devstral-Small-2-24B-Instruct-2512-4bit"
+        "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-tau2" : {
+          "name" : "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-tau2"
         },
-        "Mistral-Small-3.2-24B-Instruct-2506-MLX-6bit": {
-          "name": "Mistral-Small-3.2-24B-Instruct-2506-MLX-6bit"
+        "gemma-4-31b-it" : {
+          "name" : "gemma-4-31b-it"
         },
-        "nightmedia/Qwen3.6-35B-A3B-MTP-Holo3-Qwopus-mxfp4-mlx": {
-          "name": "nightmedia/Qwen3.6-35B-A3B-MTP-Holo3-Qwopus-mxfp4-mlx"
+        "glm-4.7-flash-reap-23b-a3b" : {
+          "name" : "glm-4.7-flash-reap-23b-a3b"
         },
-        "gemma-4-26B-A4B-it-QAT-MLX-4bit": {
-          "name": "gemma-4-26B-A4B-it-QAT-MLX-4bit"
+        "google\/gemma-4-26b-a4b-qat" : {
+          "name" : "google\/gemma-4-26b-a4b-qat"
+        },
+        "ornith-1.0-35b" : {
+          "name" : "ornith-1.0-35b"
+        },
+        "ornith-1.0-35b-mlx" : {
+          "name" : "ornith-1.0-35b-mlx"
+        },
+        "qwable-3.6-35b" : {
+          "name" : "qwable-3.6-35b"
+        },
+        "qwen\/qwen2.5-coder-14b" : {
+          "name" : "qwen\/qwen2.5-coder-14b"
+        },
+        "qwopus3.6-35b-a3b-v1-apex-mtp" : {
+          "name" : "qwopus3.6-35b-a3b-v1-apex-mtp"
         }
+      },
+      "name" : "LM Studio",
+      "npm" : "@ai-sdk\/openai-compatible",
+      "options" : {
+        "apiKey" : "not-needed",
+        "baseURL" : "http:\/\/localhost:1234\/v1"
       }
     },
-    "local lmstudio": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "LM Studio",
-      "options": {
-        "baseURL": "http://localhost:1234/v1",
-        "apiKey": "not-needed"
-      },
-      "models": {
-        "qwen/qwen2.5-coder-14b": {
-          "name": "qwen/qwen2.5-coder-14b"
-        },
-        "google/gemma-4-26b-a4b-qat": {
-          "name": "google/gemma-4-26b-a4b-qat"
-        },
-        "qwopus3.6-35b-a3b-v1-apex-mtp": {
-          "name": "qwopus3.6-35b-a3b-v1-apex-mtp"
-        },
-        "gemma-4-31b-it": {
-          "name": "gemma-4-31b-it"
-        },
-        "glm-4.7-flash-reap-23b-a3b": {
-          "name": "glm-4.7-flash-reap-23b-a3b"
+    "mtplx" : {
+      "models" : {
+        "wang-yang-ornith-1-0-35b-mtplx" : {
+          "limit" : {
+            "context" : 262144,
+            "output" : 262144
+          },
+          "modalities" : {
+            "input" : [
+              "text"
+            ],
+            "output" : [
+              "text"
+            ]
+          },
+          "name" : "MTPLX wang-yang-ornith-1-0-35b-mtplx",
+          "reasoning" : false,
+          "temperature" : false,
+          "tool_call" : true
         }
+      },
+      "name" : "MTPLX (local)",
+      "npm" : "@ai-sdk\/openai-compatible",
+      "options" : {
+        "baseURL" : "http:\/\/127.0.0.1:8000\/v1",
+        "chunkTimeout" : 900000,
+        "headers" : {
+          "x-mtplx-client" : "opencode"
+        },
+        "timeout" : false
+      }
+    },
+    "unsloth" : {
+      "models" : {
+        "diffusiongemma-26B-A4B-it-GGUF" : {
+          "name" : "diffusiongemma-26B-A4B-it-GGUF"
+        }
+      },
+      "name" : "unsloth",
+      "npm" : "@ai-sdk\/openai-compatible",
+      "options" : {
+        "apiKey" : "not-needed",
+        "baseURL" : "http:\/\/localhost:8888\/v1"
       }
     }
   },
-  "lsp": true,
-  "compaction": {
-    "auto": false,
-    "prune": false
-  }
+  "small_model" : "mtplx\/wang-yang-ornith-1-0-35b-mtplx"
 }

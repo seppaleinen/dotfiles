@@ -2,21 +2,21 @@
   "$schema": "https://raw.githubusercontent.com/cortexkit/magic-context/master/assets/magic-context.schema.json",
   "historian": {
     "provider": "local lmstudio",
-    "model": "local lmstudio/qwen2.5-coder-1.5b-instruct-mlx"
+    "model": "local lmstudio/google/gemma-4-26b-a4b-qat"
   },
   "dreamer": {
     "provider": "local lmstudio",
-    "model": "local lmstudio/qwen2.5-coder-1.5b-instruct-mlx"
+    "model": "local lmstudio/google/gemma-4-26b-a4b-qat"
   },
   "sidekick": {
-    "enabled": true,
-    "maxHints": 3,              // Strict limit to prevent prompt bloating
-    "similarityThreshold": 0.75 // Only inject highly relevant data
+    "maxHints": 3, // Strict limit to prevent prompt bloating
+    "similarityThreshold": 0.75, // Only inject highly relevant data
+    "model": "local lmstudio/google/gemma-4-26b-a4b-qat"
   },
   "memory": {
     "enabled": true,
     // Embeddings should ideally remain bound to a static, stable provider
     "provider": "local lmstudio",
-    "embeddingModel": "local lmstudio/bge-m3-mlx" 
+    "embeddingModel": "local lmstudio/mlx-community/bge-m3-mlx"
   }
 }
