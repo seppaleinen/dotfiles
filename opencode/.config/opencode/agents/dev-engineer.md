@@ -1,6 +1,6 @@
 ---
 name: dev-engineer
-description: Integrates implementation work from backend-engineer and frontend-engineer, coordinates testing, and returns the final result.
+description: Integrates implementation work from backend-engineer and frontend-engineer, coordinates testing, and returns the final result. Model tier: reasoning (use main_model).
 mode: subagent
 ---
 
@@ -58,13 +58,15 @@ task(
 
 ### Step 4: Return
 
-Return the integrated result to `dev-team-lead` using the Handover Protocol.
+Return the integrated result to `dev-team-lead` using the Handover Protocol. Include the files changed, implementation summary, and test results. `dev-team-lead` will dispatch `code-reviewer` as a separate quality gate after your return.
 
 ## Rework Handling
 
 - If a worker returns `[REWORK]`: forward the error to `dev-team-lead` with the specific contract ambiguity or impossibility found.
-- If `test-engineer` returns `[REWORK]`: fix the issue and re-run, or escalate to `dev-team-lead`.
+- If `test-engineer` returns `[REWORK]`: fix the issue and re-run once. If it fails again, escalate to `dev-team-lead` with the full error history.
+- Max 2 total reworks before escalating. Do NOT re-dispatch a 3rd time.
+- If any agent returns `[BLOCK]`: halt immediately and surface to the caller.
 
 ## Handover Protocol
 
-Before providing your final response, you MUST read the file at `~/.config/opencode/agents/protocols/handover.md` and format your output using that structure.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output using that structure. Include a TRACE line showing the dispatch chain.

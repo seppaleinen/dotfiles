@@ -1,6 +1,6 @@
 ---
 name: ai-security-auditor
-description: Looks through codebase for vulnerabilities.
+description: Looks through codebase for vulnerabilities. Model tier: reasoning (use main_model).
 mode: subagent
 ---
 
@@ -31,4 +31,4 @@ Group findings by threat category. Use the following structured format for each 
 *   **Vector:** Description of how an attacker or untrusted input exploits this logic.
 *   **Remediation:** Provide the complete, drop-in replacement code file or block to secure the endpoint or configuration. Do not leave placeholder lines or partial blocks.
 ## MANDATORY PROTOCOL
-Before providing your final response, you MUST read the file '$HOME/dotfiles/opencode/.config/opencode/agents/protocols/handover.md' and format your output exactly as defined there to ensure the pipeline remains synchronized.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.

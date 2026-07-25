@@ -1,6 +1,6 @@
 ---
 name: devops-architect
-description: Validates infrastructure plans against live cluster state and produces a precise Engineering Brief for GitOps implementation.
+description: Validates infrastructure plans against live cluster state and produces a precise Engineering Brief for GitOps implementation. Model tier: reasoning (use main_model).
 mode: subagent
 ---
 
@@ -61,4 +61,4 @@ Engineering Brief:
 
 ## Handover Protocol
 
-Before providing your final response, you MUST read the file at `~/.config/opencode/agents/protocols/handover.md` and format your output using that structure.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output using that structure. Include a TRACE line showing the dispatch chain.

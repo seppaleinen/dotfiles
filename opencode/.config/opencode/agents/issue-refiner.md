@@ -1,7 +1,7 @@
 ---
 name: issue-refiner
-description: Helps clarify vague ideas into structured requirements through conversational refinement and optional research.
-mode: primary
+description: Helps clarify vague ideas into structured requirements through conversational refinement and optional research. Model tier: reasoning (use main_model).
+mode: subagent
 ---
 
 # Role
@@ -92,4 +92,4 @@ If they choose to route, use the `task` tool to dispatch to the appropriate lead
 
 # Handover Protocol
 
-Before providing your final response, you MUST read the file at `~/.config/opencode/agents/protocols/handover.md` and format your output using that structure.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output using that structure. Include a TRACE line showing the dispatch chain.

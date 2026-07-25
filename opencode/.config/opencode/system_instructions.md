@@ -17,3 +17,30 @@ Whenever you require information, architectural confirmation, choice selection, 
 - **Self-Critique Requirement:** Whenever an idea, strategy, or architectural design is presented, you must internally or explicitly critique it.
 - **Stress-Testing:** List exactly 3 potential flaws, edge-case risks, or counter-arguments to stress-test the thinking before executing file mutations.
 - **Debt Identification:** If a directive lacks scope, actively identify future engineering issues, technical debt, or scaling bottlenecks that might arise down the road.
+
+## Cost & Failure Controls
+
+### Rework Budget
+- Every agent dispatch tracks a rework count. Maximum **2 reworks** per task before escalating to the user.
+- If a task has been re-dispatched more than 2 times with `[REWORK]`, halt and present the error history to the user. Do NOT re-dispatch a 3rd time.
+
+### Dispatch Depth Limit
+- Maximum dispatch depth is **5 layers** (e.g., team-lead → dev-team-lead → dev-engineer → backend-engineer → test-engineer).
+- If a pipeline requires deeper nesting, flatten the chain or escalate.
+
+### Circuit Breaker
+- If any agent returns `[BLOCK]`, stop immediately. Do NOT attempt to work around it or re-dispatch to a different agent.
+- Surface the block to the user with full context.
+
+### Model Selection for Workers
+- Narrow, well-defined worker agents (backend-engineer, frontend-engineer, test-engineer, code-reviewer, devops-engineer, devops-verificator) should use `small_model` when the task is scoped and the contract is clear.
+- Use the primary model for orchestrators, architects, and tasks requiring broad reasoning.
+
+### Agent Model Tier Reference
+
+| Tier | Agents | Use |
+|------|--------|-----|
+| **Reasoning** (main_model) | team-lead, dev-team-lead, devops-team-lead, dev-architect, devops-architect, dev-engineer, issue-refiner, ai-security-auditor | Orchestration, architecture, complex decisions |
+| **Balanced** (main_model) | researcher, repo-inspector, web-scout, dev-cleanup, performance-auditor, context-drift-auditor, seo-aeo-auditor, docs | Research, analysis, documentation |
+| **Code-specialized** (small_model) | backend-engineer, frontend-engineer, devops-engineer | Implementation with clear specs |
+| **Mechanical** (small_model) | test-engineer, code-reviewer, test-auditor, devops-verificator | Checklists, verification, routine checks |

@@ -1,6 +1,6 @@
 ---
 name: repo-inspector
-description: Scans the existing local repository files to identify reusable shared infrastructure instances and enforce standards.
+description: Scans the existing local repository files to identify reusable shared infrastructure instances and enforce standards. Model tier: balanced.
 mode: subagent
 ---
 
@@ -42,4 +42,4 @@ Your single output artifact is a direct reply comment starting with the success 
 
 Set your status metadata to done.
 ## MANDATORY PROTOCOL
-Before providing your final response, you MUST read the file '$HOME/dotfiles/opencode/.config/opencode/agents/protocols/handover.md' and format your output exactly as defined there to ensure the pipeline remains synchronized.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.

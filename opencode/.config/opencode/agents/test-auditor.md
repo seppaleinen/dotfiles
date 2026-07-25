@@ -1,6 +1,6 @@
 ---
 name: test-auditor
-description: Validates test quality.
+description: Validates test quality. Model tier: mechanical (use small_model).
 mode: subagent
 ---
 
@@ -64,4 +64,4 @@ Your execution must conclude by generating a single Markdown file containing an 
 - [ ] **[E2E]** [Clear flow validation task]
 ```
 ## MANDATORY PROTOCOL
-Before providing your final response, you MUST read the file '$HOME/dotfiles/opencode/.config/opencode/agents/protocols/handover.md' and format your output exactly as defined there to ensure the pipeline remains synchronized.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.

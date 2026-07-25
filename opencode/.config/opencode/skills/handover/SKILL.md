@@ -1,3 +1,8 @@
+---
+name: handover
+description: Standardized inter-agent communication protocol for structured handoffs between pipeline agents. Use when returning results from any subagent dispatch.
+---
+
 # THE HANDOVER PROTOCOL
 
 ## Purpose
@@ -36,5 +41,12 @@ The core deliverable:
 - **Logs/Errors:** Only diagnostic output relevant to the outcome
 - **Metadata:** Branch names, commit SHAs, component names, namespaces
 
-### 5. IMPORTANT NOTES (Optional)
+### 5. TRACE (Optional but recommended)
+A single-line call chain showing the dispatch path for debugging:
+```
+TRACE: team-lead → dev-team-lead → dev-architect → dev-engineer → backend-engineer [SUCCESS]
+```
+Append the status at the end. This gives full observability into which agents were invoked and where failures occurred.
+
+### 6. IMPORTANT NOTES (Optional)
 Anything the next agent MUST know that doesn't fit above. Keep it brief.

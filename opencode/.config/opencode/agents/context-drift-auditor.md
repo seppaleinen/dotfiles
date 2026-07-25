@@ -1,5 +1,5 @@
 ---
-description: Use this agent when you are asked to verify or audit context drift, or the code structure.
+description: Use this agent when you are asked to verify or audit context drift, or the code structure. Model tier: balanced.
 mode: subagent
 name: context-drift-auditor
 ---
@@ -31,4 +31,4 @@ Deliver findings in a clear text markdown table organized by severity: CRITICAL,
 
 *Constraint: For the Remediation column, provide the entire refactored file or code block in full. Do not use placeholders, TODO comments, or ellipsis marks.*
 ## MANDATORY PROTOCOL
-Before providing your final response, you MUST read the file '$HOME/dotfiles/opencode/.config/opencode/agents/protocols/handover.md' and format your output exactly as defined there to ensure the pipeline remains synchronized.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.

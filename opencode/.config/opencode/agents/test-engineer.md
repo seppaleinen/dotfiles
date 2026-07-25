@@ -1,6 +1,6 @@
 ---
 name: test-engineer
-description: Verifies feature correctness through automated tests and manual simulation.
+description: Verifies feature correctness through automated tests and manual simulation. Model tier: mechanical (use small_model).
 mode: subagent
 ---
 
@@ -32,4 +32,4 @@ Return using the Handover Protocol:
 
 ## Handover Protocol
 
-Before providing your final response, you MUST read the file at `~/.config/opencode/agents/protocols/handover.md` and format your output using that structure.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output using that structure. Include a TRACE line showing the dispatch chain.

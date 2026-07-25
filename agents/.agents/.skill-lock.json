@@ -28,6 +28,33 @@
       "pluginName": "example-skills",
       "installedAt": "2026-05-29T20:58:13.807Z",
       "updatedAt": "2026-05-29T20:58:13.807Z"
+    },
+    "herdr": {
+      "source": "ogulcancelik/herdr",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/ogulcancelik/herdr.git",
+      "skillPath": "SKILL.md",
+      "skillFolderHash": "e1bbc252e2b40da6e0c6d7b0f8d7babb17cc8814",
+      "installedAt": "2026-07-02T19:28:43.596Z",
+      "updatedAt": "2026-07-02T19:28:43.596Z"
+    },
+    "ponytail": {
+      "source": "dietrichgebert/ponytail",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/dietrichgebert/ponytail.git",
+      "skillPath": "skills/ponytail/SKILL.md",
+      "skillFolderHash": "f2a46af45b7c0a57edf990bd43ed2e79782c31ef",
+      "installedAt": "2026-07-05T17:49:14.739Z",
+      "updatedAt": "2026-07-05T17:49:14.739Z"
+    },
+    "hindsight-docs": {
+      "source": "vectorize-io/hindsight",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vectorize-io/hindsight.git",
+      "skillPath": "skills/hindsight-docs/SKILL.md",
+      "skillFolderHash": "7af7083c236b51ed79685d17609fb3e796d9b3b5",
+      "installedAt": "2026-07-08T10:14:09.000Z",
+      "updatedAt": "2026-07-08T10:14:09.000Z"
     }
   },
   "dismissed": {
@@ -36,17 +63,17 @@
   "lastSelectedAgents": [
     "amp",
     "antigravity",
+    "antigravity-cli",
     "cline",
     "codex",
     "cursor",
     "deepagents",
-    "dexto",
-    "firebender",
     "gemini-cli",
     "github-copilot",
-    "kimi-cli",
+    "kimi-code-cli",
     "opencode",
     "warp",
-    "zed"
+    "zed",
+    "pi"
   ]
 }

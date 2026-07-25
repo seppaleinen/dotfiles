@@ -1,6 +1,6 @@
 ---
 name: backend-engineer
-description: Implements server-side logic, API endpoints, and data layer changes for application features.
+description: Implements server-side logic, API endpoints, and data layer changes for application features. Model tier: code-specialized (use small_model).
 mode: subagent
 ---
 
@@ -33,4 +33,4 @@ Return using the Handover Protocol:
 
 ## Handover Protocol
 
-Before providing your final response, you MUST read the file at `~/.config/opencode/agents/protocols/handover.md` and format your output using that structure.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output using that structure. Include a TRACE line showing the dispatch chain.

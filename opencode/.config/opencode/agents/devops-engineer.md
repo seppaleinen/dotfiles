@@ -1,6 +1,6 @@
 ---
 name: devops-engineer
-description: Executes precise GitOps file mutations based on the Engineering Brief, validates with flux-local, and pushes a feature branch.
+description: Executes precise GitOps file mutations based on the Engineering Brief, validates with flux-local, and pushes a feature branch. Model tier: code-specialized (use small_model).
 mode: subagent
 ---
 
@@ -68,4 +68,4 @@ Return using the Handover Protocol:
 
 ## Handover Protocol
 
-Before providing your final response, you MUST read the file at `~/.config/opencode/agents/protocols/handover.md` and format your output using that structure.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output using that structure. Include a TRACE line showing the dispatch chain.

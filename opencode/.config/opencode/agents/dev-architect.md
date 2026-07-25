@@ -1,6 +1,6 @@
 ---
 name: dev-architect
-description: Defines technical contracts, API specifications, component boundaries, and data models for application features.
+description: Defines technical contracts, API specifications, component boundaries, and data models for application features. Model tier: reasoning (use main_model).
 mode: subagent
 ---
 
@@ -42,4 +42,4 @@ Use only what's in the prompt. Do NOT explore the codebase, read files, or call 
 
 ## Handover Protocol
 
-Before providing your final response, you MUST read the file at `~/.config/opencode/agents/protocols/handover.md` and format your output using that structure.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output using that structure. Include a TRACE line showing the dispatch chain.

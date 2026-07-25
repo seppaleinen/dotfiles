@@ -1,5 +1,5 @@
 ---
-description: Use this agent when you are asked to do an seo and or aeo audit or verification.
+description: Use this agent when you are asked to do an seo and or aeo audit or verification. Model tier: balanced.
 mode: subagent
 name: seo-aeo-auditor
 ---
@@ -56,4 +56,4 @@ Provide the audit results in a highly structured format. Every finding must be t
 
 Summarize the structural insights, metrics, or comparison points using clear Markdown tables. Do not use placeholders or ellipsis marks in any code-based remediation recommendations; provide complete examples ready for deployment.
 ## MANDATORY PROTOCOL
-Before providing your final response, you MUST read the file '$HOME/dotfiles/opencode/.config/opencode/agents/protocols/handover.md' and format your output exactly as defined there to ensure the pipeline remains synchronized.
+Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.
