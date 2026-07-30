@@ -1,0 +1,35 @@
+{
+  "servers": {
+    "hindsight": {
+      "url": "https://hindsight.labb.site/v1/default/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:HINDSIGHT_API_TOKEN}",
+        "X-Bank-Id": "auto"
+      },
+      "shared": true,
+      "type": "remote"
+    },
+    "authentik": {
+      "command": "uvx",
+      "args": ["authentik-mcp", "--base-url", "https://authentik.labb.site", "--token", "${env:MCP_TOKEN}"],
+      "shared": true
+    },
+    "grafana": {
+      "command": "uvx",
+      "args": ["mcp-grafana", "-t", "stdio"],
+      "env": {
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "${env:MCP_TOKEN}",
+        "GRAFANA_URL": "https://grafana.labb.site"
+      },
+      "shared": true
+    },
+"kubernetes": {
+      "url": "https://mcp.labb.site/k8s/mcp",
+      "headers": {
+        "Authorization": "${env:K8S_TOKEN}"
+      },
+      "type": "remote",
+      "shared": true
+    }
+  }
+}

@@ -1,0 +1,197 @@
+OLLAMA_HOST: http://ollama.labb.site
+OLLAMA_TIMEOUT: '20'
+extensions:
+  developer:
+    enabled: true
+    type: builtin
+    name: developer
+    description: Write and edit files, and execute shell commands
+    display_name: Developer
+    timeout: null
+    bundled: true
+  todo:
+    enabled: true
+    type: platform
+    name: todo
+    description: Enable a todo list for goose so it can keep track of what it is doing
+    display_name: Todo
+    bundled: true
+  extensionmanager:
+    enabled: true
+    type: platform
+    name: Extension Manager
+    description: Enable extension management tools for discovering, enabling, and disabling extensions
+    display_name: Extension Manager
+    bundled: true
+  chatrecall:
+    enabled: true
+    type: platform
+    name: chatrecall
+    description: Search past conversations and load session summaries for contextual memory
+    display_name: Chat Recall
+    bundled: true
+  computercontroller:
+    enabled: false
+    type: builtin
+    name: computercontroller
+    description: General computer control tools that don't require you to be a developer or engineer.
+    display_name: Computer Controller
+    timeout: 300
+    bundled: true
+    available_tools: []
+  autovisualiser:
+    enabled: false
+    type: builtin
+    name: autovisualiser
+    description: Data visualization and UI generation tools
+    display_name: Auto Visualiser
+    timeout: 300
+    bundled: true
+    available_tools: []
+  memory:
+    enabled: true
+    type: builtin
+    name: memory
+    description: Teach goose your preferences as you go.
+    display_name: Memory
+    timeout: 300
+    bundled: true
+    available_tools: []
+  tutorial:
+    enabled: false
+    type: builtin
+    name: tutorial
+    description: Access interactive tutorials and guides
+    display_name: Tutorial
+    timeout: 300
+    bundled: true
+    available_tools: []
+  github:
+    enabled: false
+    type: streamable_http
+    name: GitHub
+    description: GitHub repository management and operations
+    uri: https://api.githubcopilot.com/mcp/
+    envs: {}
+    env_keys: []
+    headers:
+      Authorization: Bearer <YOUR_GITHUB_PERSONAL_ACCESS_TOKEN>
+    timeout: 300
+    bundled: null
+    available_tools: []
+  summarize:
+    enabled: false
+    type: platform
+    name: summarize
+    description: Load files/directories and get an LLM summary in a single call
+    display_name: Summarize
+    bundled: true
+  orchestrator:
+    enabled: false
+    type: platform
+    name: orchestrator
+    description: 'Manage agent sessions: list, view, start, send messages, interrupt, and stop agents'
+    display_name: Orchestrator
+    bundled: true
+  summon:
+    enabled: true
+    type: platform
+    name: summon
+    description: Load knowledge and delegate tasks to subagents
+    display_name: Summon
+    bundled: true
+  analyze:
+    enabled: true
+    type: platform
+    name: analyze
+    description: 'Analyze code structure with tree-sitter: directory overviews, file details, symbol call graphs'
+    display_name: Analyze
+    bundled: true
+  apps:
+    enabled: true
+    type: platform
+    name: apps
+    description: Create and manage custom Goose apps through chat. Apps are HTML/CSS/JavaScript and run in sandboxed windows.
+    display_name: Apps
+    bundled: true
+  tom:
+    enabled: true
+    type: platform
+    name: tom
+    description: Inject custom context into every turn via GOOSE_MOIM_MESSAGE_TEXT and GOOSE_MOIM_MESSAGE_FILE environment variables
+    display_name: Top Of Mind
+    bundled: true
+  skills:
+    enabled: true
+    type: platform
+    name: skills
+    description: Discover and provide skill instructions from filesystem and builtins
+    display_name: Skills
+    bundled: true
+  code_execution:
+    enabled: false
+    type: platform
+    name: code_execution
+    description: Goose will make extension calls through code execution, saving tokens
+    display_name: Code Mode
+    bundled: true
+
+  # ---- Custom MCP servers ----
+
+  hindsight:
+    enabled: true
+    type: remote
+    name: hindsight
+    description: Cross-session memory via Hindsight
+    url: "https://hindsight.labb.site/v1/default/mcp"
+    headers:
+      Authorization: "Bearer ${env:HINDSIGHT_API_TOKEN}"
+    timeout: 300
+  authentik:
+    enabled: true
+    type: stdio
+    name: authentik
+    description: Authentik identity provider management
+    cmd: uvx
+    args: ["authentik-mcp", "--base-url", "https://authentik.labb.site", "--token", "$MCP_TOKEN"]
+    timeout: 300
+  grafana:
+    enabled: true
+    type: stdio
+    name: grafana
+    description: Grafana observability platform
+    cmd: uvx
+    args: ["mcp-grafana", "-t", "stdio"]
+    envs:
+      GRAFANA_SERVICE_ACCOUNT_TOKEN: "$MCP_TOKEN"
+      GRAFANA_URL: "https://grafana.labb.site"
+    timeout: 300
+kubernetes:
+    enabled: true
+    type: remote
+    name: kubernetes
+    description: Kubernetes cluster management
+    url: "https://mcp.labb.site/k8s/mcp"
+    headers:
+      Authorization: "$K8S_TOKEN"
+    timeout: 300
+GOOSE_ENABLE_ROUTER: 'true'
+GOOSE_MODE: auto
+providers:
+  ollama:
+    enabled: true
+    model: mistral-nemo:12b
+    configured: true
+  lmstudio:
+    enabled: true
+    model: qwen3.6-14b-a3b-fablevibes
+    configured: true
+  litellm:
+    enabled: true
+    model: qwen3.6-35b-a3b-mtp
+    host: https://litellm.labb.site
+    api_key_env: MCP_TOKEN
+    configured: true
+active_provider: lmstudio
+LMSTUDIO_HOST: http://localhost:1234
+GOOSE_TELEMETRY_ENABLED: false
