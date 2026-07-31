@@ -9,6 +9,10 @@
     "authentik" : {
       "command" : [
         "uvx",
+        "--from",
+        "authentik-mcp",
+        "--with",
+        "mcp<2.0",
         "authentik-mcp",
         "--base-url",
         "https:\/\/authentik.labb.site",
