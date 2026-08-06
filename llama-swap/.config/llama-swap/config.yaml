@@ -1,0 +1,52 @@
+globalTTL: 300
+sendLoadingState: true
+healthCheckTimeout: 180
+startPort: 5800
+macros:
+  "models_dir": "/home/seppa/models"
+  "default_flags": >-
+    --cache-type-k q8_0
+    --cache-type-v q8_0
+  "reasoning": >-
+
+models:
+  gemma-4-26b:
+    cmd: >-
+      llama-server --port ${PORT} -m ${models_dir}/gemma-4-26B/gemma-4-26B_q4_0-it.gguf
+      --model-draft ${models_dir}/gemma-4-26B/mtp-gemma-4-26B-A4B-it.gguf --spec-type draft-mtp --spec-draft-n-max 2
+      -c 65536 ${default_flags}
+      --parallel 1 --jinja ${reasoning}
+
+  gemma-4-31b:
+    cmd: >-
+      llama-server --port ${PORT}
+      -m ${models_dir}/gemma-4-31B/gemma-4-31B-it-qat-UD-Q4_K_XL.gguf
+      --model-draft ${models_dir}/gemma-4-31B/mtp-gemma-4-31B-it.gguf --spec-type draft-mtp --spec-draft-n-max 2
+      -c 65536 ${default_flags}
+      --parallel 1 --jinja ${reasoning} --flash-attn on
+
+  qwen3.6-27b:
+    cmd: >-
+      llama-server --port ${PORT} -m ${models_dir}/qwen3.6-27b/Qwen3.6-27B-UD-Q4_K_XL.gguf
+      --spec-type draft-mtp --spec-draft-n-max 2 --spec-draft-p-min 0.75
+      -c 65536 --cache-type-k q8_0 --cache-type-v q8_0
+      --flash-attn on --parallel 1 --jinja ${default_flags}
+
+  qwen3.6-35b:
+    cmd: llama-server --port ${PORT} -m ${models_dir}/qwen3.6-35b/Qwen3.6-35B-A3B-UD-Q4_K_M.gguf
+      --spec-type draft-mtp --spec-draft-n-max 2 --spec-draft-p-min 0.75
+      -c 65536 --cache-type-k q8_0 --cache-type-v q8_0
+      --flash-attn on --parallel 1 --jinja ${reasoning}
+
+  gpt-oss-20b:
+    cmd: >-
+      llama-server --port ${PORT} -m ${models_dir}/gpt-oss-20b/gpt-oss-20b-Q4_K_M.gguf
+      -c 32768 -b 2048 -ub 512 ${default_flags}
+      ${reasoning}
+
+  qwen2.5-coder-7b:
+    cmd: >-
+      llama-server --port ${PORT}
+      -m ${models_dir}/qwen2.5-coder-7b-instruct/Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf
+      -c 32768 -b 2048 -ub 2048 ${default_flags}
+      --jinja
