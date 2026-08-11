@@ -1,13 +1,17 @@
 {
-  "$schema" : "https:\/\/opencode.ai\/config.json",
-  "compaction" : {
-    "auto" : true,
-    "prune" : true
+  "$schema": "https://opencode.ai/config.json",
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "buffer": 15536,
+    "keep": {
+      "tokens": 8192
+    }
   },
-  "lsp" : true,
-  "mcp" : {
-    "authentik" : {
-      "command" : [
+  "lsp": true,
+  "mcp": {
+    "authentik": {
+      "command": [
         "uvx",
         "--from",
         "authentik-mcp",
@@ -15,199 +19,217 @@
         "mcp<2.0",
         "authentik-mcp",
         "--base-url",
-        "https:\/\/authentik.labb.site",
+        "https://authentik.labb.site",
         "--token",
         "{env:MCP_TOKEN}"
       ],
-      "type" : "local"
+      "type": "local"
     },
-    "grafana" : {
-      "command" : [
+    "grafana": {
+      "command": [
         "uvx",
         "mcp-grafana",
         "-t",
         "stdio"
       ],
-      "env" : {
-        "GRAFANA_SERVICE_ACCOUNT_TOKEN" : "{env:MCP_TOKEN}",
-        "GRAFANA_URL" : "https:\/\/grafana.labb.site"
+      "env": {
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:MCP_TOKEN}",
+        "GRAFANA_URL": "https://grafana.labb.site"
       },
-      "type" : "local"
+      "type": "local"
     },
-"kubernetes" : {
-      "enabled" : true,
-      "headers" : {
-        "Authorization" : "{env:K8S_TOKEN}"
+    "kubernetes": {
+      "enabled": true,
+      "headers": {
+        "Authorization": "{env:K8S_TOKEN}"
       },
-      "oauth" : false,
-      "type" : "remote",
-      "url" : "https:\/\/mcp.labb.site\/k8s\/mcp"
+      "oauth": false,
+      "type": "remote",
+      "url": "https://mcp.labb.site/k8s/mcp"
     }
   },
-  "mode" : {
-
-  },
-  "permission" : {
-    "bash" : {
-      "*" : "ask",
-      "awk*" : "allow",
-      "basename*" : "allow",
-      "cat*" : "allow",
-      "cut*" : "allow",
-      "date*" : "allow",
-      "df*" : "allow",
-      "diff*" : "allow",
-      "dirname*" : "allow",
-      "du*" : "allow",
-      "echo*" : "allow",
-      "env*" : "allow",
-      "file*" : "allow",
-      "find*" : "allow",
-      "flux*" : "ask",
-      "flux-local*" : "allow",
-      "gh*" : "allow",
-      "git*" : "allow",
-      "grep*" : "allow",
-      "head*" : "allow",
-      "helm*" : "ask",
-      "hostname*" : "allow",
-      "id*" : "allow",
-      "jq*" : "allow",
-      "kubectl apply*" : "ask",
-      "kubectl delete*" : "ask",
-      "kubectl drain*" : "ask",
-      "kubectl edit*" : "ask",
-      "kubectl patch*" : "ask",
-      "kubectl*" : "allow",
-      "la*" : "allow",
-      "ll*" : "allow",
-      "ls*" : "allow",
-      "pnpm*" : "allow",
-      "printenv*" : "allow",
-      "printf*" : "allow",
-      "ps*" : "allow",
-      "pwd*" : "allow",
-      "readlink*" : "allow",
-      "realpath*" : "allow",
-      "rg*" : "allow",
-      "sed*" : "allow",
-      "sort*" : "allow",
-      "source .venv\/bin\/activate" : "allow",
-      "stat*" : "allow",
-      "tail*" : "allow",
-      "tr*" : "allow",
-      "tree*" : "allow",
-      "turbo*" : "allow",
-      "type*" : "allow",
-      "uname*" : "allow",
-      "uniq*" : "allow",
-      "wc*" : "allow",
-      "which*" : "allow",
-      "whoami*" : "allow",
-      "xargs*" : "allow",
-      "act*" : "allow",
-      "which*" : "allow",
-      "mkdir*" : "allow",
-      "*eslint*" : "allow",
-      "*python*" : "allow",
-      "uv*" : "allow",
+  "permission": {
+    "bash": {
+      "*": "ask",
+      "awk*": "allow",
+      "basename*": "allow",
+      "cat*": "allow",
+      "cut*": "allow",
+      "date*": "allow",
+      "df*": "allow",
+      "diff*": "allow",
+      "dirname*": "allow",
+      "du*": "allow",
+      "echo*": "allow",
+      "env*": "allow",
+      "file*": "allow",
+      "find*": "allow",
+      "flux*": "ask",
+      "flux-local*": "allow",
+      "gh*": "allow",
+      "git*": "allow",
+      "grep*": "allow",
+      "head*": "allow",
+      "helm*": "ask",
+      "hostname*": "allow",
+      "id*": "allow",
+      "jq*": "allow",
+      "kubectl apply*": "ask",
+      "kubectl delete*": "ask",
+      "kubectl drain*": "ask",
+      "kubectl edit*": "ask",
+      "kubectl patch*": "ask",
+      "kubectl*": "allow",
+      "la*": "allow",
+      "ll*": "allow",
+      "ls*": "allow",
+      "pnpm*": "allow",
+      "printenv*": "allow",
+      "printf*": "allow",
+      "ps*": "allow",
+      "pwd*": "allow",
+      "readlink*": "allow",
+      "realpath*": "allow",
+      "rg*": "allow",
+      "sed*": "allow",
+      "sort*": "allow",
+      "source .venv/bin/activate": "allow",
+      "stat*": "allow",
+      "tail*": "allow",
+      "tr*": "allow",
+      "tree*": "allow",
+      "turbo*": "allow",
+      "type*": "allow",
+      "uname*": "allow",
+      "uniq*": "allow",
+      "wc*": "allow",
+      "which*": "allow",
+      "whoami*": "allow",
+      "xargs*": "allow",
+      "act*": "allow",
+      "mkdir*": "allow",
+      "*eslint*": "allow",
+      "*python*": "allow",
+      "uv*": "allow",
       "uuidgen*": "allow",
       "pgrep*": "allow",
-      "act*": "allow",
       "sleep*": "allow",
-      "docker*" : "allow"
+      "docker*": "allow"
     },
-    "doom_loop" : "ask",
-    "edit" : "allow",
-    "read" : "allow",
-    "webfetch" : "allow",
-    "write" : "ask"
+    "doom_loop": "ask",
+    "edit": "allow",
+    "read": "allow",
+    "webfetch": "allow",
+    "write": "ask"
   },
-  "plugin" : [
+  "plugin": [
     "opencode-agent-tmux",
-    ["@vectorize-io/opencode-hindsight", {
-      "hindsightApiUrl": "https://hindsight.labb.site/v1/default",
-      "dynamicBankId": true,
-      "dynamicBankGranularity": ["project"],
-      "autoRecall": true,
-      "autoRetain": true
-    }]
+    "/Users/daveri/.hindsight/coding-agents"
   ],
-  "provider" : {
-    "litellm" : {
-      "models" : {
-        "qwen3.6-35b-a3b-mtp" : {
-          "name" : "qwen3.6-35b-a3b-mtp"
+  "provider": {
+    "litellm": {
+      "models": {
+        "qwen3.6-35b-a3b-mtp": {
+          "name": "qwen3.6-35b-a3b-mtp"
         }
       },
-      "name" : "LiteLLM Proxy",
-      "npm" : "@ai-sdk\/openai-compatible",
-      "options" : {
-        "apiKey" : "sk-dummy-key-for-local",
-        "baseURL" : "https:\/\/litellm.labb.site\/v1"
+      "name": "LiteLLM Proxy",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "apiKey": "sk-dummy-key-for-local",
+        "baseURL": "https://litellm.labb.site/v1"
       }
     },
-    "remote ollama" : {
-      "models" : {
-        "qwen3.6:35b-108k" : {
-          "name" : "qwen3.6:35b"
-        },
-        "qwen3.6:27b-108k": {
-          "name": "qwen3.6:27b"
-        }
+    "litellm-swap": {
+      "name": "LiteLLM Llama-swap Proxy",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "apiKey": "sk-dummy-key-for-local",
+        "baseURL": "https://litellm.labb.site/v1"
       },
-      "name" : "Remote Ollama",
-      "npm" : "@ai-sdk\/openai-compatible",
-      "options" : {
-        "apiKey" : "sk-dummy-key-for-local",
-        "baseURL" : "http:\/\/192.168.1.216:11434\/v1"
+      "models": {
+        "gemma-4-26b": {
+          "name": "Gemma 4 26B",
+          "headers": {
+            "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
+            "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
+          }
+        },
+        "gemma-4-31b": {
+          "name": "Gemma 4 31B",
+          "headers": {
+            "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
+            "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
+          }
+        },
+        "gpt-oss-20b": {
+          "name": "GPT-OSS 20B",
+          "headers": {
+            "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
+            "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
+          }
+        },
+        "qwen3.6-27b": {
+          "name": "Qwen 3.6 27B",
+          "headers": {
+            "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
+            "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
+          }
+        },
+        "qwen3.6-35b": {
+          "name": "Qwen 3.6 35B",
+          "headers": {
+            "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
+            "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
+          }
+        }
       }
     },
-    "local lmstudio" : {
-      "models" : {
-        "diffusiongemma-26b-a4b-it" : {
-          "name" : "diffusiongemma-26b-a4b-it"
+    "local lmstudio": {
+      "models": {
+        "diffusiongemma-26b-a4b-it": {
+          "name": "diffusiongemma-26b-a4b-it"
         },
-        "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-tau2" : {
-          "name" : "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-tau2"
+        "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-tau2": {
+          "name": "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-tau2"
         },
-        "gemma-4-31b-it" : {
-          "name" : "gemma-4-31b-it"
+        "gemma-4-31b-it": {
+          "name": "gemma-4-31b-it"
         },
-        "glm-4.7-flash-reap-23b-a3b" : {
-          "name" : "glm-4.7-flash-reap-23b-a3b"
+        "glm-4.7-flash-reap-23b-a3b": {
+          "name": "glm-4.7-flash-reap-23b-a3b"
         },
-        "google\/gemma-4-26b-a4b-qat" : {
-          "name" : "google\/gemma-4-26b-a4b-qat"
+        "google/gemma-4-26b-a4b-qat": {
+          "name": "google/gemma-4-26b-a4b-qat"
         },
-        "ornith-1.0-35b" : {
-          "name" : "ornith-1.0-35b"
+        "ornith-1.0-35b": {
+          "name": "ornith-1.0-35b"
         },
-        "ornith-1.0-35b-mlx" : {
-          "name" : "ornith-1.0-35b-mlx"
+        "ornith-1.0-35b-mlx": {
+          "name": "ornith-1.0-35b-mlx"
         },
-        "qwable-3.6-35b" : {
-          "name" : "qwable-3.6-35b"
+        "qwable-3.6-35b": {
+          "name": "qwable-3.6-35b"
         },
-        "qwen\/qwen2.5-coder-14b" : {
-          "name" : "qwen\/qwen2.5-coder-14b"
+        "qwen/qwen2.5-coder-14b": {
+          "name": "qwen/qwen2.5-coder-14b"
         },
-        "qwopus3.6-35b-a3b-v1-mlx-mixed_4_6" : {
-          "name" : "qwopus3.6-35b-a3b-v1-mlx-mixed_4_6"
+        "qwopus3.6-35b-a3b-v1-mlx-mixed_4_6": {
+          "name": "qwopus3.6-35b-a3b-v1-mlx-mixed_4_6"
         },
         "qwen3.6-14b-a3b-fablevibes": {
           "name": "qwen3.6-14b-a3b-fablevibes"
         }
       },
-      "name" : "LM Studio",
-      "npm" : "@ai-sdk\/openai-compatible",
-      "options" : {
-        "apiKey" : "not-needed",
-        "baseURL" : "http:\/\/localhost:1234\/v1"
+      "name": "LM Studio",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "apiKey": "not-needed",
+        "baseURL": "http://localhost:1234/v1"
       }
     }
   },
-  "model": "google\/gemma-4-26b-a4b-qat",
-  "small_model" : "qwen\/qwen2.5-coder-14b",
+  "model": "google/gemma-4-26b-a4b-qat",
+  "small_model": "qwen/qwen2.5-coder-14b",
   "default_agent": "team-lead"
 }
