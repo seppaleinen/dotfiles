@@ -41,12 +41,24 @@ models:
   gpt-oss-20b:
     cmd: >-
       llama-server --port ${PORT} -m ${models_dir}/gpt-oss-20b/gpt-oss-20b-Q4_K_M.gguf
-      -c 32768 -b 2048 -ub 512 ${default_flags}
-      ${reasoning}
+      -c 65536 -b 2048 -ub 512 ${default_flags}
+      --flash-attn on --parallel 1 --jinja ${reasoning}
 
   qwen2.5-coder-7b:
     cmd: >-
       llama-server --port ${PORT}
       -m ${models_dir}/qwen2.5-coder-7b-instruct/Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf
-      -c 32768 -b 2048 -ub 2048 ${default_flags}
+      -c 65536 -b 2048 -ub 2048 ${default_flags}
       --jinja
+
+  nomic-embed-text-v2:
+    cmd: >-
+      llama-server --port ${PORT}
+      -m ${models_dir}/nomic-embed-text-v2/nomic-embed-text-v2-moe-q8_0.gguf
+      -c 2048 ${default_flags}
+
+  llama-3.1-8b-instruct:
+    cmd: >-
+      llama-server --port ${PORT}
+      -m ${models_dir}/llama-3.1-8b-instruct/Llama-3.1-8B-Instruct-Q6_K.gguf
+      -c 65536 ${default_flags} --jinja --flash-attn on
