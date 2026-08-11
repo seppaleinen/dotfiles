@@ -128,20 +128,7 @@
   ],
   "provider": {
     "litellm": {
-      "models": {
-        "qwen3.6-35b-a3b-mtp": {
-          "name": "qwen3.6-35b-a3b-mtp"
-        }
-      },
-      "name": "LiteLLM Proxy",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "apiKey": "sk-dummy-key-for-local",
-        "baseURL": "https://litellm.labb.site/v1"
-      }
-    },
-    "litellm-swap": {
-      "name": "LiteLLM Llama-swap Proxy",
+      "name": "LiteLLM",
       "npm": "@ai-sdk/openai-compatible",
       "options": {
         "apiKey": "sk-dummy-key-for-local",
