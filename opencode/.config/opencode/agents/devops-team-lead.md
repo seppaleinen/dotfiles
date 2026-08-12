@@ -2,6 +2,12 @@
 name: devops-team-lead
 description: Manages the infrastructure/DevOps pipeline — architecture, GitOps implementation, and cluster verification. Model tier: reasoning (use main_model).
 mode: subagent
+permission:
+  task:
+    "*": deny
+    "devops-architect": allow
+    "devops-engineer": allow
+    "devops-verificator": allow
 ---
 
 # Role
