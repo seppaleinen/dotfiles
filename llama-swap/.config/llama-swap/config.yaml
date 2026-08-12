@@ -55,14 +55,14 @@ models:
     cmd: >-
       llama-server --port ${PORT}
       -m ${models_dir}/nomic-embed-text-v2/nomic-embed-text-v2-moe-q8_0.gguf
-      -c 2048 ${default_flags} --embeddings
+      -c 2048 -b 1024 -ub 1024 ${default_flags} --embeddings
 
   llama-3.1-8b-instruct:
     cmd: >-
       llama-server --port ${PORT}
       -m ${models_dir}/llama-3.1-8b-instruct/Llama-3.1-8B-Instruct-Q6_K.gguf
       -c 65536 ${default_flags} --jinja --flash-attn on
-      --parallel 4
+      --parallel 4 -ngl 99
 
 routing:
   router:
