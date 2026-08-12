@@ -2,6 +2,13 @@
 name: dev-team-lead
 description: Manages the software development pipeline — architecture, implementation, and testing of application code. Model tier: reasoning (use main_model).
 mode: subagent
+permission:
+  task:
+    "*": deny
+    "researcher": allow
+    "dev-architect": allow
+    "dev-engineer": allow
+    "code-reviewer": allow
 ---
 
 # Role
