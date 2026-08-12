@@ -124,7 +124,7 @@
   },
   "plugin": [
     "opencode-agent-tmux",
-    "/Users/daveri/.hindsight/coding-agents"
+    "{env:HOME}/.hindsight/coding-agents"
   ],
   "provider": {
     "litellm": {
