@@ -52,9 +52,29 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/vectorize-io/hindsight.git",
       "skillPath": "skills/hindsight-docs/SKILL.md",
-      "skillFolderHash": "7af7083c236b51ed79685d17609fb3e796d9b3b5",
+      "skillFolderHash": "292679ef4f22fe192a35d27fafaf03490c1b4ea2",
       "installedAt": "2026-07-08T10:14:09.000Z",
-      "updatedAt": "2026-07-08T10:14:09.000Z"
+      "updatedAt": "2026-08-12T06:45:30.533Z"
+    },
+    "codebase-design": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/engineering/codebase-design/SKILL.md",
+      "skillFolderHash": "20b7cd1dd1fe5b0bd37ba72649f3a29375574b5b",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-08-10T15:22:50.186Z",
+      "updatedAt": "2026-08-10T15:22:50.186Z"
+    },
+    "improve-codebase-architecture": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/mattpocock/skills.git",
+      "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "skillFolderHash": "6a971d1f5b109ac817e18c0f0419c2a32d60f26a",
+      "pluginName": "mattpocock-skills",
+      "installedAt": "2026-08-10T15:23:10.439Z",
+      "updatedAt": "2026-08-10T15:23:10.439Z"
     }
   },
   "dismissed": {

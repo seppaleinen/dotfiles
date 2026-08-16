@@ -20,7 +20,7 @@ Banks are completely isolated from each other — memories stored in one bank ar
 You don't need to pre-create a bank. Hindsight will automatically create it with default settings when you first use it.
 
 > **💡 Prerequisites**
-> 
+>
 Make sure you've completed the [Quick Start](./quickstart) to install the client and start the server.
 ## Creating a Memory Bank
 
@@ -163,6 +163,8 @@ Each entry in `entity_labels` is a **label group** — one classification dimens
 }
 ```
 
+**How label entities resolve.** Regular entities resolve fuzzily so close name variants merge ("Alice" / "Alice Chen"). Label entities are different: their canonical names are user-defined, so two similar-looking values (`use:use-001` / `use:use-002`) must stay distinct. They therefore resolve by **exact match only** and are stored with `entity_kind = "label"`, which keeps them out of fuzzy name matching entirely — a free-text label group accumulating thousands of similar values doesn't slow down resolution of the bank's regular entities. The classification is fixed when the entity is first stored; removing a label group later doesn't reclassify its existing entities.
+
 ### entities_allow_free_form
 
 By default, entity labels are extracted **alongside** regular named entities (people, places, concepts). Set to `false` to disable free-form extraction so only label entities are stored:
@@ -291,7 +293,7 @@ How much to weight emotional context when reasoning during `reflect`. Scale 1–
 | `5` | Empathetic — considers emotional context |
 
 > **ℹ️ Info**
-> 
+>
 Disposition traits and `reflect_mission` only affect the `reflect` operation. `retain_mission` and `observations_mission` are separate per-operation settings.
 ### mcp_enabled_tools
 
@@ -507,10 +509,10 @@ You can also update configuration directly from the Control Plane UI — navigat
 
 ## Directives
 
-Directives are hard rules that the agent must follow during [reflect](./reflect) operations. Unlike disposition traits which influence *how* the agent reasons, directives are explicit instructions that are *always* enforced.
+Directives are hard rules that the agent must follow during [reflect](./reflect) operations. Unlike disposition traits which influence *how* the agent reasons, directives are explicit instructions that are enforced whenever they are in scope (see [Directive Scope and Tags](#directive-scope-and-tags)).
 
 > **ℹ️ Info**
-> 
+>
 Directives only affect the `reflect` operation. They are injected into prompts and the agent is required to comply with them in all responses.
 ### When to Use Directives
 
@@ -520,6 +522,15 @@ Use directives for rules that must never be violated:
 - **Privacy rules**: "Never share personal data with third parties"
 - **Domain constraints**: "Prefer conservative investment recommendations"
 - **Behavioral guardrails**: "Always cite sources when making claims"
+
+### Directive Scope and Tags
+
+Directives can carry `tags`, and those tags scope **when** a directive is applied during `reflect` — mirroring how tags scope memories:
+
+- **Untagged directives always apply**, on every `reflect`.
+- **Tagged directives apply only when the `reflect` request includes matching tags** (using the request's `tags_match` mode). A `reflect` call with no tags applies only the untagged directives.
+
+To apply **every** active directive regardless of tags, set `apply_all_directives: true` on the `reflect` request. This ignores tag scope for directives (untagged and tagged alike are enforced) and is useful when an operator keeps tagged directives for organization but wants all of them enforced on an untagged reflection.
 
 ### Creating Directives
 
@@ -686,22 +697,35 @@ Move documents — and the facts already extracted from them — between banks *
 
 ### Export documents
 
-`GET /v1/default/banks/{bank_id}/document-transfer` — synchronous; streams a ZIP archive.
+`POST /v1/default/banks/{bank_id}/document-transfer/export` — runs as a **background operation** (a whole-bank export loads every unit and compresses a large archive, which on a big bank could exhaust memory and pin a connection). It returns `202` with an `operation_id`; poll the bank's operations endpoint, then download the archive from the `download_url` in `result_metadata`.
 
 ```bash
-# whole bank
-curl -H "Authorization: Bearer $API_KEY" \
-  "$HINDSIGHT_URL/v1/default/banks/my-bank/document-transfer" -o my-bank.zip
+# 1. Submit the export (whole bank; add ?document_id=… to scope it)
+curl -X POST -H "Authorization: Bearer $API_KEY" \
+  "$HINDSIGHT_URL/v1/default/banks/my-bank/document-transfer/export"
+# -> {"operation_id": "…", "status": "pending"}
 
-# specific documents, including consolidated observations
+# 2. Poll until completed
 curl -H "Authorization: Bearer $API_KEY" \
-  "$HINDSIGHT_URL/v1/default/banks/my-bank/document-transfer?document_id=doc-1&include_observations=true" -o subset.zip
+  "$HINDSIGHT_URL/v1/default/banks/my-bank/operations/$OPERATION_ID"
+# -> {"status":"completed","result_metadata":{
+#      "download_url":"/v1/default/files/download/banks/my-bank/exports/…/transfer.zip",
+#      "storage_key":"banks/my-bank/exports/…/transfer.zip","byte_size":12345,"filename":"my-bank-documents.zip"}}
+
+# 3. Download the archive
+curl -H "Authorization: Bearer $API_KEY" \
+  "$HINDSIGHT_URL$DOWNLOAD_URL" -o my-bank.zip
 ```
 
 | Query param | Description |
 |-------------|-------------|
 | `document_id` | Repeatable. Export only these documents; omit for the whole bank. |
 | `include_observations` | Also export consolidated observations (default `false`). Only valid for a **whole-bank** export — combining it with `document_id` returns `400`. |
+
+> **📝 The synchronous `GET …/document-transfer` was removed**
+>
+It loaded the entire bank into memory and held a database connection for the full request, which could take down the shared API on large banks. It now returns `410` pointing here. Use the async flow above. The download route (`GET /v1/default/files/download/{key}`) authorizes the caller against the bank the archive belongs to.
+The archive lives as long as its export **operation record** — indefinitely by default, or until the operation is pruned when `HINDSIGHT_API_OPERATION_RETENTION_DAYS` is set (the archive is deleted in step with the row). Deleting the operation removes the archive immediately.
 
 ### Import documents
 
@@ -732,7 +756,7 @@ Consolidated observations are excluded by default — the target bank regenerate
 Because an observation can be derived from facts spanning several documents, `include_observations` is only supported on a **whole-bank export** (omit `document_id`); combining it with a document subset returns `400`.
 
 > **⚠️ Imported observations are inserted as-is — no merge**
-> 
+>
 They are not merged or deduplicated against observations already in the target bank (consolidation merges related observations; import does not). Prefer importing observations into a fresh/empty bank, or omit `include_observations` and let the target consolidate the imported facts itself.
 ### Enabling / disabling
 
@@ -740,7 +764,7 @@ Both endpoints are gated by server-level flags (default `true`). A disabled endp
 
 | Variable | Gates |
 |----------|-------|
-| `HINDSIGHT_API_ENABLE_DOCUMENT_EXPORT_API` | `GET …/document-transfer` |
+| `HINDSIGHT_API_ENABLE_DOCUMENT_EXPORT_API` | `POST …/document-transfer/export` and `GET …/files/download/{key}` |
 | `HINDSIGHT_API_ENABLE_DOCUMENT_IMPORT_API` | `POST …/document-transfer` |
 
 ## Migrating a bank to a new instance

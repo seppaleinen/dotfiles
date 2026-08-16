@@ -8,10 +8,10 @@ When you **recall**, Hindsight runs four retrieval strategies in parallel — se
 {/* Import raw source files */}
 
 > **ℹ️ How Recall Works**
-> 
+>
 Learn about the four retrieval strategies (semantic, keyword, graph, temporal) and RRF fusion in the [Recall Architecture](../retrieval.md) guide.
 > **💡 Prerequisites**
-> 
+>
 Make sure you've completed the [Quick Start](./quickstart) to install the client and start the server.
 ## Basic Recall
 
@@ -151,7 +151,7 @@ hindsight memory recall my-bank "query" --fact-type world,observation
 ```
 
 > **💡 About Observations**
-> 
+>
 Observations are deduplicated, evidence-grounded beliefs consolidated from multiple facts — preferences, recurring patterns, and durable learnings the memory bank has built up. Each observation references its supporting memories (with exact quotes), and is refined rather than overwritten when new evidence arrives. They are created and maintained automatically in the background after retain operations.
 ### prefer_observations
 
@@ -252,7 +252,7 @@ An optional object controlling supplementary data returned alongside the main fa
 When enabled, the response includes the raw source text chunks from which each fact was extracted. Chunks are fetched before the `max_tokens` filter, so setting `max_tokens=0` returns no facts but can still return chunks. The `max_tokens` sub-option (default `8192`) controls the total chunk token budget independently of the main fact budget. This is useful when agents need surrounding context beyond the extracted fact text.
 
 > **📝 Note**
-> 
+>
 When `include_chunks` is enabled, chunks are fetched based on the top-scored reranked results before token filtering. The last chunk is truncated (not dropped) to fit exactly within the budget, and each chunk carries a `truncated` flag indicating whether it was cut.
 #### source_facts
 
@@ -322,7 +322,8 @@ Enabled by default. When active, each returned fact includes the canonical names
 
 ### tags
 
-Filters recall to only memories that match the specified tags. When omitted, all memories regardless of tags are eligible. Tag filtering is applied at the database level across all four retrieval strategies, not as a post-processing step.
+Filters recall to memories in the requested tag scope. `tags` defaults to `null` and
+`tags_match` defaults to `any`.
 
 The `tags_match` parameter controls the filtering logic:
 
@@ -334,6 +335,22 @@ The `tags_match` parameter controls the filtering logic:
 | `all_strict` | Excluded | Memory has **all** of the specified tags |
 | `exact` | Excluded | Memory has **exactly** the specified tag set |
 
+The defaults and empty-filter behavior are important:
+
+| `tags` | `tags_match` | Eligible memories |
+|--------|--------------|-------------------|
+| Omitted, `null`, or `[]` | Omitted (`any`) | All tagged and untagged memories |
+| Omitted, `null`, or `[]` | `any`, `all`, `any_strict`, or `all_strict` | All tagged and untagged memories; an empty tag list means no filter |
+| Omitted, `null`, or `[]` | `exact` | Only untagged/global memories |
+| Non-empty | `any` or `all` | Matching tagged memories plus untagged/global memories |
+| Non-empty | `any_strict` or `all_strict` | Matching tagged memories only |
+| Non-empty | `exact` | Memories whose complete tag set exactly equals `tags` |
+
+> **📝 MCP empty-scope behavior**
+>
+For the MCP `recall` tool, `tags_match` is forwarded only when `tags` is present.
+To select the untagged/global scope through MCP, pass both `tags: []` and
+`tags_match: "exact"` rather than omitting `tags`.
 #### Scenario setup
 
 Consider a bank with these four memories:
@@ -522,7 +539,7 @@ hindsight memory recall my-bank "communication tools" \
 Use this for strict scope enforcement where a memory must explicitly belong to **all** specified contexts.
 
 > **💡 Extra tags are fine**
-> 
+>
 A memory with tags `["user:alice", "team", "project:x"]` will still match a filter of `["user:alice", "team"]` under `all_strict` — extra tags on the memory are not a problem. The filter only requires the memory to contain **at least** the specified tags.
 #### `exact` — set equality, excludes untagged
 
@@ -531,7 +548,7 @@ Returns memories whose tag set is exactly equal to the specified tags, regardles
 Use this when filtering a precise observation scope returned by `GET /v1/default/banks/{bank_id}/observations/scopes`, where `["user:alice"]` should not also match observations scoped to `["user:alice", "project:x"]`.
 
 > **💡 Filter to global (untagged) observations only**
-> 
+>
 The empty scope is a real scope — it's where `observation_scopes: "shared"` consolidation writes. Set `tags_match: "exact"` with **no tags** (omit `tags`, or pass `[]`) to recall **only** untagged/global memories and exclude every tagged one:
 
 ```json
@@ -543,7 +560,13 @@ With any other `tags_match` mode, absent or empty `tags` means "no tag filter" (
 
 `tag_groups` is a list of compound boolean tag filters. The groups in the list are AND-ed together at the top level. Each group is a recursive boolean expression: a **leaf** node `{tags, match}`, or a **compound** node `{and: [...]}`, `{or: [...]}`, or `{not: ...}`.
 
-`tag_groups` and `tags` / `tags_match` can be used simultaneously — they are AND-ed together.
+`tag_groups` defaults to `null`. The public REST and MCP request models treat
+`tag_groups` and `tags` as mutually exclusive: if both are present, the request is
+rejected. Use `tag_groups` by itself for compound filtering and normally leave the
+top-level `tags_match` at its default, `any`. Each `tag_groups` leaf has its own
+`match` value. The exception is top-level `tags_match: "exact"`: because exact
+matching gives absent flat tags a meaning, it adds a global-only flat constraint
+that is AND-ed with the compound expression.
 
 #### Leaf node
 
