@@ -140,6 +140,31 @@
           "headers": {
             "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
             "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
+          },
+          "settings": {
+            "reasoningEffort": "medium"
+          },
+          "variants": {
+            "none": {
+              "reasoningEffort": "none",
+              "extraBody": { "reasoning_budget": 0}
+            },
+            "low": {
+              "reasoningEffort": "low",
+              "extraBody": { "reasoning_budget": 1024 }
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "extraBody": { "reasoning_budget": 4096 }
+            },
+            "high": {
+              "reasoningEffort": "high",
+              "extraBody": { "reasoning_budget": -1 }
+            },
+            "max": {
+              "reasoningEffort": "max",
+              "extraBody": { "reasoning_budget": -1 }
+            }
           }
         },
         "gemma-4-31b": {
@@ -168,6 +193,31 @@
           "headers": {
             "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
             "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
+          },
+          "settings": {
+            "reasoningEffort": "medium"
+          },
+          "variants": {
+            "none": {
+              "reasoningEffort": "none",
+              "extraBody": { "reasoning_budget": 0}
+            },
+            "low": {
+              "reasoningEffort": "low",
+              "extraBody": { "reasoning_budget": 1024 }
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "extraBody": { "reasoning_budget": 4096 }
+            },
+            "high": {
+              "reasoningEffort": "high",
+              "extraBody": { "reasoning_budget": -1 }
+            },
+            "max": {
+              "reasoningEffort": "max",
+              "extraBody": { "reasoning_budget": -1 }
+            }
           }
         }
       }
@@ -187,7 +237,32 @@
           "name": "glm-4.7-flash-reap-23b-a3b"
         },
         "google/gemma-4-26b-a4b-qat": {
-          "name": "google/gemma-4-26b-a4b-qat"
+          "name": "google/gemma-4-26b-a4b-qat",
+          "settings": {
+            "reasoningEffort": "medium"
+          },
+          "variants": {
+            "none": {
+              "reasoningEffort": "none",
+              "extraBody": { "reasoning_budget": 0}
+            },
+            "low": {
+              "reasoningEffort": "low",
+              "extraBody": { "reasoning_budget": 1024 }
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "extraBody": { "reasoning_budget": 4096 }
+            },
+            "high": {
+              "reasoningEffort": "high",
+              "extraBody": { "reasoning_budget": -1 }
+            },
+            "max": {
+              "reasoningEffort": "max",
+              "extraBody": { "reasoning_budget": -1 }
+            }
+          }
         },
         "ornith-1.0-35b": {
           "name": "ornith-1.0-35b"
@@ -202,7 +277,32 @@
           "name": "qwen/qwen2.5-coder-14b"
         },
         "qwopus3.6-35b-a3b-v1-mlx-mixed_4_6": {
-          "name": "qwopus3.6-35b-a3b-v1-mlx-mixed_4_6"
+          "name": "qwopus3.6-35b-a3b-v1-mlx-mixed_4_6",
+          "settings": {
+            "reasoningEffort": "medium"
+          },
+          "variants": {
+            "none": {
+              "reasoningEffort": "none",
+              "extraBody": { "reasoning_budget": 0}
+            },
+            "low": {
+              "reasoningEffort": "low",
+              "extraBody": { "reasoning_budget": 1024 }
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "extraBody": { "reasoning_budget": 4096 }
+            },
+            "high": {
+              "reasoningEffort": "high",
+              "extraBody": { "reasoning_budget": -1 }
+            },
+            "max": {
+              "reasoningEffort": "max",
+              "extraBody": { "reasoning_budget": -1 }
+            }
+          }
         },
         "qwen3.6-14b-a3b-fablevibes": {
           "name": "qwen3.6-14b-a3b-fablevibes"
