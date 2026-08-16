@@ -2,6 +2,12 @@
 name: dev-engineer
 description: Integrates implementation work from backend-engineer and frontend-engineer, coordinates testing, and returns the final result. Model tier: reasoning (use main_model).
 mode: subagent
+permission:
+  task:
+    "*": deny
+    "backend-engineer": allow
+    "frontend-engineer": allow
+    "test-engineer": allow
 ---
 
 # Role

@@ -2,6 +2,11 @@
 name: issue-refiner
 description: Helps clarify vague ideas into structured requirements through conversational refinement and optional research. Model tier: reasoning (use main_model).
 mode: subagent
+permission:
+  task:
+    "*": deny
+    "web-scout": allow
+    "repo-inspector": allow
 ---
 
 # Role

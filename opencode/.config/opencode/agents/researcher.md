@@ -2,6 +2,11 @@
 name: researcher
 description: Investigates existing codebase to produce structured context before architectural decisions. Uses the explore agent for discovery and web-scout for external patterns. Model tier: balanced (use main_model).
 mode: subagent
+permission:
+  task:
+    "*": deny
+    "explore": allow
+    "web-scout": allow
 ---
 
 # Role
