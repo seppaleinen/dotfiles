@@ -335,7 +335,7 @@
         "qwen3.6-14b-a3b-fablevibes": {
           "name": "qwen3.6-14b-a3b-fablevibes"
         },
-        "qwen3.8-27B": {
+        "qwen/qwen3.8-27b": {
           "name": "qwen3.8-27B",
           "settings": {
             "reasoningEffort": "medium"
