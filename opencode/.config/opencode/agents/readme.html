@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenCode · Team Lead Staff Chart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1c1712;
+      --paper: #f3ead8;
+      --rule: #d8cbb0;
+      --muted: #6b5e4e;
+      --lead: #b8860b;
+      --dev: #b5471a;
+      --ops: #1f6b68;
+      --support: #4a5560;
+      --ok: #2d6a3e;
+      --rework: #9a6b12;
+      --block: #8b1e1e;
+      --shadow: 0 18px 40px rgba(28, 23, 18, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(184, 134, 11, 0.12), transparent 50%),
+        radial-gradient(900px 500px at 110% 0%, rgba(31, 107, 104, 0.12), transparent 45%),
+        var(--paper);
+      font-family: "Fraunces", Georgia, serif;
+      line-height: 1.5;
+    }
+
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      opacity: 0.07;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    header, main, footer { position: relative; z-index: 1; }
+
+    header {
+      padding: 3.2rem 6vw 1.5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .kicker {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 0.4rem 0 0.6rem;
+      font-size: clamp(2.4rem, 6vw, 4.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 0.95;
+    }
+
+    .lede {
+      max-width: 46rem;
+      font-size: 1.15rem;
+      color: #3d3428;
+    }
+
+    .mast {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem 2.5rem;
+      margin-top: 1.6rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.78rem;
+    }
+
+    .mast b { display: block; color: var(--muted); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; }
+
+    nav.toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 1rem 6vw;
+      border-bottom: 1px solid var(--rule);
+      position: sticky;
+      top: 0;
+      background: color-mix(in srgb, var(--paper) 88%, white);
+      backdrop-filter: blur(8px);
+      z-index: 5;
+    }
+
+    nav.toc a {
+      color: var(--ink);
+      text-decoration: none;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      padding: 0.35rem 0.65rem;
+      border: 1px solid var(--rule);
+    }
+
+    nav.toc a:hover { background: var(--ink); color: var(--paper); }
+
+    main { padding: 2.4rem 6vw 5rem; }
+
+    section { margin: 3.2rem 0; }
+    h2 {
+      font-size: 2rem;
+      margin: 0 0 0.8rem;
+      letter-spacing: -0.02em;
+    }
+    h3 { margin: 1.4rem 0 0.5rem; font-size: 1.25rem; }
+
+    p { max-width: 46rem; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .card {
+      background: #fffaf0;
+      border: 1px solid var(--rule);
+      padding: 1.1rem 1.15rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card h3 { margin-top: 0; }
+    .card p { margin: 0.4rem 0 0; font-size: 0.98rem; }
+
+    .tag {
+      display: inline-block;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+    .tag.lead { background: #f3dd8a; }
+    .tag.dev { background: #f3c4ae; }
+    .tag.ops { background: #c9e6e4; }
+    .tag.support { background: #d7dde3; }
+
+    .session {
+      max-width: 46rem;
+      margin: 1rem 0 1.6rem;
+      padding-left: 0;
+      list-style: none;
+      counter-reset: step;
+    }
+    .session li {
+      counter-increment: step;
+      position: relative;
+      padding: 0.55rem 0 0.55rem 3.2rem;
+      border-left: 1px solid var(--rule);
+      margin-left: 0.7rem;
+    }
+    .session li::before {
+      content: counter(step);
+      position: absolute;
+      left: -0.75rem;
+      top: 0.55rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      display: grid;
+      place-items: center;
+    }
+    .session li:last-child { border-left-color: transparent; }
+
+    .entry {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 0.45rem 0.35rem;
+      margin: 1rem 0 1.2rem;
+      padding: 1rem;
+      background: #fffaf0;
+      border: 1px solid var(--rule);
+      box-shadow: var(--shadow);
+    }
+
+    .panes {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    @media (min-width: 72rem) {
+      .panes { grid-template-columns: 1fr 1fr; }
+    }
+
+    .pane {
+      background: #fffaf0;
+      border: 1px solid var(--rule);
+      box-shadow: var(--shadow);
+      padding: 1rem 0.9rem 1.1rem;
+      min-width: 0;
+    }
+    .pane.dev { border-top: 4px solid var(--dev); }
+    .pane.ops { border-top: 4px solid var(--ops); }
+    .pane h3 { margin-top: 0.2rem; }
+
+    .hflow {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 0.35rem;
+      overflow-x: auto;
+      padding-bottom: 0.4rem;
+    }
+    .entry .arrow,
+    .hflow > .arrow {
+      align-self: center;
+      flex: 0 0 auto;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 0 0 auto;
+    }
+    .col .note {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .badge {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid var(--rule);
+      padding: 0.05rem 0.3rem;
+      color: var(--muted);
+    }
+
+    .outside {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+      gap: 0.7rem;
+    }
+    .outside li {
+      background: #fffaf0;
+      border: 1px dashed var(--rule);
+      padding: 0.85rem 1rem;
+    }
+    .outside .id {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.8rem;
+      display: block;
+    }
+    .outside p { margin: 0.25rem 0 0; font-size: 0.92rem; max-width: none; }
+
+    button.node {
+      appearance: none;
+      border: 1px solid var(--ink);
+      background: #fffaf0;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      padding: 0.5rem 0.6rem;
+      min-width: 7.4rem;
+      text-align: left;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    button.node:hover,
+    button.node:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 var(--ink);
+      outline: none;
+    }
+
+    button.node.active { background: var(--ink); color: var(--paper); }
+    button.node .id {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      display: block;
+    }
+    button.node .role {
+      font-size: 0.78rem;
+      opacity: 0.8;
+    }
+
+    button.node.lead { border-width: 2px; min-width: 9.5rem; }
+    button.node.dev { border-color: var(--dev); }
+    button.node.ops { border-color: var(--ops); }
+    button.node.support { border-style: dashed; }
+
+    .detail {
+      margin-top: 1.2rem;
+      min-height: 8rem;
+      border-left: 4px solid var(--lead);
+      padding: 0.2rem 0 0.2rem 1rem;
+    }
+
+    .detail .id {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.85rem;
+    }
+
+    .status {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+    .pill {
+      border: 1px solid currentColor;
+      padding: 0.7rem 0.9rem;
+      flex: 1;
+      min-width: 12rem;
+    }
+    .pill.ok { color: var(--ok); }
+    .pill.rework { color: var(--rework); }
+    .pill.block { color: var(--block); }
+    .pill strong { display: block; font-family: "IBM Plex Mono", monospace; font-size: 0.78rem; }
+
+    .folders {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.78rem;
+      line-height: 1.55;
+      background: #fffaf0;
+      border: 1px solid var(--rule);
+      box-shadow: var(--shadow);
+      padding: 1.1rem 1.2rem;
+      overflow-x: auto;
+      max-width: 46rem;
+      white-space: pre;
+    }
+
+    footer {
+      padding: 1.5rem 6vw 3rem;
+      border-top: 1px solid var(--rule);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    code {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.84em;
+      background: #efe4cc;
+      padding: 0.05em 0.3em;
+    }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <header>
+    <div class="kicker">OpenCode staff chart · default_agent</div>
+    <h1>team-lead<br>does not ship code.</h1>
+    <p class="lede">
+      <code>team-lead</code> is the only primary agent and the default for user chat.
+      It classifies work as software, infra, or both, then always dispatches the matching pipeline lead.
+      Implementation lives further down that pipeline.
+    </p>
+    <div class="mast">
+      <div><b>Config</b> default_agent: team-lead</div>
+      <div><b>Mode</b> primary · reasoning model</div>
+      <div><b>Depth cap</b> 5 dispatch layers</div>
+      <div><b>Rework budget</b> 2 retries, then escalate</div>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Sections">
+    <a href="#role">Role</a>
+    <a href="#using">Using team-lead</a>
+    <a href="#layout">Folders</a>
+    <a href="#tree">Delegation flow</a>
+    <a href="#handover">Handover</a>
+    <a href="#outside">Outside this chain</a>
+  </nav>
+
+  <main>
+    <section id="role">
+      <h2>What team-lead actually does</h2>
+      <p>
+        Think CEO, not IC. Incoming work is either a raw user request or a Refinement Summary from
+        <code>issue-refiner</code>. Vague work gets refined first. Clear work gets classified, then
+        dispatched with the <code>task</code> tool. Each dispatch is a fresh call: wait, evaluate
+        status, then continue. Mixed app-plus-infra work splits and runs in parallel.
+      </p>
+      <div class="grid-2">
+        <article class="card">
+          <span class="tag lead">Does</span>
+          <h3>Classify, dispatch, synthesize</h3>
+          <p>Pick domain (dev / ops / both), dispatch the pipeline lead, merge handovers into a user-facing report: what changed, decisions, files, next steps, BLOCK items.</p>
+        </article>
+        <article class="card">
+          <span class="tag support">Does not</span>
+          <h3>Write the change itself</h3>
+          <p>No application code, no GitOps manifests, no cluster mutation. Never skip to an engineer. If a pipeline lead returns <code>[REWORK]</code>, retry with error context. If <code>[BLOCK]</code>, stop and show the user.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="using">
+      <h2>What happens when you talk to team-lead</h2>
+      <p>
+        You never pick a specialist. You talk to <code>team-lead</code>. It decides who to call,
+        waits for each handover, then answers you. Nested agents only talk to their parent — they do not chat with you.
+      </p>
+      <ol class="session">
+        <li>You describe the work. If it is already a Refinement Summary, skip intake.</li>
+        <li>If the ask is vague, <code>team-lead</code> refines it or dispatches <code>issue-refiner</code> first.</li>
+        <li>It classifies <strong>domain</strong>: software, infra, or both.</li>
+        <li>It always dispatches <code>dev-team-lead</code> and/or <code>devops-team-lead</code>. Mixed work runs both in parallel. It cannot call engineers directly.</li>
+        <li>Each child may dispatch further (shown in the tree). Results bubble back up as a handover.</li>
+        <li><code>team-lead</code> checks status: <code>[SUCCESS]</code> → report to you; <code>[REWORK]</code> → retry (max 2); <code>[BLOCK]</code> → stop and ask you.</li>
+      </ol>
+      <div class="grid-2">
+        <article class="card">
+          <span class="tag dev">Domain</span>
+          <h3>Software vs infra vs mixed</h3>
+          <p><strong>Software:</strong> app code, features, bugs, UI, APIs, schema, tests.<br>
+          <strong>Infra:</strong> Flux/GitOps, Kubernetes, Helm, storage, ingress, CI/CD.<br>
+          <strong>Mixed:</strong> split, fire both branches, merge the report.</p>
+        </article>
+        <article class="card">
+          <span class="tag lead">Always</span>
+          <h3>Through the pipeline lead</h3>
+          <p>Same stages: investigate → design → implement → verify. Intake sits above both. Leads <code>[BLOCK]</code> if the ask is still vague.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="layout">
+      <h2>Where the files live</h2>
+      <p>
+        Folders are for humans. OpenCode still addresses agents by the <code>name:</code> field in frontmatter
+        (<code>dev-team-lead</code>, not <code>dev/dev-team-lead</code>). This file is HTML on purpose so it is not loaded as an agent.
+      </p>
+      <pre class="folders">agents/
+  readme.html                 ← this overview
+  common/                     intake + shared
+    team-lead.md
+    issue-refiner.md
+    web-scout.md
+    docs.md
+  dev/                        software pipeline only
+    dev-team-lead.md
+    researcher.md
+    dev-architect.md
+    dev-engineer.md
+    backend-engineer.md
+    frontend-engineer.md
+    test-engineer.md
+    code-reviewer.md
+  devops/                     infra pipeline only
+    devops-team-lead.md
+    devops-investigator.md
+    devops-architect.md
+    devops-engineer.md
+    devops-verificator.md
+  *.md                        on-demand (not dispatched by team-lead)
+    ai-security-auditor.md
+    context-drift-auditor.md
+    dev-cleanup.md
+    performance-auditor.md
+    seo-aeo-auditor.md
+    test-auditor.md
+  ontology/                   separate primary (Ontology Auditor)</pre>
+    </section>
+
+    <section id="tree">
+      <h2>Delegation flow</h2>
+      <p>
+        Left to right is time. Below a stage, stacked nodes are helpers or parallel workers.
+        Wide screens show software and infra as two windows; narrow screens stack them.
+        Each fact-finding job has one owner: <code>web-scout</code> (internet identity), <code>researcher</code> (app source), <code>devops-investigator</code> (GitOps + cluster reuse).
+        Click an agent for what it does.
+      </p>
+
+      <div class="entry">
+        <div class="col">
+          <span class="note">You talk here</span>
+          <button class="node lead" data-agent="team-lead" type="button"><span class="id">team-lead</span><span class="role">classify · dispatch lead</span></button>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="col">
+          <span class="note">If vague</span>
+          <button class="node support" data-agent="issue-refiner" type="button"><span class="id">issue-refiner</span><span class="role">Refinement Summary</span></button>
+          <button class="node support" data-agent="web-scout" type="button"><span class="id">web-scout</span><span class="role">what software / which chart</span></button>
+        </div>
+        <span class="arrow" aria-hidden="true">→</span>
+        <div class="col">
+          <span class="note">Then one or both windows</span>
+          <span class="badge">dev-team-lead</span>
+          <span class="badge">devops-team-lead</span>
+        </div>
+      </div>
+
+      <div class="panes">
+        <article class="pane dev">
+          <span class="tag dev">Software · agents/dev/</span>
+          <h3>dev-team-lead</h3>
+          <div class="hflow">
+            <div class="col">
+              <span class="note">Lead</span>
+              <button class="node dev" data-agent="dev-team-lead" type="button"><span class="id">dev-team-lead</span><span class="role">does not write code</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">1 Investigate</span>
+              <button class="node dev" data-agent="researcher" type="button"><span class="id">researcher</span><span class="role">codebase facts</span></button>
+              <button class="node support" data-agent="explore" type="button"><span class="id">explore</span><span class="role">built-in search</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">2 Design</span>
+              <button class="node dev" data-agent="dev-architect" type="button"><span class="id">dev-architect</span><span class="role">CONTRACT</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">3 Implement</span>
+              <button class="node dev" data-agent="dev-engineer" type="button"><span class="id">dev-engineer</span><span class="role">integrator</span></button>
+              <button class="node dev" data-agent="backend-engineer" type="button"><span class="id">backend-engineer</span><span class="role">API / data</span></button>
+              <button class="node dev" data-agent="frontend-engineer" type="button"><span class="id">frontend-engineer</span><span class="role">UI / client</span></button>
+              <span class="badge">parallel</span>
+              <button class="node dev" data-agent="test-engineer" type="button"><span class="id">test-engineer</span><span class="role">then verify</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">4 Review</span>
+              <button class="node dev" data-agent="code-reviewer" type="button"><span class="id">code-reviewer</span><span class="role">quality gate</span></button>
+            </div>
+          </div>
+        </article>
+
+        <article class="pane ops">
+          <span class="tag ops">Infrastructure · agents/devops/</span>
+          <h3>devops-team-lead</h3>
+          <div class="hflow">
+            <div class="col">
+              <span class="note">Lead</span>
+              <button class="node ops" data-agent="devops-team-lead" type="button"><span class="id">devops-team-lead</span><span class="role">does not edit YAML</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">1 Investigate</span>
+              <button class="node ops" data-agent="devops-investigator" type="button"><span class="id">devops-investigator</span><span class="role">GitOps + cluster reuse</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">2 Design</span>
+              <button class="node ops" data-agent="devops-architect" type="button"><span class="id">devops-architect</span><span class="role">Engineering Brief</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">3 Implement</span>
+              <button class="node ops" data-agent="devops-engineer" type="button"><span class="id">devops-engineer</span><span class="role">GitOps + flux-local</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">4 Verify</span>
+              <button class="node ops" data-agent="devops-verificator" type="button"><span class="id">devops-verificator</span><span class="role">cluster reconcile</span></button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="detail" id="detail" aria-live="polite">
+        <div class="kicker">Selected agent</div>
+        <p>Click any node. Results return to the parent, then to <code>team-lead</code>, then to you.</p>
+      </div>
+
+      <p>Dispatch depth is capped at five layers. Software: <code>team-lead → dev-team-lead → dev-engineer → backend-engineer</code> is four; <code>test-engineer</code> is the fifth. Infra: <code>team-lead → devops-team-lead → devops-investigator</code> is three.</p>
+    </section>
+
+    <section id="handover">
+      <h2>How agents talk</h2>
+      <p>Every specialist returns the handover protocol (signal, not the raw log dump). <code>team-lead</code> then translates that into a human summary and keeps a TRACE of the chain.</p>
+      <div class="status">
+        <div class="pill ok"><strong>[SUCCESS]</strong> Done as asked. Synthesize and report.</div>
+        <div class="pill rework"><strong>[REWORK]</strong> Re-dispatch with error context. Max 2. Then escalate.</div>
+        <div class="pill block"><strong>[BLOCK]</strong> Human needed. Halt. Do not route around it.</div>
+      </div>
+      <h3>What gets passed down</h3>
+      <p>Refined task, constraints, expected output. Not full chat history, not raw exploration dumps, not internal routing notes.</p>
+    </section>
+
+    <section id="outside">
+      <h2>Outside the team-lead chain</h2>
+      <p>
+        Live at <code>agents/*.md</code> (parent folder), not under <code>dev/</code>.
+        <code>team-lead</code> does not dispatch them. Invoke yourself for an audit or cleanup.
+      </p>
+      <ul class="outside">
+        <li><span class="id">ai-security-auditor</span><p>Vulnerability pass over the codebase.</p></li>
+        <li><span class="id">context-drift-auditor</span><p>Structure / context-drift check.</p></li>
+        <li><span class="id">dev-cleanup</span><p>Architectural drift, dependency violations, systematic tidy.</p></li>
+        <li><span class="id">performance-auditor</span><p>Performance audit.</p></li>
+        <li><span class="id">seo-aeo-auditor</span><p>SEO / AEO verification.</p></li>
+        <li><span class="id">test-auditor</span><p>Test-quality validation (separate from test-engineer).</p></li>
+        <li><span class="id">docs</span><p>ADRs, PR descriptions, changelogs — lives in <code>common/</code>.</p></li>
+      </ul>
+      <h3>Ontology (separate primary)</h3>
+      <p><code>ontology-auditor</code> plus <code>db-scanner</code>, <code>api-scanner</code>, <code>ux-scanner</code>, <code>socratic-questioner</code>, <code>matrix-generator</code> in <code>agents/ontology/</code>. Not part of team-lead.</p>
+    </section>
+  </main>
+
+  <footer>
+    This file: opencode/.config/opencode/agents/readme.html · markdown agents nearby · opencode.json default_agent: team-lead
+  </footer>
+
+  <script>
+    const agents = {
+      "team-lead": {
+        title: "team-lead",
+        blurb: "Primary orchestrator. Classifies domain (dev / ops / mixed) and always dispatches the pipeline lead. Permission-locked to issue-refiner, dev-team-lead, and devops-team-lead. Never implements, never calls engineers directly."
+      },
+      "issue-refiner": {
+        title: "issue-refiner",
+        blurb: "Turns a fuzzy idea into a Refinement Summary. May call web-scout only to identify official repo / chart / image. Does not scan GitOps or app source."
+      },
+      "dev-engineer": {
+        title: "dev-engineer",
+        blurb: "Application integrator. Called only by dev-team-lead with an architect CONTRACT. Splits work to backend-engineer and frontend-engineer in parallel, then test-engineer. Returns to the pipeline lead; code-reviewer is the next gate."
+      },
+      "devops-engineer": {
+        title: "devops-engineer",
+        blurb: "GitOps implementer. Called only by devops-team-lead with an Engineering Brief. Mutates listed Flux files, validates with flux-local, pushes agent/devops/<id>. If the brief says reuse Postgres, attach Database/User only — no new install."
+      },
+      "dev-team-lead": {
+        title: "dev-team-lead",
+        blurb: "Software pipeline manager. Always the software entry from team-lead. Permission-locked to researcher, dev-architect, dev-engineer, code-reviewer. Blocks if the task is still vague — does not re-run intake."
+      },
+      "devops-team-lead": {
+        title: "devops-team-lead",
+        blurb: "Infra pipeline manager. Always the infra entry from team-lead. Permission-locked to devops-investigator, devops-architect, devops-engineer, devops-verificator. Does not edit manifests. Reuse of shared backends is mandatory when investigation finds them."
+      },
+      "researcher": {
+        title: "researcher",
+        blurb: "Application-source facts for the software architect. Dispatches explore only. Does not look up Helm charts and does not scan flux/ for shared Postgres."
+      },
+      "dev-architect": {
+        title: "dev-architect",
+        blurb: "Writes the CONTRACT: backend API, frontend components, data model, verification criteria. Does not implement."
+      },
+      "devops-architect": {
+        title: "devops-architect",
+        blurb: "Prompt-only designer. Turns refined requirements plus the investigation report into an Engineering Brief. Must reuse listed shared backends (e.g. existing CNPG). Does not kubectl, does not explore the repo, does not implement."
+      },
+      "devops-investigator": {
+        title: "devops-investigator",
+        blurb: "GitOps repo + live cluster facts, including reusable CNPG/Postgres. One agent — no nested repo-inspector. Does not search the internet. Does not scan application source."
+      },
+      "devops-verificator": {
+        title: "devops-verificator",
+        blurb: "After merge, confirms Flux reconciled. On failure, returns diagnostics as REWORK for devops-engineer."
+      },
+      "code-reviewer": {
+        title: "code-reviewer",
+        blurb: "Post-implementation gate on the software pipeline. Checks quality, security, and CONTRACT adherence. Critical findings: one rework cycle through dev-engineer."
+      },
+      "backend-engineer": {
+        title: "backend-engineer",
+        blurb: "Implements the server half of the CONTRACT. Called only by dev-engineer. small_model when the spec is clear."
+      },
+      "frontend-engineer": {
+        title: "frontend-engineer",
+        blurb: "Implements the UI / client half of the CONTRACT. Called only by dev-engineer, usually in parallel with backend-engineer."
+      },
+      "test-engineer": {
+        title: "test-engineer",
+        blurb: "Checks the integrated feature against expected behavior. Called by dev-engineer after backend and frontend land."
+      },
+      "web-scout": {
+        title: "web-scout",
+        blurb: "Internet only: official repo, Helm chart, image, upstream deps. Called only by issue-refiner. Not used inside either pipeline."
+      },
+      "explore": {
+        title: "explore",
+        blurb: "Built-in OpenCode explore agent. researcher uses it for codebase discovery before design. Not a custom file in agents/."
+      }
+    };
+
+    const detail = document.getElementById("detail");
+    document.querySelectorAll("button.node").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("button.node").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const id = btn.dataset.agent;
+        const a = agents[id];
+        if (!a) return;
+        detail.innerHTML = `<div class="kicker">Selected agent</div><p class="id">${a.title}</p><p>${a.blurb}</p>`;
+      });
+    });
+  </script>
+</body>
+</html>
