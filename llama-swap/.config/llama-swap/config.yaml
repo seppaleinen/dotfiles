@@ -10,6 +10,15 @@ macros:
   "reasoning": >-
 
 models:
+  gemma-4-12b:
+    concurrencyLimit: 3
+    cmd: >-
+      llama-server --port ${PORT} -m ${models_dir}/gemma-4-12B/gemma-4-12B-it-qat-UD-Q4_K_XL.gguf
+      --model-draft ${models_dir}/gemma-4-12B/MTP/mtp-gemma-4-12B-it-Q8_0.gguf --spec-type draft-mtp --spec-draft-n-max 3
+      --cache-reuse 256 -ngl 99 -ngld 99 -b 4096 -ub 2048
+      -c 163920 ${default_flags} --reasoning off --reasoning-budget 0
+      --flash-attn on --parallel 3 --jinja
+
   gemma-4-26b:
     cmd: >-
       llama-server --port ${PORT} -m ${models_dir}/gemma-4-26B/gemma-4-26B_q4_0-it.gguf
@@ -39,9 +48,62 @@ models:
       --flash-attn on --parallel 1 --jinja ${reasoning}
 
   gpt-oss-20b:
+    concurrencyLimit: 8
     cmd: >-
       llama-server --port ${PORT} -m ${models_dir}/gpt-oss-20b/gpt-oss-20b-Q4_K_M.gguf
-      -c 65536 -b 2048 -ub 512 ${default_flags}
+      -c 131072 -b 4096 -ub 1024 ${default_flags}
+      --flash-attn on --parallel 8 --jinja ${reasoning}
+
+  qwen3.5-9b-fable:
+    concurrencyLimit: 6
+    cmd: >-
+      llama-server --port ${PORT}
+      -m ${models_dir}/qwen3.5-9b-fable/Qwen3.5-9B-The-Defiant-Fable-Uncnr-Heretic-NEO-MAX-MTP-Q6_K.gguf
+      -c 131072 -b 4096 -ub 1024 ${default_flags} --cache-reuse 256 -ngl 999
+      --spec-type draft-mtp --spec-draft-n-max 2 --spec-draft-p-min 0.75
+      --reasoning off --reasoning-budget 0
+      --flash-attn on --parallel 6 --jinja ${reasoning}
+
+  qwen3.8-27b:
+    concurrencyLimit: 1
+    cmd: >-
+      llama-server --port ${PORT} -m ${models_dir}/qwen3.8-27b/Qwen3.8-27B-Q4_K_M.gguf
+      -c 65536 ${default_flags}
+      --spec-type draft-mtp --spec-draft-n-max 3 --spec-draft-p-min 0.75
+      --flash-attn on --parallel 1 --jinja ${reasoning} --reasoning-format deepseek
+
+    metadata:
+      reasoning: true
+      capabilities:
+        reasoning_effort: ["low", "medium", "high", "xhigh"]
+
+    # 2. Virtual suffixes for clients that pass model names instead of payload parameters
+    aliases:
+      - "qwen3.8-27b:low"
+      - "qwen3.8-27b:medium"
+      - "qwen3.8-27b:high"
+      - "qwen3.8-27b:xhigh"
+
+    # 3. Dynamically route virtual alias calls into model template kwargs
+    filters:
+      setParamsByID:
+        "qwen3.8-27b:low":
+          chat_template_kwargs:
+            reasoning_effort: "low"
+        "qwen3.8-27b:medium":
+          chat_template_kwargs:
+            reasoning_effort: "medium"
+        "qwen3.8-27b:high":
+          chat_template_kwargs:
+            reasoning_effort: "high"
+        "qwen3.8-27b:xhigh":
+          chat_template_kwargs:
+            reasoning_effort: "xhigh"
+
+  thinkingcap-qwen3.6-27b:
+    cmd: >-
+      llama-server --port ${PORT} -m ${models_dir}/thinkingcap-qwen3.6-27b/ThinkingCap-Qwen3.6-27B-Q4_K_M.gguf
+      -c 65536 ${default_flags}
       --flash-attn on --parallel 1 --jinja ${reasoning}
 
   qwen2.5-coder-7b:
@@ -55,14 +117,14 @@ models:
     cmd: >-
       llama-server --port ${PORT}
       -m ${models_dir}/nomic-embed-text-v2/nomic-embed-text-v2-moe-q8_0.gguf
-      -c 2048 -b 1024 -ub 1024 ${default_flags} --embeddings
+      -c 4096 -b 2048 -ub 2048 ${default_flags} --embeddings
 
   llama-3.1-8b-instruct:
+    concurrencyLimit: 8
     cmd: >-
       llama-server --port ${PORT}
       -m ${models_dir}/llama-3.1-8b-instruct/Llama-3.1-8B-Instruct-Q6_K.gguf
-      -c 65536 ${default_flags} --jinja --flash-attn on
-      --parallel 4 -ngl 99
+      -c 131072 ${default_flags} --jinja --flash-attn on --parallel 8 -ngl 99 --temp 0.0 --top-p 1.0 --presence-penalty 0.0 --repeat-penalty 1.0 --batch-size 4096 -ub 1024
 
 routing:
   router:
@@ -79,10 +141,14 @@ routing:
           swap: true
           exclusive: false
           members:
+            - gemma-4-12b
             - gemma-4-26b
             - gemma-4-31b
+            - qwen3.5-9b-fable
             - qwen3.6-27b
             - qwen3.6-35b
+            - qwen3.8-27b
+            - thinkingcap-qwen3.6-27b
             - gpt-oss-20b
             - qwen2.5-coder-7b
             - llama-3.1-8b-instruct
