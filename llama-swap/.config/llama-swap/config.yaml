@@ -38,8 +38,8 @@ models:
     concurrencyLimit: 4
     cmd: >-
       llama-server --port ${PORT}
-      -m ${models_dir}/models/qwen3-8b/Qwen3-8B-UD-Q6_K_XL.gguf -ngl 99 
-      -c 163920 --cache-reuse 256 -b 4096 -ub 2048 ${default_flags}
+      -m ${models_dir}/models/qwen3-8b/Qwen3-8B-UD-Q6_K_XL.gguf
+      -c 131000 --cache-reuse 256 -b 4096 -ub 2048 ${default_flags}
       --flash-attn on --parallel 4 --jinja
       --reasoning off --reasoning-budget 0
 
