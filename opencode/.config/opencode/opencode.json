@@ -142,28 +142,26 @@
             "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
           },
           "settings": {
-            "reasoningEffort": "medium"
+            "reasoningEffort": "on"
           },
           "variants": {
-            "none": {
-              "reasoningEffort": "none",
-              "extraBody": { "reasoning_budget": 0}
+            "off": {
+              "settings": {
+                "reasoningEffort": "off",
+                "extraBody": {
+                  "enable_thinking": false,
+                  "reasoning_budget": 0
+                }
+              }
             },
-            "low": {
-              "reasoningEffort": "low",
-              "extraBody": { "reasoning_budget": 1024 }
-            },
-            "medium": {
-              "reasoningEffort": "medium",
-              "extraBody": { "reasoning_budget": 4096 }
-            },
-            "high": {
-              "reasoningEffort": "high",
-              "extraBody": { "reasoning_budget": -1 }
-            },
-            "max": {
-              "reasoningEffort": "max",
-              "extraBody": { "reasoning_budget": -1 }
+            "on": {
+              "settings": {
+                "reasoningEffort": "on",
+                "extraBody": {
+                  "enable_thinking": true,
+                  "reasoning_budget": -1
+                }
+              }
             }
           }
         },
@@ -200,23 +198,39 @@
           "variants": {
             "none": {
               "reasoningEffort": "none",
-              "extraBody": { "reasoning_budget": 0}
+              "extraBody": {
+                "reasoning_budget": 0
+              }
+            },
+            "minimal": {
+              "reasoningEffort": "minimal",
+              "extraBody": {
+                "reasoning_budget": 512
+              }
             },
             "low": {
               "reasoningEffort": "low",
-              "extraBody": { "reasoning_budget": 1024 }
+              "extraBody": {
+                "reasoning_budget": 1024
+              }
             },
             "medium": {
               "reasoningEffort": "medium",
-              "extraBody": { "reasoning_budget": 4096 }
+              "extraBody": {
+                "reasoning_budget": 4096
+              }
             },
             "high": {
               "reasoningEffort": "high",
-              "extraBody": { "reasoning_budget": -1 }
+              "extraBody": {
+                "reasoning_budget": -1
+              }
             },
             "max": {
-              "reasoningEffort": "max",
-              "extraBody": { "reasoning_budget": -1 }
+              "reasoningEffort": "xhigh",
+              "extraBody": {
+                "reasoning_budget": -1
+              }
             }
           }
         }
@@ -239,28 +253,26 @@
         "google/gemma-4-26b-a4b-qat": {
           "name": "google/gemma-4-26b-a4b-qat",
           "settings": {
-            "reasoningEffort": "medium"
+            "reasoningEffort": "on"
           },
           "variants": {
-            "none": {
-              "reasoningEffort": "none",
-              "extraBody": { "reasoning_budget": 0}
+            "off": {
+              "settings": {
+                "reasoningEffort": "off",
+                "extraBody": {
+                  "enable_thinking": false,
+                  "reasoning_budget": 0
+                }
+              }
             },
-            "low": {
-              "reasoningEffort": "low",
-              "extraBody": { "reasoning_budget": 1024 }
-            },
-            "medium": {
-              "reasoningEffort": "medium",
-              "extraBody": { "reasoning_budget": 4096 }
-            },
-            "high": {
-              "reasoningEffort": "high",
-              "extraBody": { "reasoning_budget": -1 }
-            },
-            "max": {
-              "reasoningEffort": "max",
-              "extraBody": { "reasoning_budget": -1 }
+            "on": {
+              "settings": {
+                "reasoningEffort": "on",
+                "extraBody": {
+                  "enable_thinking": true,
+                  "reasoning_budget": -1
+                }
+              }
             }
           }
         },
@@ -284,28 +296,88 @@
           "variants": {
             "none": {
               "reasoningEffort": "none",
-              "extraBody": { "reasoning_budget": 0}
+              "extraBody": {
+                "reasoning_budget": 0
+              }
+            },
+            "minimal": {
+              "reasoningEffort": "minimal",
+              "extraBody": {
+                "reasoning_budget": 512
+              }
             },
             "low": {
               "reasoningEffort": "low",
-              "extraBody": { "reasoning_budget": 1024 }
+              "extraBody": {
+                "reasoning_budget": 1024
+              }
             },
             "medium": {
               "reasoningEffort": "medium",
-              "extraBody": { "reasoning_budget": 4096 }
+              "extraBody": {
+                "reasoning_budget": 4096
+              }
             },
             "high": {
               "reasoningEffort": "high",
-              "extraBody": { "reasoning_budget": -1 }
+              "extraBody": {
+                "reasoning_budget": -1
+              }
             },
             "max": {
-              "reasoningEffort": "max",
-              "extraBody": { "reasoning_budget": -1 }
+              "reasoningEffort": "xhigh",
+              "extraBody": {
+                "reasoning_budget": -1
+              }
             }
           }
         },
         "qwen3.6-14b-a3b-fablevibes": {
           "name": "qwen3.6-14b-a3b-fablevibes"
+        },
+        "qwen/qwen3.8-27b": {
+          "name": "qwen3.8-27B",
+          "settings": {
+            "reasoningEffort": "medium"
+          },
+          "variants": {
+            "none": {
+              "reasoningEffort": "none",
+              "extraBody": {
+                "reasoning_budget": 0
+              }
+            },
+            "minimal": {
+              "reasoningEffort": "minimal",
+              "extraBody": {
+                "reasoning_budget": 512
+              }
+            },
+            "low": {
+              "reasoningEffort": "low",
+              "extraBody": {
+                "reasoning_budget": 1024
+              }
+            },
+            "medium": {
+              "reasoningEffort": "medium",
+              "extraBody": {
+                "reasoning_budget": 4096
+              }
+            },
+            "high": {
+              "reasoningEffort": "high",
+              "extraBody": {
+                "reasoning_budget": -1
+              }
+            },
+            "max": {
+              "reasoningEffort": "xhigh",
+              "extraBody": {
+                "reasoning_budget": -1
+              }
+            }
+          }
         }
       },
       "name": "LM Studio",

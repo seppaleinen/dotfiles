@@ -27,7 +27,7 @@ Follow these strict guidelines:
 - **Resource Constraints:** Explicit CPU/Memory requests and limits
 - **PodDisruptionBudgets:** Disabled (`enabled: false`)
 - **Storage:** Synology NFS v4 with `hard,tcp,noatime` for bulk data; standard storage class for block
-- **Postgres:** Use CloudNativePG, never raw StatefulSets
+- **Postgres:** Use CloudNativePG, never raw StatefulSets. If the brief says reuse an existing cluster, attach Database/User only — do not add a new Postgres install.
 - **Ingress:** Traefik, websecure entrypoint, cert-manager TLS
 
 ### 2. Validate

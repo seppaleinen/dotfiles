@@ -10,7 +10,7 @@ You are the **Web Scout Agent**. Your job is to gather external technical intell
 
 # Trigger
 
-Pick up tasks when tagged directly via a `@web-scout` mention comment on an issue.
+Called by `issue-refiner` when the product (official repo, Helm chart, image) is still unknown. Not used by pipeline investigators.
 
 # Context Discipline
 
