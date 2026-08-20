@@ -73,7 +73,6 @@ models:
       -c 131072 -b 4096 -ub 1024 ${default_flags}
       --flash-attn on --parallel 8 --jinja ${reasoning}
 
-
   qwen3.8-27b:
     concurrencyLimit: 1
     cmd: >-
@@ -82,34 +81,6 @@ models:
       --spec-type draft-mtp --spec-draft-n-max 3 --spec-draft-p-min 0.75
       --flash-attn on --parallel 1 --jinja ${reasoning} --reasoning-format deepseek
 
-    metadata:
-      reasoning: true
-      capabilities:
-        reasoning_effort: ["low", "medium", "high", "xhigh"]
-
-    # 2. Virtual suffixes for clients that pass model names instead of payload parameters
-    aliases:
-      - "qwen3.8-27b:low"
-      - "qwen3.8-27b:medium"
-      - "qwen3.8-27b:high"
-      - "qwen3.8-27b:xhigh"
-
-    # 3. Dynamically route virtual alias calls into model template kwargs
-    filters:
-      setParamsByID:
-        "qwen3.8-27b:low":
-          chat_template_kwargs:
-            reasoning_effort: "low"
-        "qwen3.8-27b:medium":
-          chat_template_kwargs:
-            reasoning_effort: "medium"
-        "qwen3.8-27b:high":
-          chat_template_kwargs:
-            reasoning_effort: "high"
-        "qwen3.8-27b:xhigh":
-          chat_template_kwargs:
-            reasoning_effort: "xhigh"
-
   thinkingcap-qwen3.6-27b:
     cmd: >-
       llama-server --port ${PORT} -m ${models_dir}/thinkingcap-qwen3.6-27b/ThinkingCap-Qwen3.6-27B-Q4_K_M.gguf
@@ -117,11 +88,14 @@ models:
       --flash-attn on --parallel 1 --jinja ${reasoning}
 
   qwen2.5-coder-7b:
+    concurrencyLimit: 4
     cmd: >-
       llama-server --port ${PORT}
       -m ${models_dir}/qwen2.5-coder-7b-instruct/Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf
-      -c 65536 -b 2048 -ub 2048 ${default_flags}
-      --jinja --parallel 4 --flash-attn on
+      --model-draft ${models_dir}/qwen2.5-coder-7b-instruct/Qwen2.5-Coder-0.5B-Instruct-Q8_0.gguf --draft-max 5
+      -c 163920 -ngl 99 -ngld 99 -b 4096 -ub 2048 ${default_flags}
+      --reasoning off
+      --cache-reuse 256 --jinja --parallel 4 --flash-attn on
 
   nomic-embed-text-v2:
     cmd: >-
@@ -134,7 +108,9 @@ models:
     cmd: >-
       llama-server --port ${PORT}
       -m ${models_dir}/llama-3.1-8b-instruct/Llama-3.1-8B-Instruct-Q6_K.gguf
-      -c 131072 ${default_flags} --jinja --flash-attn on --parallel 8 -ngl 99 --temp 0.0 --top-p 1.0 --presence-penalty 0.0 --repeat-penalty 1.0 --batch-size 4096 -ub 1024
+      -c 163920 ${default_flags} --jinja --flash-attn on 
+      --parallel 8 -ngl 99 --temp 0.0 --top-p 1.0 --presence-penalty 0.0 --repeat-penalty 1.0 
+      --batch-size 4096 -ub 1024
 
 routing:
   router:
