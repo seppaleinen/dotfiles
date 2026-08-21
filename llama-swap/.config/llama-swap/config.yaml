@@ -88,14 +88,17 @@ models:
       --flash-attn on --parallel 1 --jinja ${reasoning}
 
   qwen2.5-coder-7b:
-    concurrencyLimit: 4
+    concurrencyLimit: 3
     cmd: >-
       llama-server --port ${PORT}
       -m ${models_dir}/qwen2.5-coder-7b-instruct/Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf
-      --model-draft ${models_dir}/qwen2.5-coder-7b-instruct/Qwen2.5-Coder-0.5B-Instruct-Q8_0.gguf --draft-max 5
-      -c 163920 -ngl 99 -ngld 99 -b 4096 -ub 2048 ${default_flags}
-      --reasoning off
-      --cache-reuse 256 --jinja --parallel 4 --flash-attn on
+      --model-draft ${models_dir}/qwen2.5-coder-7b-instruct/Qwen2.5-Coder-0.5B-Instruct-Q8_0.gguf
+      --spec-draft-n-max 8
+      -c 196608 --parallel 3
+      -ngl 99 -ngld 99
+      -b 8192 -ub 4096
+      --reasoning off --chat-template qwen2.5
+      --cache-reuse 256 --jinja --flash-attn on ${default_flags}
 
   nomic-embed-text-v2:
     cmd: >-
@@ -108,8 +111,8 @@ models:
     cmd: >-
       llama-server --port ${PORT}
       -m ${models_dir}/llama-3.1-8b-instruct/Llama-3.1-8B-Instruct-Q6_K.gguf
-      -c 163920 ${default_flags} --jinja --flash-attn on 
-      --parallel 8 -ngl 99 --temp 0.0 --top-p 1.0 --presence-penalty 0.0 --repeat-penalty 1.0 
+      -c 163920 ${default_flags} --jinja --flash-attn on
+      --parallel 8 -ngl 99 --temp 0.0 --top-p 1.0 --presence-penalty 0.0 --repeat-penalty 1.0
       --batch-size 4096 -ub 1024
 
 routing:
