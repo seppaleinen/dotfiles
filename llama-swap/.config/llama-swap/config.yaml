@@ -14,7 +14,7 @@ models:
     concurrencyLimit: 3
     cmd: >-
       llama-server --port ${PORT} -m ${models_dir}/gemma-4-12B/gemma-4-12B-it-qat-UD-Q4_K_XL.gguf
-      --model-draft ${models_dir}/gemma-4-12B/MTP/mtp-gemma-4-12B-it-Q8_0.gguf --spec-type draft-mtp --spec-draft-n-max 3
+      --model-draft ${models_dir}/gemma-4-12B/MTP/mtp-gemma-4-12B-it-Q8_0.gguf --spec-type draft-mtp --spec-draft-n-max 8
       --cache-reuse 256 -ngl 99 -ngld 99 -b 4096 -ub 2048
       -c 163920 ${default_flags} --reasoning off --reasoning-budget 0
       --flash-attn on --parallel 3 --jinja
@@ -63,7 +63,7 @@ models:
   qwen3.6-35b:
     cmd: llama-server --port ${PORT} -m ${models_dir}/qwen3.6-35b/Qwen3.6-35B-A3B-UD-Q4_K_M.gguf
       --spec-type draft-mtp --spec-draft-n-max 2 --spec-draft-p-min 0.75
-      -c 65536 --cache-type-k q8_0 --cache-type-v q8_0
+      -c 65536 --cache-type-k q8_0 --cache-type-v q8_0 --no-mmap --mlock
       --flash-attn on --parallel 1 --jinja ${reasoning}
 
   gpt-oss-20b:
