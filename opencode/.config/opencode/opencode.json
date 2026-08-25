@@ -46,6 +46,11 @@
       "oauth": false,
       "type": "remote",
       "url": "https://mcp.labb.site/k8s/mcp"
+    },
+    "flux-schema-catalog": {
+      "enabled": true,
+      "type": "remote",
+      "url": "https://schemas.fluxoperator.dev/mcp"
     }
   },
   "permission": {
@@ -114,6 +119,11 @@
       "uuidgen*": "allow",
       "pgrep*": "allow",
       "sleep*": "allow",
+      "graft*": "allow",
+      "flate*": "allow",
+      "rg*": "allow",
+      "alembic*": "allow",
+      "ruff*": "allow",
       "docker*": "allow"
     },
     "doom_loop": "ask",
