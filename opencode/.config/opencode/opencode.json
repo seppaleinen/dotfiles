@@ -54,6 +54,11 @@
     }
   },
   "permission": {
+    "external_directory": {
+      "~/workspace/personal/**": "allow",
+      "~/.config/opencode/**": "allow",
+      "/tmp/**": "allow"
+    },
     "bash": {
       "*": "ask",
       "awk*": "allow",
