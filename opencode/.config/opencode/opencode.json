@@ -127,7 +127,6 @@
       "sleep*": "allow",
       "graft*": "allow",
       "flate*": "allow",
-      "rg*": "allow",
       "alembic*": "allow",
       "ruff*": "allow",
       "docker*": "allow"
@@ -148,109 +147,8 @@
       "name": "LiteLLM",
       "npm": "@ai-sdk/openai-compatible",
       "options": {
-        "apiKey": "sk-dummy-key-for-local",
+        "apiKey": "{env:LITELLM_API_KEY}",
         "baseURL": "https://litellm.labb.site/v1"
-      },
-      "models": {
-        "gemma-4-26b": {
-          "name": "Gemma 4 26B",
-          "headers": {
-            "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
-            "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
-          },
-          "settings": {
-            "reasoningEffort": "on"
-          },
-          "variants": {
-            "off": {
-              "settings": {
-                "reasoningEffort": "off",
-                "extraBody": {
-                  "enable_thinking": false,
-                  "reasoning_budget": 0
-                }
-              }
-            },
-            "on": {
-              "settings": {
-                "reasoningEffort": "on",
-                "extraBody": {
-                  "enable_thinking": true,
-                  "reasoning_budget": -1
-                }
-              }
-            }
-          }
-        },
-        "gemma-4-31b": {
-          "name": "Gemma 4 31B",
-          "headers": {
-            "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
-            "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
-          }
-        },
-        "gpt-oss-20b": {
-          "name": "GPT-OSS 20B",
-          "headers": {
-            "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
-            "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
-          }
-        },
-        "qwen3.6-27b": {
-          "name": "Qwen 3.6 27B",
-          "headers": {
-            "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
-            "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
-          }
-        },
-        "qwen3.6-35b": {
-          "name": "Qwen 3.6 35B",
-          "headers": {
-            "Authorization": "{file:~/.local/share/opencode/secrets/litellm-swap-auth}",
-            "x-litellm-api-key": "{file:~/.local/share/opencode/secrets/litellm-swap-key}"
-          },
-          "settings": {
-            "reasoningEffort": "medium"
-          },
-          "variants": {
-            "none": {
-              "reasoningEffort": "none",
-              "extraBody": {
-                "reasoning_budget": 0
-              }
-            },
-            "minimal": {
-              "reasoningEffort": "minimal",
-              "extraBody": {
-                "reasoning_budget": 512
-              }
-            },
-            "low": {
-              "reasoningEffort": "low",
-              "extraBody": {
-                "reasoning_budget": 1024
-              }
-            },
-            "medium": {
-              "reasoningEffort": "medium",
-              "extraBody": {
-                "reasoning_budget": 4096
-              }
-            },
-            "high": {
-              "reasoningEffort": "high",
-              "extraBody": {
-                "reasoning_budget": -1
-              }
-            },
-            "max": {
-              "reasoningEffort": "xhigh",
-              "extraBody": {
-                "reasoning_budget": -1
-              }
-            }
-          }
-        }
       }
     },
     "local lmstudio": {
