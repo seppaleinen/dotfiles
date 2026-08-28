@@ -140,6 +140,7 @@
   },
   "plugin": [
     "opencode-agent-tmux",
+    "opencode-plugin-litellm@latest",
     "{env:HOME}/.hindsight/coding-agents"
   ],
   "provider": {
