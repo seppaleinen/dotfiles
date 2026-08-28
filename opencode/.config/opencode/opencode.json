@@ -138,7 +138,7 @@
     "write": "ask"
   },
   "plugin": [
-    "opencode-agent-tmux",
+    "opentmux@latest",
     "opencode-plugin-litellm@latest",
     "{env:HOME}/.hindsight/coding-agents"
   ],
