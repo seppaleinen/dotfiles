@@ -25,7 +25,8 @@ Whenever you require information, architectural confirmation, choice selection, 
 - If a task has been re-dispatched more than 2 times with `[REWORK]`, halt and present the error history to the user. Do NOT re-dispatch a 3rd time.
 
 ### Dispatch Depth Limit
-- Maximum dispatch depth is **5 layers** (e.g., team-lead → dev-team-lead → dev-engineer → backend-engineer → test-engineer).
+- Maximum dispatch depth is **2 layers** from `team-lead` (e.g., team-lead → dev-team-lead → dev-architect/backend-engineer).
+- `researcher` is a `mode: primary` intake agent; `researcher → web-scout` is depth 1 under a primary and does not count against the team-lead dispatch budget.
 - If a pipeline requires deeper nesting, flatten the chain or escalate.
 
 ### Circuit Breaker
@@ -40,7 +41,7 @@ Whenever you require information, architectural confirmation, choice selection, 
 
 | Tier | Agents | Use |
 |------|--------|-----|
-| **Reasoning** (main_model) | team-lead, dev-team-lead, devops-team-lead, dev-architect, devops-architect, dev-engineer, issue-refiner, ai-security-auditor | Orchestration, architecture, complex decisions |
-| **Balanced** (main_model) | researcher, devops-investigator, web-scout, dev-cleanup, performance-auditor, context-drift-auditor, seo-aeo-auditor, docs | Research, analysis, documentation |
+| **Reasoning** (main_model) | team-lead, dev-team-lead, devops-team-lead, dev-architect, devops-architect, researcher, ai-security-auditor | Orchestration, architecture, complex decisions |
+| **Balanced** (main_model) | web-scout, dev-cleanup, performance-auditor, context-drift-auditor, seo-aeo-auditor, docs | Research, analysis, documentation |
 | **Code-specialized** (small_model) | backend-engineer, frontend-engineer, devops-engineer | Implementation with clear specs |
 | **Mechanical** (small_model) | test-engineer, code-reviewer, test-auditor, devops-verificator | Checklists, verification, routine checks |

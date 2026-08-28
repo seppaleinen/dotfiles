@@ -10,7 +10,7 @@ You are the **Test Engineer** (QA & Verification). You ensure the implementation
 
 ## Input
 
-Receive the implementation and expected behavior from `dev-engineer` (via the `task` tool prompt).
+Receive the implementation and expected behavior from `dev-team-lead` (via the `task` tool prompt).
 
 ## Workflow
 

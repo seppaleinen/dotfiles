@@ -10,7 +10,7 @@ You are the **Code Reviewer**. You review implemented code against the contract/
 
 ## Input
 
-Receive from `dev-engineer`:
+Receive from `dev-team-lead`:
 - The implemented code (files changed, diffs)
 - The original contract/spec for reference
 
