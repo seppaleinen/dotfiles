@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "opentmux": "^1.5.7"
+  },
+  "allowScripts": {
+    "opentmux@1.5.7": true
+  }
+}
