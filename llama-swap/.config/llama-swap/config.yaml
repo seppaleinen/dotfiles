@@ -1,7 +1,7 @@
 globalTTL: 300
 sendLoadingState: true
 healthCheckTimeout: 180
-unloadTimeout: 5s
+unloadTimeout: 5
 startPort: 5800
 macros:
   "models_dir": "/home/seppa/models"
@@ -11,7 +11,7 @@ macros:
   "reasoning": >-
 
 models:
-   gemma-4-12b-vllm:
+  gemma-4-12b-vllm:
     concurrencyLimit: 3
     cmd: >-
       docker run --rm --name gemma4-12b-vllm-${PORT}
@@ -110,20 +110,20 @@ models:
       --flash-attn on --parallel 1 --jinja ${reasoning}
 
   qwen2.5-coder-7b:
-    concurrencyLimit: 3
+    concurrencyLimit: 4
+    cmdStop: "kill -9 ${PID}"
     cmd: >-
       llama-server --port ${PORT}
       -m ${models_dir}/qwen2.5-coder-7b-instruct/qwen2.5-coder-7b-instruct-q6_k.gguf
-      --model-draft ${models_dir}/qwen2.5-coder-7b-instruct/Qwen2.5-Coder-0.5B-Instruct-Q8_0.gguf
-      --spec-draft-n-max 8
-      -c 196608 --parallel 3
+      --spec-type none
+      -c 100768 --parallel 4
+      --cache-type-k q8_0 --cache-type-v q8_0
       -ngl 99 -ngld 99
-      -b 8192 -ub 4096
-      --reasoning off --chat-template qwen2.5
+      -b 4096 -ub 1024
+      --reasoning off
       --cache-reuse 256 --jinja --flash-attn on ${default_flags}
-      --temp 0.0 --top-p 1.0 --top-k 1
-      --repeat-penalty 1.0 --presence-penalty 0.0 --frequency-penalty 0.0
-      --batch-size 8192
+      --temp 0.1 --top-p 0.95 --top-k 40
+      --repeat-penalty 1.08 --frequency-penalty 0.1
 
   nomic-embed-text-v2:
     cmd: >-
