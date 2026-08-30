@@ -91,7 +91,7 @@ models:
     concurrencyLimit: 3
     cmd: >-
       llama-server --port ${PORT}
-      -m ${models_dir}/qwen2.5-coder-7b-instruct/Qwen2.5-Coder-7B-Instruct-Q4_K_M.gguf
+      -m ${models_dir}/qwen2.5-coder-7b-instruct/qwen2.5-coder-7b-instruct-q6_k.gguf
       --model-draft ${models_dir}/qwen2.5-coder-7b-instruct/Qwen2.5-Coder-0.5B-Instruct-Q8_0.gguf
       --spec-draft-n-max 8
       -c 196608 --parallel 3
