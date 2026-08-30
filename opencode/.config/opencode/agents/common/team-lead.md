@@ -85,7 +85,11 @@ Each dispatch gets a fresh `task` call. Do NOT chain dispatches in a single call
 
 ## Rework Handling
 
-If a dispatched pipeline lead returns `[REWORK]`, re-dispatch with the additional error context appended to the task description. Track rework count — if the same task returns `[REWORK]` more than **2 times**, escalate to the user with the error history instead of re-dispatching.
+If a dispatched pipeline lead returns `[REWORK]`, prefer **`task_id` resume**: use the previous `task_id` to continue the same session with the error context appended. This preserves the subagent's working memory and avoids the empty-result problem.
+
+If the session has been aborted (`task_id` no longer valid), fall back to fresh dispatch with the error context appended.
+
+Track rework count — if the same task returns `[REWORK]` more than **2 times**, escalate to the user with the error history instead of re-dispatching.
 
 If it returns `[BLOCK]`, halt and present the issue to the user immediately.
 

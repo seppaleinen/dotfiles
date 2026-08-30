@@ -93,6 +93,10 @@ Present the result to the caller (user, `team-lead`, or pipeline lead) using the
 
 ## Rework Handling
 
+If a dispatched pipeline lead returns `[REWORK]`, prefer **`task_id` resume**: use the previous `task_id` to continue the same session with the error context appended. This preserves the subagent's working memory and avoids the empty-result problem.
+
+If the session has been aborted (`task_id` no longer valid), fall back to fresh dispatch with the error context appended.
+
 - If `devops-architect` returns `[REWORK]`: clarify using brief facts and re-dispatch. Max 2 reworks per task.
 - If `devops-engineer` returns `[REWORK]` / `[BLOCK]`: forward errors to `devops-architect` for plan fixes. Max 2 reworks per task.
 - If `devops-verificator` returns `[REWORK]` / `[BLOCK]`: forward cluster errors to `devops-engineer`. Max 2 reworks per task.

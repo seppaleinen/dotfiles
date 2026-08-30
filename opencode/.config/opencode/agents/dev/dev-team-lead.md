@@ -121,12 +121,13 @@ Once the reviewer returns `[SUCCESS]`, present the result to the caller (user, `
 
 ## Rework Handling
 
-- If `dev-architect` returns `[REWORK]`: clarify requirements and re-dispatch. Max 2 reworks per task.
-- If `backend-engineer` or `frontend-engineer` returns `[REWORK]`: forward the error context to `dev-architect` for contract fixes. Max 2 reworks per task.
-- If `test-engineer` returns `[REWORK]`: fix the issue via the responsible engineer once. If it fails again, escalate to the caller with the full error history.
-- If `code-reviewer` returns `[REWORK]` with Critical findings: forward to the responsible engineer for fixes, then re-review once. Max 1 re-review cycle.
-- If the same task has been re-dispatched more than 2 times total, escalate to the caller with the full error history. Do NOT re-dispatch a 3rd time.
-- If any agent returns `[BLOCK]`: halt immediately and surface to the caller with full context.
+If a dispatched pipeline lead returns `[REWORK]`, prefer **`task_id` resume**: use the previous `task_id` to continue the same session with the error context appended. This preserves the subagent's working memory and avoids the empty-result problem.
+
+If the session has been aborted (`task_id` no longer valid), fall back to fresh dispatch with the error context appended.
+
+Track rework count — if the same task returns `[REWORK]` more than **2 times**, escalate to the user with the error history instead of re-dispatching.
+
+If it returns `[BLOCK]`, halt and present the issue to the user immediately.
 
 ## Handover Protocol
 
