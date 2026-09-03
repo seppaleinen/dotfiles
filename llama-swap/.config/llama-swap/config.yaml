@@ -17,10 +17,10 @@ models:
       docker run --rm --name gemma4-12b-vllm-${PORT}
       --runtime nvidia --gpus all --ipc=host --network host
       -v /home/seppa/.cache/huggingface:/root/.cache/huggingface
-      -e VLLM_ATTENTION_BACKEND=TRITON_ATTN
+      -e HF_XET_HIGH_PERFORMANCE=1
       -e HF_TOKEN
       vllm/vllm-openai:latest
-      --model google/gemma-4-12B-it-qat-w4a16-ct
+      google/gemma-4-12B-it-qat-w4a16-ct
       --port ${PORT} --host 0.0.0.0
       --max-model-len 16384
       --gpu-memory-utilization 0.92
@@ -29,17 +29,19 @@ models:
       --max-num-batched-tokens 4096
       --max-num-seqs 3
       --speculative-config '{"method":"mtp","model":"google/gemma-4-12B-it-assistant","num_speculative_tokens":8}'
-      --disable-log-requests
+      --trust-remote-code
+      --hf-overrides '{"text_config": {"allow_global_per_layer_attribute_access": true}, "allow_global_per_layer_attribute_access": true}'
 
   gemma-4-12b:
-    concurrencyLimit: 5
+    concurrencyLimit: 3
     cmdStop: "kill -9 ${PID}"
     cmd: >-
       llama-server --port ${PORT} -m ${models_dir}/gemma-4-12B/gemma-4-12B-it-qat-UD-Q4_K_XL.gguf
-      --model-draft ${models_dir}/gemma-4-12B/MTP/mtp-gemma-4-12B-it-Q8_0.gguf --spec-type draft-mtp --spec-draft-n-max 8
+      --model-draft ${models_dir}/gemma-4-12B/MTP/mtp-gemma-4-12B-it-Q8_0.gguf --spec-type draft-mtp --spec-draft-n-max 3
       --cache-reuse 256 -ngl 99 -ngld 99 -b 4096 -ub 2048
-      -c 163920 ${default_flags} --reasoning off --reasoning-budget 0
-      --flash-attn on --parallel 5 --jinja
+      -c 120000 ${default_flags} --reasoning off --reasoning-budget 0
+      --flash-attn on --parallel 3 --jinja
+      --temp 0.1 --top-p 0.95 --top-k 40
 
   gemma-4-26b:
     cmd: >-
@@ -118,12 +120,13 @@ models:
       --spec-type none
       -c 100768 --parallel 4
       --cache-type-k q8_0 --cache-type-v q8_0
-      -ngl 99 -ngld 99
+      -ngl 99
       -b 4096 -ub 1024
       --reasoning off
+      --parallel 4
       --cache-reuse 256 --jinja --flash-attn on ${default_flags}
-      --temp 0.1 --top-p 0.95 --top-k 40
-      --repeat-penalty 1.08 --frequency-penalty 0.1
+      --temp 0.2 --top-p 0.95 --top-k 40
+      --repeat-penalty 1.20 --frequency-penalty 0.3
 
   nomic-embed-text-v2:
     cmd: >-
