@@ -82,6 +82,23 @@ aza-market unpin python-expert          # re-enable auto-updates (user scope)
 aza-market unpin python-expert --project  # unpin at project scope
 ```
 
+## Per-install configuration
+
+```bash
+# Show effective settings for an installed component
+aza-market config component jira
+aza-market config component my-skill --project
+
+# GitLab git+ MCP: test a feature branch without hand-editing mcp.json
+aza-market config component jira --set branch my-branch
+aza-market config component jira --unset branch
+
+# Skill: allow ambient model invocation (disable-model-invocation: false)
+aza-market config component aza-cli --set disable-model-invocation false
+```
+
+Overrides are stored in `installed.json` and survive sync/update. `aza-market list` shows active overrides in the Status column (`branch=… (override)` for GitLab git+ MCPs, `disable-model-invocation=… (override)` for skills). Pinned installs are patched in place (SHA unchanged).
+
 ## Dev / branch testing
 
 **Only run `use-branch` when the user explicitly asks** to test an unmerged catalog branch. Do not suggest or use it proactively — it switches the local marketplace clone to a feature branch and can leave the user stuck there.
