@@ -25,9 +25,16 @@ Whenever you require information, architectural confirmation, choice selection, 
 - If a task has been re-dispatched more than 2 times with `[REWORK]`, halt and present the error history to the user. Do NOT re-dispatch a 3rd time.
 
 ### Dispatch Depth Limit
-- Maximum dispatch depth is **2 layers** from `team-lead` (e.g., team-lead → dev-team-lead → dev-architect/backend-engineer).
+- Maximum dispatch depth is **3 layers** from `team-lead` (matches `opencode.json` `subagent_depth: 3`). This accommodates the full worker pipeline: `team-lead → dev-team-lead → dev-architect → backend-engineer`.
 - `researcher` is a `mode: primary` intake agent; `researcher → web-scout` is depth 1 under a primary and does not count against the team-lead dispatch budget.
-- If a pipeline requires deeper nesting, flatten the chain or escalate.
+- **If a `task()` dispatch fails or errors out** (e.g., depth limit hit, agent unavailable), do NOT silently retry or drop the task. Surface the failure in your response with the step that failed and the error, so the caller can see where the pipeline stalled.
+- If a pipeline would require deeper nesting, flatten the chain or escalate.
+
+### Progress Reporting (Visibility)
+- Subagents that run multi-step pipelines MUST surface their current step to the caller. When you dispatch a subagent and it will take multiple minutes, do NOT just block silently.
+- Prefer dispatching long-running pipeline leads in the **background** (`background: true`) where supported, then poll for completion and report intermediate status to the user as steps complete.
+- Before dispatching a pipeline lead, tell the user **which pipeline** is running and **what it will do** (e.g., "Dev pipeline: architect → implement → test → review"). This gives the user a mental model of what's happening while they wait.
+- Every pipeline lead MUST include a STATUS marker in its final handover indicating where it got to: `[SUCCESS]`, `[REWORK]`, `[BLOCK]`, or `[STUCK]` (see handover skill).
 
 ### Circuit Breaker
 - If any agent returns `[BLOCK]`, stop immediately. Do NOT attempt to work around it or re-dispatch to a different agent.

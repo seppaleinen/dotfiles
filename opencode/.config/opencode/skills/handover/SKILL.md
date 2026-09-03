@@ -27,6 +27,7 @@ One of:
 - `[SUCCESS]` — Task completed as requested
 - `[REWORK]` — Task cannot be completed as specified; include errors and context for the fix
 - `[BLOCK]` — Critical issue requiring human intervention; include full context
+- `[STUCK]` — Task could not be progressed; the agent hit a dispatch failure, empty result, or unexplained stall at a known step. Include WHICH step failed, WHICH agent/dispatch failed, and any error. This is distinct from `[REWORK]` (which needs a content fix) and `[BLOCK]` (which needs a human decision) — `[STUCK]` means the machinery itself failed and the caller should decide whether to re-dispatch, escalate, or hand back to the user.
 
 ### 2. SUMMARY
 A high-level, one-paragraph description of what was achieved or why it failed. The downstream agent should understand the outcome without reading anything else.
