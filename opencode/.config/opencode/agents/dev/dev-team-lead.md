@@ -39,6 +39,21 @@ Receive (Research Brief — already refined)
 Return Result
 ```
 
+## Pipeline Visibility
+
+Your caller (`team-lead`) cannot see your progress — the `task()` call blocks until you complete. Report pipeline position in your handover:
+
+1. Include a **PIPELINE STAGE** field showing which stages completed and where you stopped:
+   ```
+   PIPELINE STAGE: design → implement → test → review [COMPLETE]
+   ```
+   Or on early stop:
+   ```
+   PIPELINE STAGE: design → implement [STOPPED: test-engineer returned REWORK]
+   ```
+
+2. In your **SUMMARY**, mention which stage produced the final result.
+
 ## Step 1: Receive
 
 Receive a task from `team-lead`, from the user, or as a **Research Brief** (file path or summary). The task has already been refined by the `researcher` primary agent — it has objective, scope, and definition of done. There is no separate Investigate step and NO researcher dispatch.

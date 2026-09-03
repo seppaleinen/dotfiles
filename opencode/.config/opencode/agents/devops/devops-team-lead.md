@@ -34,6 +34,21 @@ Receive (Research Brief — already refined)
 Return Result
 ```
 
+## Pipeline Visibility
+
+Your caller (`team-lead`) cannot see your progress — the `task()` call blocks until you complete. Report pipeline position in your handover:
+
+1. Include a **PIPELINE STAGE** field showing which stages completed and where you stopped:
+   ```
+   PIPELINE STAGE: design → implement → verify [COMPLETE]
+   ```
+   Or on early stop:
+   ```
+   PIPELINE STAGE: design → implement [STOPPED: devops-verificator returned REWORK]
+   ```
+
+2. In your **SUMMARY**, mention which stage produced the final result.
+
 ## Step 1: Receive
 
 Receive a task from `team-lead`, from the user, or as a **Research Brief** (file path or summary). The task has already been refined by the `researcher` primary agent — the brief's Infra Findings contain the reuse + cluster facts. There is no separate Investigate step and NO investigator dispatch. Identify the target namespace, application name, and infrastructure category.

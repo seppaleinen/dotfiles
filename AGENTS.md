@@ -38,6 +38,10 @@ All inter-agent communication uses the handover protocol defined in `opencode/.c
 
 **Model tiers:** `team-lead` and orchestrators use `main_model` (reasoning). Worker agents (`backend-engineer`, `frontend-engineer`, `devops-engineer`) use `small_model` when the spec is clear.
 
+**Dispatch depth:** Max **3 layers** from `team-lead` (`subagent_depth: 3` in `opencode.json`) — enough for `team-lead → dev-team-lead → dev-architect → backend-engineer`. Keep pipelines within this budget.
+
+**Visibility:** `team-lead` and the pipeline leads announce their current step (via the `todo` tool and STATUS markers) and surface any `[STUCK]` subagent to the user instead of looping silently. If you see a long wait with no progress output, a subagent may have hit a dispatch/depth-limit failure — interrupt that `team-lead` session and ask it for its TRACE so you can see where the chain stalled.
+
 ## Shared MCP Servers
 
 Configured identically across OpenCode, Goose, and jcode:

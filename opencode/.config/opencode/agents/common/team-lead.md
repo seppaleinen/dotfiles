@@ -83,6 +83,29 @@ Wait for both to complete. Then synthesize a combined result (see Step 3 below).
 
 Each dispatch gets a fresh `task` call. Do NOT chain dispatches in a single call. Wait for the result, evaluate it, then dispatch the next step if needed.
 
+## Pipeline Visibility
+
+The `task()` call blocks until the subagent completes — the user sees nothing during execution. You MUST keep the user informed at two points:
+
+### Before dispatching
+
+Before EVERY `task()` call, tell the user:
+1. **Which agent** you're dispatching
+2. **What pipeline stages** it will run through (e.g., "architect → engineer → test → review")
+
+Example: `Dispatching dev-team-lead. Pipeline: architect → backend-engineer → test-engineer → code-reviewer`
+
+### After receiving
+
+When a subagent returns, report which stage produced the result (from the TRACE line in the handover). If re-dispatching, state which stage is being retried and why.
+
+### On stalled agents
+
+If a dispatched agent returns empty, errors, or `[STUCK]`:
+- Do NOT silently retry in a loop
+- Report to the user: which agent stalled, what step it was on, what you'll do next
+- Offer: re-dispatch with `task_id` resume, or hand back to the user
+
 ## Rework Handling
 
 If a dispatched pipeline lead returns `[REWORK]`, prefer **`task_id` resume**: use the previous `task_id` to continue the same session with the error context appended. This preserves the subagent's working memory and avoids the empty-result problem.
@@ -106,6 +129,7 @@ Once the dispatched agent returns, check the STATUS field:
 - `[SUCCESS]` → proceed to Step 3 (synthesis)
 - `[REWORK]` → re-dispatch with error context (max 2 retries)
 - `[BLOCK]` → present to user with full context
+- `[STUCK]` → report to the user which agent stalled and on what step, then offer re-dispatch (`task_id` resume) or hand back. Do NOT loop-re-dispatch silently.
 
 ## Step 3: Synthesize & Report
 
