@@ -48,10 +48,13 @@
       "type": "remote",
       "url": "https://mcp.labb.site/k8s/mcp"
     },
-    "flux-schema-catalog": {
+    "litellm-openviking": {
       "enabled": true,
       "type": "remote",
-      "url": "https://schemas.fluxoperator.dev/mcp"
+      "url": "https://litellm.labb.site/mcp",
+      "headers": {
+        "Authorization": "Bearer {env:LITELLM_API_KEY}"
+      }
     }
   },
   "permission": {
@@ -140,7 +143,9 @@
   "plugin": [
     "opentmux@latest",
     "opencode-plugin-litellm@latest",
-    "{env:HOME}/.hindsight/coding-agents"
+    "{env:HOME}/.hindsight/coding-agents",
+    "@openviking/opencode-plugin@latest",
+    "opencode-agent-tmux"
   ],
   "provider": {
     "litellm": {
