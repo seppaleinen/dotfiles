@@ -112,9 +112,23 @@ If a dispatched pipeline lead returns `[REWORK]`, prefer **`task_id` resume**: u
 
 If the session has been aborted (`task_id` no longer valid), fall back to fresh dispatch with the error context appended.
 
+`[REWORK]` means **resume at the failed stage**, not re-run the pipeline from intake/design. For a dev-pipeline rework from `code-reviewer`, re-enter at the reviewer/engineer stage — do NOT re-dispatch `dev-architect` unless the contract itself is invalid. Pass the error context verbatim with the resume.
+
 Track rework count — if the same task returns `[REWORK]` more than **2 times**, escalate to the user with the error history instead of re-dispatching.
 
 If it returns `[BLOCK]`, halt and present the issue to the user immediately.
+
+## Follow-up Handling
+
+- **Rule 1 — Classify the follow-up.** Two buckets:
+  - *New task:* unrelated to the last pipeline run → full pipeline from Step 1 (classify dev/devops/mixed; dispatch `researcher` only if raw/ambiguous).
+  - *Continuation:* "last pipeline had an issue" (rework/regression) OR "also do X" (increment on prior work) → treat as continuation, NOT fresh intake. Never auto-re-dispatch `researcher` for a continuation.
+- **Rule 2 — Continuations resume, not restart.**
+  - Identify the pipeline (dev/devops) and the stopped stage from the handover's `TRACE` / `PIPELINE STAGE` fields.
+  - Do NOT re-run `researcher` for small fixes; do NOT re-run the architect (design) for small fixes — resume at the failing/affected stage.
+  - Route the continuation to the pipeline lead with the previous handover + error context appended (pass the prior `TRACE`).
+  - **Always** end with at least one verification step before returning to the user: dev → `test-engineer` or `code-reviewer`; devops → `devops-verificator`.
+- **Rule 3 — Routing discipline:** never dispatch engineers or architects directly, even for continuations — always go through `dev-team-lead` / `devops-team-lead`.
 
 # Steps
 

@@ -49,6 +49,13 @@ Your caller (`team-lead`) cannot see your progress — the `task()` call blocks 
 
 2. In your **SUMMARY**, mention which stage produced the final result.
 
+## Fast Path
+
+- **When:** small, well-defined changes — single manifest/Helm value bump or equivalent.
+- **May skip:** `devops-architect` (design) — proceed straight to `devops-engineer` with the brief's Infra Findings.
+- **Never skip:** `devops-verificator` — cluster verification is the only correctness gate; non-negotiable on every run, full or fast path.
+- **Escape hatch:** when in doubt, run the full pipeline from `## Step 2`.
+
 ## Step 1: Receive
 
 Receive a task from `team-lead`, from the user, or as a **Research Brief** (file path or summary). The task has already been refined by the `researcher` primary agent — the brief's Infra Findings contain the reuse + cluster facts. There is no separate Investigate step and NO investigator dispatch. Identify the target namespace, application name, and infrastructure category.
@@ -101,6 +108,11 @@ If `devops-verificator` returns `[REWORK]` with diagnostic findings:
 - Forward the root cause analysis and evidence to `devops-engineer` for targeted fixes.
 - Do NOT re-dispatch to `devops-architect` unless the issue is architectural.
 - Max 2 verification cycles before escalating.
+
+### CI/Deploy Verification (Optional)
+
+- After verification passes, may optionally check CI/deployment (Flux reconciliation, GitHub Actions, cluster apply status); route failures back to `devops-engineer`.
+- **Must NOT block handover:** if CI/deploy tooling is unavailable or slow, return `[SUCCESS]` anyway; report CI/deploy status in the handover as informational, not a gate.
 
 ## Step 5: Return Result
 

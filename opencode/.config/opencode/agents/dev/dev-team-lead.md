@@ -54,6 +54,14 @@ Your caller (`team-lead`) cannot see your progress — the `task()` call blocks 
 
 2. In your **SUMMARY**, mention which stage produced the final result.
 
+## Fast Path
+
+- **When:** small, well-defined fixes — single-file/small diff, clear objective and DoD.
+- **May skip:** `dev-architect` (design stage). Note `researcher` never re-runs here.
+- **Must run:** engineer (`backend-engineer`/`frontend-engineer`) → then `test-engineer` **OR** `code-reviewer` (at least one verification stage, mandatory).
+- **Golden rule:** *May skip design, never skip verification.*
+- **Escape hatch:** when in doubt whether a task qualifies as "small", run the full pipeline from `## Step 2`.
+
 ## Step 1: Receive
 
 Receive a task from `team-lead`, from the user, or as a **Research Brief** (file path or summary). The task has already been refined by the `researcher` primary agent — it has objective, scope, and definition of done. There is no separate Investigate step and NO researcher dispatch.
@@ -130,9 +138,26 @@ task(
 **Pass:** Files changed / diffs, the original contract for spec adherence check.
 **Do NOT pass:** Internal pipeline routing, architect's reasoning.
 
+### CI/Deploy Verification (Optional)
+
+- After review passes, may optionally verify CI/deployment (check CI runs, smoke-test deployed app); coordinate fixes back through the responsible worker.
+- **Must NOT block handover:** if CI/deploy tooling is unavailable or slow, return `[SUCCESS]` anyway; report CI/deploy status in the handover as informational, not a gate.
+
 ## Step 6: Return Result
 
 Once the reviewer returns `[SUCCESS]`, present the result to the caller (user, `team-lead`, or pipeline lead) using the Handover Protocol.
+
+## Re-entry
+
+On `[REWORK]` from any worker: **resume at the failed step** with the error context appended — prefer `task_id` resume per `## Rework Handling`.
+
+Do NOT restart the pipeline from `## Step 2` (design) unless the contract itself is broken — then re-dispatch `dev-architect` once, and say so.
+
+After the fix lands, **run the remaining stages** (e.g., fix from reviewer → re-run `test-engineer` → `code-reviewer`).
+
+Update `PIPELINE STAGE` in the handover to reflect the re-entry point (example: `design → implement → test [REWORK] → re-enter at implement → test → review [COMPLETE]`).
+
+Cross-reference `## Rework Handling` for session mechanics (task_id resume, max 2, BLOCK halt) — keep Re-entry focused on stage semantics.
 
 ## Rework Handling
 
