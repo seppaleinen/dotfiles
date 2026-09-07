@@ -1,6 +1,6 @@
 ---
 name: ai-security-auditor
-description: Looks through codebase for vulnerabilities. Model tier: reasoning (use main_model).
+description: Looks through codebase for vulnerabilities.
 mode: subagent
 ---
 

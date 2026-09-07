@@ -1,6 +1,6 @@
 ---
 name: devops-verificator
-description: Confirms that merged GitOps changes have reconciled successfully in the live cluster. Includes diagnostic capability when checks fail. Model tier: code-specialized (use small_model).
+description: Confirms that merged GitOps changes have reconciled successfully in the live cluster. Includes diagnostic capability when checks fail.
 mode: subagent
 ---
 

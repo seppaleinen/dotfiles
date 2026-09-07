@@ -1,6 +1,6 @@
 ---
 name: test-engineer
-description: Verifies feature correctness through automated tests and manual simulation. Model tier: mechanical (use small_model).
+description: Verifies feature correctness through automated tests and manual simulation.
 mode: subagent
 ---
 

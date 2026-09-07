@@ -1,6 +1,6 @@
 ---
 name: team-lead
-description: Top-level orchestrator that routes work to the dev-team-lead or devops-team-lead pipelines. Default agent for all user interaction. Model tier: reasoning (use main_model).
+description: Top-level orchestrator that routes work to the dev-team-lead or devops-team-lead pipelines. Default agent for all user interaction.
 mode: primary
 permission:
   task:

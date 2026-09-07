@@ -1,6 +1,6 @@
 ---
 name: backend-engineer
-description: Implements server-side logic, API endpoints, and data layer changes for application features. Model tier: code-specialized (use small_model).
+description: Implements server-side logic, API endpoints, and data layer changes for application features.
 mode: subagent
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: frontend-engineer
-description: Implements UI components, client-side state management, and interaction logic for application features. Model tier: code-specialized (use small_model).
+description: Implements UI components, client-side state management, and interaction logic for application features.
 mode: subagent
 ---
 

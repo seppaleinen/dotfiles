@@ -1,6 +1,6 @@
 ---
 name: test-auditor
-description: Validates test quality. Model tier: mechanical (use small_model).
+description: Validates test quality.
 mode: subagent
 ---
 

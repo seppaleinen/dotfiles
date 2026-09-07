@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Reviews code for quality, security, and spec adherence. Use after implementation and before merge. Model tier: mechanical (use small_model).
+description: Reviews code for quality, security, and spec adherence. Use after implementation and before merge.
 mode: subagent
 ---
 

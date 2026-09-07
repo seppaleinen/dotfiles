@@ -1,6 +1,6 @@
 ---
 name: dev-architect
-description: Defines technical contracts, API specifications, component boundaries, and data models for application features. Model tier: reasoning (use main_model).
+description: Defines technical contracts, API specifications, component boundaries, and data models for application features.
 mode: subagent
 ---
 

@@ -12,6 +12,7 @@
   "lsp": true,
   "mcp": {
     "authentik": {
+      "enabled": false,
       "command": [
         "uvx",
         "--from",
@@ -27,6 +28,7 @@
       "type": "local"
     },
     "grafana": {
+      "enabled": false,
       "command": [
         "uvx",
         "mcp-grafana",
@@ -40,7 +42,7 @@
       "type": "local"
     },
     "kubernetes": {
-      "enabled": true,
+      "enabled": false,
       "headers": {
         "Authorization": "{env:K8S_TOKEN}"
       },
@@ -49,7 +51,7 @@
       "url": "https://mcp.labb.site/k8s/mcp"
     },
     "litellm-openviking": {
-      "enabled": true,
+      "enabled": false,
       "type": "remote",
       "url": "https://litellm.labb.site/mcp",
       "headers": {
@@ -158,18 +160,6 @@
     },
     "local lmstudio": {
       "models": {
-        "diffusiongemma-26b-a4b-it": {
-          "name": "diffusiongemma-26b-a4b-it"
-        },
-        "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-tau2": {
-          "name": "gemma-4-12b-agentic-fable5-composer2.5-v2-3.5x-tau2"
-        },
-        "gemma-4-31b-it": {
-          "name": "gemma-4-31b-it"
-        },
-        "glm-4.7-flash-reap-23b-a3b": {
-          "name": "glm-4.7-flash-reap-23b-a3b"
-        },
         "google/gemma-4-26b-a4b-qat": {
           "name": "google/gemma-4-26b-a4b-qat",
           "settings": {
@@ -196,64 +186,20 @@
             }
           }
         },
-        "ornith-1.0-35b": {
-          "name": "ornith-1.0-35b"
+        "qwen3.8-27b-gsq-rco": {
+          "name": "qwen3.8-27b-gsq-rco"
         },
-        "ornith-1.0-35b-mlx": {
-          "name": "ornith-1.0-35b-mlx"
+        "prism-ml/bonsai-27b": {
+          "name": "prism-ml/bonsai-27b"
         },
-        "qwable-3.6-35b": {
-          "name": "qwable-3.6-35b"
+        "qwen3.8-27b-qat-nvfp4": {
+          "name": "qwen3.8-27b-qat-nvfp4"
+        },
+        "thinkingcap-qwen3.6-27b": {
+          "name": "thinkingcap-qwen3.6-27b"
         },
         "qwen/qwen2.5-coder-14b": {
           "name": "qwen/qwen2.5-coder-14b"
-        },
-        "qwopus3.6-35b-a3b-v1-mlx-mixed_4_6": {
-          "name": "qwopus3.6-35b-a3b-v1-mlx-mixed_4_6",
-          "settings": {
-            "reasoningEffort": "medium"
-          },
-          "variants": {
-            "none": {
-              "reasoningEffort": "none",
-              "extraBody": {
-                "reasoning_budget": 0
-              }
-            },
-            "minimal": {
-              "reasoningEffort": "minimal",
-              "extraBody": {
-                "reasoning_budget": 512
-              }
-            },
-            "low": {
-              "reasoningEffort": "low",
-              "extraBody": {
-                "reasoning_budget": 1024
-              }
-            },
-            "medium": {
-              "reasoningEffort": "medium",
-              "extraBody": {
-                "reasoning_budget": 4096
-              }
-            },
-            "high": {
-              "reasoningEffort": "high",
-              "extraBody": {
-                "reasoning_budget": -1
-              }
-            },
-            "max": {
-              "reasoningEffort": "xhigh",
-              "extraBody": {
-                "reasoning_budget": -1
-              }
-            }
-          }
-        },
-        "qwen3.6-14b-a3b-fablevibes": {
-          "name": "qwen3.6-14b-a3b-fablevibes"
         },
         "qwen/qwen3.8-27b": {
           "name": "qwen3.8-27B",
@@ -310,5 +256,24 @@
   },
   "model": "google/gemma-4-26b-a4b-qat",
   "small_model": "qwen/qwen2.5-coder-14b",
+  "agent": {
+    // Orchestrators / planners → main model (reasoning)
+    "common/team-lead":        { "model": "google/gemma-4-26b-a4b-qat" },
+    "common/researcher":       { "model": "google/gemma-4-26b-a4b-qat" },
+    "dev/dev-team-lead":       { "model": "google/gemma-4-26b-a4b-qat" },
+    "dev/dev-architect":       { "model": "google/gemma-4-26b-a4b-qat" },
+    "devops/devops-team-lead": { "model": "google/gemma-4-26b-a4b-qat" },
+    "devops/devops-architect": { "model": "google/gemma-4-26b-a4b-qat" },
+    "ai-security-auditor":     { "model": "google/gemma-4-26b-a4b-qat" },
+
+    // Workers / mechanical → small model
+    "dev/backend-engineer":    { "model": "qwen/qwen2.5-coder-14b" },
+    "dev/frontend-engineer":   { "model": "qwen/qwen2.5-coder-14b" },
+    "dev/test-engineer":       { "model": "qwen/qwen2.5-coder-14b" },
+    "dev/code-reviewer":       { "model": "qwen/qwen2.5-coder-14b" },
+    "devops/devops-engineer":  { "model": "qwen/qwen2.5-coder-14b" },
+    "devops/devops-verificator": { "model": "qwen/qwen2.5-coder-14b" },
+    "test-auditor":            { "model": "qwen/qwen2.5-coder-14b" }
+  },
   "default_agent": "team-lead"
 }

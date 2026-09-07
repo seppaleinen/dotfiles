@@ -1,6 +1,6 @@
 ---
 name: dev-team-lead
-description: Manages the software development pipeline — architecture, implementation, testing, and review. Model tier: reasoning (use main_model).
+description: Manages the software development pipeline — architecture, implementation, testing, and review.
 mode: subagent
 permission:
   task:
