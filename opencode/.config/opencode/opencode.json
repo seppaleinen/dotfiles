@@ -134,6 +134,7 @@
       "flate*": "allow",
       "alembic*": "allow",
       "ruff*": "allow",
+      "rtk*": "allow",
       "docker*": "allow"
     },
     "doom_loop": "ask",
@@ -145,9 +146,7 @@
   "plugin": [
     "opentmux@latest",
     "opencode-plugin-litellm@latest",
-    "{env:HOME}/.hindsight/coding-agents",
     "@openviking/opencode-plugin@latest",
-    "opencode-agent-tmux"
   ],
   "provider": {
     "litellm": {
@@ -187,7 +186,11 @@
           }
         },
         "qwen3.8-27b-gsq-rco": {
-          "name": "qwen3.8-27b-gsq-rco"
+          "name": "qwen3.8-27b-gsq-rco",
+          "limit": {
+            "context": 80000,
+            "output": 16000
+          }
         },
         "prism-ml/bonsai-27b": {
           "name": "prism-ml/bonsai-27b"

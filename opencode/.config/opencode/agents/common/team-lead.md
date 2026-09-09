@@ -67,6 +67,15 @@ task(
 - Raw tool output from prior exploration
 - Internal routing logic
 
+## Direct Execution (Fast-Path Exemption)
+
+You MAY execute low-risk repository management directly (without dispatching pipeline leads) if the task involves ONLY:
+- Creating or updating tracking issues, boards, or planning docs (e.g., `gh issue create`).
+- Staging/committing pre-existing or minor administrative changes (e.g., `.gitignore`, formatting).
+- Trivial 1-2 line non-code fixes (e.g., bumping a version in CI or updating a readme).
+
+Do NOT dispatch `dev-team-lead` or `devops-team-lead` for purely administrative or planning tasks.
+
 ## Mixed Task Dispatch
 
 For tasks spanning both dev and ops, dispatch BOTH pipeline leads in parallel:
