@@ -147,6 +147,7 @@
     "opentmux@latest",
     "opencode-plugin-litellm@latest",
     "@openviking/opencode-plugin@latest",
+    "/Users/daveri/.hindsight/coding-agents",
   ],
   "provider": {
     "litellm": {
