@@ -147,7 +147,7 @@
     "opentmux@latest",
     "opencode-plugin-litellm@latest",
     "@openviking/opencode-plugin@latest",
-    "/Users/daveri/.hindsight/coding-agents",
+    "/Users/daveri/.hindsight/coding-agents"
   ],
   "provider": {
     "litellm": {
@@ -261,7 +261,6 @@
   "model": "google/gemma-4-26b-a4b-qat",
   "small_model": "qwen/qwen2.5-coder-14b",
   "agent": {
-    // Orchestrators / planners → main model (reasoning)
     "common/team-lead":        { "model": "google/gemma-4-26b-a4b-qat" },
     "common/researcher":       { "model": "google/gemma-4-26b-a4b-qat" },
     "dev/dev-team-lead":       { "model": "google/gemma-4-26b-a4b-qat" },
@@ -270,7 +269,6 @@
     "devops/devops-architect": { "model": "google/gemma-4-26b-a4b-qat" },
     "ai-security-auditor":     { "model": "google/gemma-4-26b-a4b-qat" },
 
-    // Workers / mechanical → small model
     "dev/backend-engineer":    { "model": "qwen/qwen2.5-coder-14b" },
     "dev/frontend-engineer":   { "model": "qwen/qwen2.5-coder-14b" },
     "dev/test-engineer":       { "model": "qwen/qwen2.5-coder-14b" },
