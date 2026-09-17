@@ -49,14 +49,6 @@
       "oauth": false,
       "type": "remote",
       "url": "https://mcp.labb.site/k8s/mcp"
-    },
-    "litellm-openviking": {
-      "enabled": false,
-      "type": "remote",
-      "url": "https://litellm.labb.site/mcp",
-      "headers": {
-        "Authorization": "Bearer {env:LITELLM_API_KEY}"
-      }
     }
   },
   "permission": {
@@ -161,7 +153,6 @@
   "plugin": [
     "opentmux@latest",
     "opencode-plugin-litellm@latest",
-    "@openviking/opencode-plugin@latest",
     "/Users/daveri/.hindsight/coding-agents"
   ],
   "provider": {
