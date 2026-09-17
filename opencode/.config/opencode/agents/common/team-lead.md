@@ -67,6 +67,8 @@ task(
 - Raw tool output from prior exploration
 - Internal routing logic
 
+**Delegation mechanism:** all coordination is via the `task()` tool (synchronous, visible in the main window). Never delegate by spawning separate agents (paseo `create_agent`/`send_agent_prompt`, herdr tab-spawns, or manual Tab-switching between primary agents).
+
 ## Direct Execution (Fast-Path Exemption)
 
 You MAY execute low-risk repository management directly (without dispatching pipeline leads) if the task involves ONLY:

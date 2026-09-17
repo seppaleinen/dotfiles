@@ -26,13 +26,13 @@ Whenever you require information, architectural confirmation, choice selection, 
 
 ### Dispatch Depth Limit
 - Maximum dispatch depth is **3 layers** from `team-lead` (matches `opencode.json` `subagent_depth: 3`). This accommodates the full worker pipeline: `team-lead → dev-team-lead → dev-architect → backend-engineer`.
-- `researcher` is a `mode: primary` intake agent; `researcher → web-scout` is depth 1 under a primary and does not count against the team-lead dispatch budget.
+- `researcher` is a `mode: subagent` auto-dispatched by `team-lead`; `researcher → web-scout` is depth 2 from `team-lead`, within the `subagent_depth: 3` budget.
 - **If a `task()` dispatch fails or errors out** (e.g., depth limit hit, agent unavailable), do NOT silently retry or drop the task. Surface the failure in your response with the step that failed and the error, so the caller can see where the pipeline stalled.
 - If a pipeline would require deeper nesting, flatten the chain or escalate.
 
 ### Progress Reporting (Visibility)
 - Subagents that run multi-step pipelines MUST surface their current step to the caller. When you dispatch a subagent and it will take multiple minutes, do NOT just block silently.
-- Prefer dispatching long-running pipeline leads in the **background** (`background: true`) where supported, then poll for completion and report intermediate status to the user as steps complete.
+- All delegation MUST use the synchronous `task()` tool (visible in the main window). Never delegate by spawning separate/background agents (paseo `create_agent`/`send_agent_prompt`, herdr tab-spawns, or manual Tab-switching). The `task()` call blocks until the subagent completes; keep the user informed before dispatch and after return.
 - Before dispatching a pipeline lead, tell the user **which pipeline** is running and **what it will do** (e.g., "Dev pipeline: architect → implement → test → review"). This gives the user a mental model of what's happening while they wait.
 - Every pipeline lead MUST include a STATUS marker in its final handover indicating where it got to: `[SUCCESS]`, `[REWORK]`, `[BLOCK]`, or `[STUCK]` (see handover skill).
 

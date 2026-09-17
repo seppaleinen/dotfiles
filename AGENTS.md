@@ -24,15 +24,15 @@ GNU Stow-managed dotfiles. Each top-level directory is a stow target symlinked t
 The agent pipeline is defined in `opencode/.config/opencode/agents/`. Default agent is `team-lead`.
 
 **Pipeline structure (flat 2-level tree):**
-- `researcher` (primary intake agent) — grills the user, does web/source/GitOps investigation, writes a **Research Brief** to a file
+- `researcher` (subagent, auto-dispatched by `team-lead`) — grills the user, does web/source/GitOps investigation, writes a **Research Brief** to a file
 - `team-lead` → routes a Research Brief to `dev-team-lead` or `devops-team-lead`
 - `dev-team-lead` → `dev-architect` → `backend-engineer` / `frontend-engineer` → `test-engineer` → `code-reviewer`
 - `devops-team-lead` → `devops-architect` → `devops-engineer` → `devops-verificator`
 - `web-scout` (subagent of researcher) → identifies upstream repos/charts/images
 
-`researcher` is a `mode: primary` agent: it cannot be launched as a subagent. The user switches to it (Tab) for intake, then returns to `team-lead` with the Research Brief file path.
+`researcher` is a `mode: subagent`, auto-dispatched by `team-lead` via `task()` when a task is raw/ambiguous. No manual Tab-switching.
 
-**Deleted agents:** the old subagent `researcher`, `dev-engineer` (coordinator/integrator role removed — integration check now done by dev-team-lead), `issue-refiner`, and `devops-investigator` have been removed; their investigative work is consolidated into the primary `researcher`.
+**Deleted agents:** the old subagent `researcher`, `dev-engineer` (coordinator/integrator role removed — integration check now done by dev-team-lead), `issue-refiner`, and `devops-investigator` have been removed; their investigative work is consolidated into the `researcher` subagent.
 
 All inter-agent communication uses the handover protocol defined in `opencode/.config/opencode/skills/handover/SKILL.md`.
 
