@@ -87,6 +87,16 @@ models:
       --flash-attn on --parallel 1 --jinja --reasoning-preserve
       ${default_flags} --chat-template-file ${models_dir}/custom-template.jinja
 
+  qwen3.8-27b-twin-turbo-gsq-rco:
+    concurrencyLimit: 2
+    cmd: >-
+      ${llama-bin} --port ${PORT}
+      -m ${models_dir}/qwen3.8-27b/Qwen3.8-27B-TWIN-TURBO-GSQ-RCO-IQ3_S-MTP.gguf
+      -c 80000 -b 4096 -ub 2048 --cache-reuse 256 -ngl all
+      --spec-type draft-mtp --spec-draft-n-max 3 --spec-draft-p-min 0.75
+      --flash-attn on --parallel 1 --jinja --reasoning-preserve
+      ${default_flags} --chat-template-file ${models_dir}/custom-template.jinja
+
   qwen3.6-27b:
     cmd: >-
       ${llama-bin} --port ${PORT} -m ${models_dir}/qwen3.6-27b/Qwen3.6-27B-UD-Q4_K_XL.gguf
@@ -127,16 +137,30 @@ models:
     cmd: >-
       ${llama-bin} --port ${PORT}
       -m ${models_dir}/qwen2.5-coder-7b-instruct/qwen2.5-coder-7b-instruct-q6_k.gguf
-      --spec-type none
       -c 100768 --parallel 4
       --cache-type-k q8_0 --cache-type-v q8_0
       -ngl 99
-      -b 4096 -ub 1024
+      -b 4096 -ub 2048
       --reasoning off
       --parallel 4
       --cache-reuse 256 --jinja --flash-attn on ${default_flags}
       --temp 0.2 --top-p 0.95 --top-k 40
-      --repeat-penalty 1.20 --frequency-penalty 0.3
+
+  qwen2.5-7b:
+    concurrencyLimit: 4
+    cmdStop: "kill -9 ${PID}"
+    cmd: >-
+      ${llama-bin} --port ${PORT}
+      -m ${models_dir}/qwen2.5-7b-instruct/qwen2.5-7b-instruct-q8_0-00001-of-00003.gguf
+      --chat-template-file /home/seppa/models/qwen2.5-7b-instruct/qwen2_tools.jinja
+      -c 100768 --parallel 4
+      --cache-type-k q8_0 --cache-type-v q8_0
+      -ngl 99
+      -b 4096 -ub 2048
+      --reasoning off
+      --parallel 4
+      --cache-reuse 256 --jinja --flash-attn on ${default_flags}
+      --temp 0.2 --top-p 0.95 --top-k 40
 
   nomic-embed-text-v2:
     cmd: >-
