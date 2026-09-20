@@ -25,15 +25,16 @@ Whenever you require information, architectural confirmation, choice selection, 
 - If a task has been re-dispatched more than 2 times with `[REWORK]`, halt and present the error history to the user. Do NOT re-dispatch a 3rd time.
 
 ### Dispatch Depth Limit
-- Maximum dispatch depth is **3 layers** from `team-lead` (matches `opencode.json` `subagent_depth: 3`). This accommodates the full worker pipeline: `team-lead → dev-team-lead → dev-architect → backend-engineer`.
-- `researcher` is a `mode: subagent` auto-dispatched by `team-lead`; `researcher → web-scout` is depth 2 from `team-lead`, within the `subagent_depth: 3` budget.
+- Maximum dispatch depth is **2 layers** from `team-lead` (`subagent_depth: 2` in `opencode.json`). This accommodates the normal worker pipelines: `team-lead → dev-team-lead → backend-engineer` and `team-lead → dev-team-lead → dev-architect`.
+- `researcher` is a `mode: subagent` auto-dispatched by `team-lead`; `researcher → web-scout` is depth 2 from `team-lead`, exactly at the `subagent_depth: 2` budget.
 - **If a `task()` dispatch fails or errors out** (e.g., depth limit hit, agent unavailable), do NOT silently retry or drop the task. Surface the failure in your response with the step that failed and the error, so the caller can see where the pipeline stalled.
 - If a pipeline would require deeper nesting, flatten the chain or escalate.
 
 ### Progress Reporting (Visibility)
-- Subagents that run multi-step pipelines MUST surface their current step to the caller. When you dispatch a subagent and it will take multiple minutes, do NOT just block silently.
-- All delegation MUST use the synchronous `task()` tool (visible in the main window). Never delegate by spawning separate/background agents (paseo `create_agent`/`send_agent_prompt`, herdr tab-spawns, or manual Tab-switching). The `task()` call blocks until the subagent completes; keep the user informed before dispatch and after return.
+- All delegation MUST use the synchronous `task()` tool. Never delegate by spawning separate/background agents (paseo `create_agent`/`send_agent_prompt`, herdr tab-spawns, or manual Tab-switching). A `task()` call blocks the dispatching agent until the subagent completes.
+- Dispatched agents do run as child sessions, but live child-session visibility is unreliable on this stack (opencode 1.18.30 + herdr) and is NOT a guaranteed UI feature. `ctrl+x+down` (`session_child_first`) / `ctrl+x+up` (`session_parent`) MAY let you inspect a child session best-effort; the SUPPORTED visibility channel is the status-reporting contract below.
 - Before dispatching a pipeline lead, tell the user **which pipeline** is running and **what it will do** (e.g., "Dev pipeline: architect → implement → test → review"). This gives the user a mental model of what's happening while they wait.
+- After a subagent returns, report which stage produced the result and its STATUS; surface every failure (`[STUCK]`, `[REWORK]`, `[BLOCK]`, or empty/crashed result) in the main conversation with the reason — never silent retries.
 - Every pipeline lead MUST include a STATUS marker in its final handover indicating where it got to: `[SUCCESS]`, `[REWORK]`, `[BLOCK]`, or `[STUCK]` (see handover skill).
 
 ### Circuit Breaker

@@ -39,9 +39,9 @@ All inter-agent communication uses the handover protocol defined in `opencode/.c
 
 **Model tiers:** `team-lead` and orchestrators use `main_model` (reasoning). Worker agents (`backend-engineer`, `frontend-engineer`, `devops-engineer`) use `small_model` when the spec is clear.
 
-**Dispatch depth:** Max **3 layers** from `team-lead` (`subagent_depth: 3` in `opencode.json`) — enough for `team-lead → dev-team-lead → dev-architect → backend-engineer`. Keep pipelines within this budget.
+**Dispatch depth:** Max **2 layers** from `team-lead` (`subagent_depth: 2` in `opencode.json`) — deepest chains are `team-lead → dev-team-lead → worker` and `team-lead → researcher → web-scout`. Keep pipelines within this budget; flatten deeper chains or escalate.
 
-**Visibility:** `team-lead` and the pipeline leads announce their current step (via the `todo` tool and STATUS markers) and surface any `[STUCK]` subagent to the user instead of looping silently. If you see a long wait with no progress output, a subagent may have hit a dispatch/depth-limit failure — interrupt that `team-lead` session and ask it for its TRACE so you can see where the chain stalled.
+**Visibility:** Dispatched agents run as child sessions, but live child-session visibility is unreliable in this stack (opencode 1.18.30 + herdr ignores child sessions in its status reporting). The supported visibility channel is the status lines + handover summaries the pipeline leads post in the main conversation: one line before each dispatch, a status/result line after each return, and every `[STUCK]`/`[REWORK]`/`[BLOCK]`/empty result surfaced with a reason. `ctrl+x+down` (`session_child_first`) / `ctrl+x+up` (`session_parent`) lets you inspect a child session best-effort, not as a guarantee. `team-lead` and the pipeline leads announce their current step (via the `todo` tool and STATUS markers). If a subagent genuinely stalls or a dispatch/depth-limit failure occurs, ask that `team-lead` session for its TRACE so you can see where the chain stalled.
 
 ## Shared MCP Servers
 
