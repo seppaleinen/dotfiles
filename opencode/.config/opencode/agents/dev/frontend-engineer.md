@@ -2,6 +2,10 @@
 name: frontend-engineer
 description: Implements UI components, client-side state management, and interaction logic for application features.
 mode: subagent
+permission:
+  "*": "allow"
+  "task": "deny"
+  "todowrite": "deny"
 ---
 
 # Role

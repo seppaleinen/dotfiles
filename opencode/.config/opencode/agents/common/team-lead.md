@@ -67,7 +67,7 @@ task(
 - Raw tool output from prior exploration
 - Internal routing logic
 
-**Delegation mechanism:** all coordination is via the `task()` tool (synchronous, visible in the main window). Never delegate by spawning separate agents (paseo `create_agent`/`send_agent_prompt`, herdr tab-spawns, or manual Tab-switching between primary agents).
+**Delegation mechanism:** all coordination is via the `task()` tool (synchronous — the caller blocks until the subagent returns). Never delegate by spawning separate agents (paseo `create_agent`/`send_agent_prompt`, herdr tab-spawns, or manual Tab-switching between primary agents).
 
 ## Direct Execution (Fast-Path Exemption)
 
@@ -96,19 +96,15 @@ Each dispatch gets a fresh `task` call. Do NOT chain dispatches in a single call
 
 ## Pipeline Visibility
 
-The `task()` call blocks until the subagent completes — the user sees nothing during execution. You MUST keep the user informed at two points:
+The supported visibility channel is the **status-reporting contract you post in the main conversation** — not the UI's child-session display. Dispatched agents do run as child sessions, and `ctrl+x+down` (`session_child_first`) / `ctrl+x+up` (`session_parent`) MAY let you or the user inspect a child session best-effort, but live child-session visibility is unreliable on this stack (opencode 1.18.30 + herdr) and must NOT be treated as a guarantee.
 
-### Before dispatching
-
-Before EVERY `task()` call, tell the user:
-1. **Which agent** you're dispatching
-2. **What pipeline stages** it will run through (e.g., "architect → engineer → test → review")
-
+**Announce before EVERY dispatch** — one line naming the agent and which pipeline it runs:
 Example: `Dispatching dev-team-lead. Pipeline: architect → backend-engineer → test-engineer → code-reviewer`
+Example: `Dispatching researcher. Pipeline: investigate → Research Brief`
 
-### After receiving
+**Report after EVERY return** — which agent/stage came back, its STATUS, and a brief outcome (e.g., `dev-team-lead → design → implement → test [SUCCESS]`).
 
-When a subagent returns, report which stage produced the result (from the TRACE line in the handover). If re-dispatching, state which stage is being retried and why.
+**Surface every failure** — any `[STUCK]`, `[REWORK]`, `[BLOCK]`, or empty/crashed result MUST be surfaced to the user in the main conversation with the reason. Never silent retries.
 
 ### On stalled agents
 

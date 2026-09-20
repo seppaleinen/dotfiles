@@ -41,7 +41,13 @@ Return Result
 
 ## Pipeline Visibility
 
-Your caller (`team-lead`) cannot see your progress — the `task()` call blocks until you complete. Report pipeline position in your handover:
+You are the **status reporter** for this pipeline. The supported visibility channel is the status lines you post in the main conversation — not the UI's child-session display. Your workers do run as child sessions, and `ctrl+x+down` (`session_child_first`) / `ctrl+x+up` (`session_parent`) MAY let your caller or the user inspect one best-effort, but live child-session visibility is unreliable on this stack (opencode 1.18.30 + herdr) and must NOT be treated as a guarantee.
+
+- Announce each dispatch as you make it — e.g., `Dispatching dev-architect (design)`, `Dispatching backend-engineer (implement)`, `Dispatching test-engineer (test)`, `Dispatching code-reviewer (review)`.
+- When each worker returns, post which stage + STATUS + a brief outcome (e.g., `implement → test [REWORK]: test-engineer reported X`).
+- Surface any worker failure (`[REWORK]`, `[STUCK]`, `[BLOCK]`, or empty/crashed result) in the main conversation with the reason — never silent retries.
+
+Keep the **PIPELINE STAGE** field in your handover as the summary of record — it documents where the pipeline stopped and other tools read it:
 
 1. Include a **PIPELINE STAGE** field showing which stages completed and where you stopped:
    ```

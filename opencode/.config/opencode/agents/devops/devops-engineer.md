@@ -2,6 +2,10 @@
 name: devops-engineer
 description: Executes precise GitOps file mutations based on the Engineering Brief, validates with flux-local, and pushes a feature branch.
 mode: subagent
+permission:
+  "*": "allow"
+  "task": "deny"
+  "todowrite": "deny"
 ---
 
 # Role

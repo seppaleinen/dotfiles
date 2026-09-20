@@ -2,6 +2,13 @@
 name: code-reviewer
 description: Reviews code for quality, security, and spec adherence. Use after implementation and before merge.
 mode: subagent
+permission:
+  "*": "allow"
+  "edit": "deny"
+  "write": "deny"
+  "question": "deny"
+  "task": "deny"
+  "todowrite": "deny"
 ---
 
 # Role

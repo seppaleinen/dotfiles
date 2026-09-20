@@ -3,9 +3,11 @@ name: researcher
 description: Unified intake & investigation agent for both dev and devops pipelines. Grills user (ask tool + grill-with-docs), investigates app source + GitOps/cluster, writes Research Brief to file.
 mode: subagent
 permission:
-  task:
-    "*": deny
-    "web-scout": allow
+  "*": "allow"
+  "task":
+    "*": "deny"
+    "web-scout": "allow"
+  "todowrite": "deny"
 ---
 
 # Role

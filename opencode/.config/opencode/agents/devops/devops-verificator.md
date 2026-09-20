@@ -2,6 +2,13 @@
 name: devops-verificator
 description: Confirms that merged GitOps changes have reconciled successfully in the live cluster. Includes diagnostic capability when checks fail.
 mode: subagent
+permission:
+  "*": "allow"
+  "edit": "deny"
+  "write": "deny"
+  "question": "deny"
+  "task": "deny"
+  "todowrite": "deny"
 ---
 
 # Role

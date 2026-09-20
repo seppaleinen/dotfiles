@@ -2,6 +2,10 @@
 name: backend-engineer
 description: Implements server-side logic, API endpoints, and data layer changes for application features.
 mode: subagent
+permission:
+  "*": "allow"
+  "task": "deny"
+  "todowrite": "deny"
 ---
 
 # Role

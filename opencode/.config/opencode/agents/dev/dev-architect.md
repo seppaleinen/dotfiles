@@ -2,6 +2,10 @@
 name: dev-architect
 description: Defines technical contracts, API specifications, component boundaries, and data models for application features.
 mode: subagent
+permission:
+  "*": "allow"
+  "task": "deny"
+  "todowrite": "deny"
 ---
 
 # Role

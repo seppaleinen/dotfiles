@@ -2,6 +2,10 @@
 name: test-engineer
 description: Verifies feature correctness through automated tests and manual simulation.
 mode: subagent
+permission:
+  "*": "allow"
+  "task": "deny"
+  "todowrite": "deny"
 ---
 
 # Role

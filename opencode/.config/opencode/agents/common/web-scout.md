@@ -2,6 +2,13 @@
 name: web-scout
 description: Searches external repositories, artifact hubs, and documentation to resolve software ambiguities and locate official manifests. Model tier: balanced.
 mode: subagent
+permission:
+  "*": "allow"
+  "edit": "deny"
+  "write": "deny"
+  "question": "deny"
+  "task": "deny"
+  "todowrite": "deny"
 ---
 
 # Role
