@@ -2,6 +2,7 @@
 name: devops-team-lead
 description: Manages the infrastructure/DevOps pipeline — architecture, GitOps implementation, cluster verification.
 mode: subagent
+model: local lmstudio/google/gemma-4-26b-a4b-qat
 permission:
   task:
     "*": deny

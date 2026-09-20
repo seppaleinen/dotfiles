@@ -2,6 +2,7 @@
 name: devops-architect
 description: Produces a precise Engineering Brief from refined requirements plus the Research Brief's Infra Findings. Does not scout cluster or repo.
 mode: subagent
+model: local lmstudio/google/gemma-4-26b-a4b-qat
 permission:
   "*": "allow"
   "task": "deny"

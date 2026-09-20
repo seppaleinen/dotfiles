@@ -59,39 +59,34 @@ Runs local GGUF models via `llama-server`. Two routing groups:
 
 Models stored at `/home/seppa/models/`. Global TTL: 300s. Health check timeout: 180s.
 
-## Model swap procedure (enforced via config)
+## Model swap procedure (per-agent models live in agent .md frontmatter)
 
-opencode now assigns per-agent models strictly from `opencode.json` under the `agent` key. This is a single-file change:
+Per-agent models are assigned via the `model:` field in each agent's `.md` frontmatter (`opencode/.config/opencode/agents/**/*.md`). The `"agent"` map in `opencode.json` does NOT apply to dispatched subagents: runtime dispatch looks up agents by bare name, so path-keyed entries (e.g. `common/team-lead`) create orphan config that is never read (GitHub issue #7). Do not re-add per-agent entries to `"agent"`.
 
-### Steps to change models:
+**Model IDs must be provider-qualified.** The runtime resolves `model:` (and `opencode.json` `model`/`small_model`) as `<provider>/<model-id>`; a bare `google/gemma-...` is parsed against the built-in Google provider and fails with `Model not found`. Use the full registered ID from `opencode models` — e.g. `local lmstudio/google/gemma-4-26b-a4b-qat` (provider `local lmstudio`, model `google/gemma-4-26b-a4b-qat`).
 
-1. **Update root models** in `opencode/.config/opencode/opencode.json`:
-   - Edit `model` field for the primary agent and lightweight tasks
-   - Edit `small_model` field for workers
+### Steps to change a model:
 
-2. **Update agent assignments** in the same file:
-   - Modify `agent.<name>.model` entries if using hardcoded model IDs
-   - If using `{env:VAR}` indirection, update the environment variables instead
+1. **Root defaults** stay in `opencode/.config/opencode/opencode.json`:
+   - `model` — primary/default agent model
+   - `small_model` — lightweight task model
+2. **Per-agent** — edit `model:` in the agent's frontmatter (e.g. `opencode/.config/opencode/agents/dev/backend-engineer.md`):
+   ```yaml
+   ---
+   name: backend-engineer
+   model: local lmstudio/qwen/qwen2.5-coder-14b
+   mode: subagent
+   permission:
+     ...
+   ---
+   ```
+3. **Restart opencode** after any change.
 
-3. **No .md files need changing** — model tier hints have been stripped from all agent `.md` files
+### Current assignments (issue #7 fix):
 
-### Example (current setup):
-
-```json
-{
-  "model": "google/gemma-4-26b-a4b-qat",
-  "small_model": "qwen/qwen2.5-coder-14b",
-  "agent": {
-    "common/team-lead":        { "model": "google/gemma-4-26b-a4b-qat" },
-    "dev/backend-engineer":    { "model": "qwen/qwen2.5-coder-14b" },
-    "devops/devops-engineer":  { "model": "qwen/qwen2.5-coder-14b" }
-  }
-}
-```
-
-**After a model change**:
-- Restart opencode (quit and restart)
-- No .md files touched
+- **gemma tier** (`local lmstudio/google/gemma-4-26b-a4b-qat`): team-lead, researcher, dev-team-lead, dev-architect, devops-team-lead, devops-architect, ai-security-auditor
+- **qwen tier** (`local lmstudio/qwen/qwen2.5-coder-14b`): backend-engineer, frontend-engineer, test-engineer, code-reviewer, devops-engineer, devops-verificator, test-auditor
+- **default (session model)**: web-scout (intentionally unassigned — "Model tier: balanced")
 
 ## Environment Variables
 

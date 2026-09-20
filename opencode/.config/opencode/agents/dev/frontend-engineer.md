@@ -2,6 +2,7 @@
 name: frontend-engineer
 description: Implements UI components, client-side state management, and interaction logic for application features.
 mode: subagent
+model: local lmstudio/qwen/qwen2.5-coder-14b
 permission:
   "*": "allow"
   "task": "deny"

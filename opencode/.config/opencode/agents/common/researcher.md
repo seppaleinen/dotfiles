@@ -2,6 +2,7 @@
 name: researcher
 description: Unified intake & investigation agent for both dev and devops pipelines. Grills user (ask tool + grill-with-docs), investigates app source + GitOps/cluster, writes Research Brief to file.
 mode: subagent
+model: local lmstudio/google/gemma-4-26b-a4b-qat
 permission:
   "*": "allow"
   "task":

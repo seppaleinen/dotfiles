@@ -232,51 +232,7 @@
       }
     }
   },
-  "model": "google/gemma-4-26b-a4b-qat",
-  "small_model": "qwen/qwen2.5-coder-14b",
-  "agent": {
-    "common/team-lead": {
-      "model": "google/gemma-4-26b-a4b-qat"
-    },
-    "common/researcher": {
-      "model": "google/gemma-4-26b-a4b-qat"
-    },
-    "dev/dev-team-lead": {
-      "model": "google/gemma-4-26b-a4b-qat"
-    },
-    "dev/dev-architect": {
-      "model": "google/gemma-4-26b-a4b-qat"
-    },
-    "devops/devops-team-lead": {
-      "model": "google/gemma-4-26b-a4b-qat"
-    },
-    "devops/devops-architect": {
-      "model": "google/gemma-4-26b-a4b-qat"
-    },
-    "ai-security-auditor": {
-      "model": "google/gemma-4-26b-a4b-qat"
-    },
-    "dev/backend-engineer": {
-      "model": "qwen/qwen2.5-coder-14b"
-    },
-    "dev/frontend-engineer": {
-      "model": "qwen/qwen2.5-coder-14b"
-    },
-    "dev/test-engineer": {
-      "model": "qwen/qwen2.5-coder-14b"
-    },
-    "dev/code-reviewer": {
-      "model": "qwen/qwen2.5-coder-14b"
-    },
-    "devops/devops-engineer": {
-      "model": "qwen/qwen2.5-coder-14b"
-    },
-    "devops/devops-verificator": {
-      "model": "qwen/qwen2.5-coder-14b"
-    },
-    "test-auditor": {
-      "model": "qwen/qwen2.5-coder-14b"
-    }
-  },
+  "model": "local lmstudio/google/gemma-4-26b-a4b-qat",
+  "small_model": "local lmstudio/qwen/qwen2.5-coder-14b",
   "default_agent": "team-lead"
 }

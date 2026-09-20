@@ -2,6 +2,7 @@
 name: ai-security-auditor
 description: Looks through codebase for vulnerabilities.
 mode: subagent
+model: local lmstudio/google/gemma-4-26b-a4b-qat
 ---
 
 # Role & Objective
