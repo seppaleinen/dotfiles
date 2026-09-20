@@ -7,6 +7,7 @@ GNU Stow-managed dotfiles. Each top-level directory is a stow target symlinked t
 1. **Edit in this repo, not through symlinks.** Always work in `~/dotfiles/`, never in `~/.config/` directly.
 2. **One stow target per folder.** After changes, re-stow: `stow -t ~ <folder>`.
 3. **Dry-run first** after adding new targets: `stow -n -t ~ <folder> --verbose=1`.
+4. **Stow verification (folded-symlink gotcha):** the top-level dir — e.g. `~/.config/opencode`, `~/.agents` — IS the stow symlink; files inside it look like regular files even on a correct install. When investigating "copies vs symlinks", check one level up with three checks: `readlink ~/.config/opencode` (expect `../workspace/dotfiles/opencode/.config/opencode`), `stow -n -t ~ <target> --verbose=1` (clean, exit 0), and an inode spot-check `ls -i ~/.config/opencode/opencode.json opencode/.config/opencode/opencode.json` (identical). herdr/opencode-managed files write through the symlink into the repo by design — treat rewrites of tracked files (e.g. `herdr-tui-session.js`) as intentional commits. `node_modules/` lives physically in the package dir (`opencode/.config/opencode/`) and is gitignored.
 
 ## Repository Layout
 
