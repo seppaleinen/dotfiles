@@ -8,48 +8,9 @@
       "tokens": 8192
     }
   },
-  "subagent_depth": 3,
+  "subagent_depth": 2,
   "lsp": true,
-  "mcp": {
-    "authentik": {
-      "enabled": false,
-      "command": [
-        "uvx",
-        "--from",
-        "authentik-mcp",
-        "--with",
-        "mcp<2.0",
-        "authentik-mcp",
-        "--base-url",
-        "https://authentik.labb.site",
-        "--token",
-        "{env:MCP_TOKEN}"
-      ],
-      "type": "local"
-    },
-    "grafana": {
-      "enabled": false,
-      "command": [
-        "uvx",
-        "mcp-grafana",
-        "-t",
-        "stdio"
-      ],
-      "env": {
-        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:MCP_TOKEN}",
-        "GRAFANA_URL": "https://grafana.labb.site"
-      },
-      "type": "local"
-    },
-    "kubernetes": {
-      "enabled": false,
-      "headers": {
-        "Authorization": "{env:K8S_TOKEN}"
-      },
-      "oauth": false,
-      "type": "remote",
-      "url": "https://mcp.labb.site/k8s/mcp"
-    }
+  "mcp": {  
   },
   "permission": {
     "external_directory": {
@@ -153,7 +114,7 @@
   "plugin": [
     "opentmux@latest",
     "opencode-plugin-litellm@latest",
-    "/Users/daveri/.hindsight/coding-agents"
+    "/Users/seppa/.hindsight/coding-agents"
   ],
   "provider": {
     "litellm": {
@@ -199,8 +160,8 @@
             "output": 16000
           }
         },
-        "qwen3.8-27b-turbo-fable-cold-fusion-735-882-heretic-uncensored-neo-coder-max-mtp": {
-          "name": "qwen3.8-27b-turbo-fable-cold-fusion-735-882-heretic-uncensored-neo-coder-max-mtp",
+        "qwen3.8-27b-twin-turbo-fable-cold-fusion-709-l-uncensored-gsq-rco-mtp": {
+          "name": "qwen3.8-27b-twin-turbo-fable-cold-fusion-709-l-uncensored-gsq-rco-mtp",
           "limit": {
             "context": 95126,
             "output": 16000
