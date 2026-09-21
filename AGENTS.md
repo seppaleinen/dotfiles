@@ -59,34 +59,14 @@ Runs local GGUF models via `llama-server`. Two routing groups:
 
 Models stored at `/home/seppa/models/`. Global TTL: 300s. Health check timeout: 180s.
 
-## Model swap procedure (per-agent models live in agent .md frontmatter)
+## Model assignment (no per-agent model forcing)
 
-Per-agent models are assigned via the `model:` field in each agent's `.md` frontmatter (`opencode/.config/opencode/agents/**/*.md`). The `"agent"` map in `opencode.json` does NOT apply to dispatched subagents: runtime dispatch looks up agents by bare name, so path-keyed entries (e.g. `common/team-lead`) create orphan config that is never read (GitHub issue #7). Do not re-add per-agent entries to `"agent"`.
+Agents inherit the session model from the opencode model picker. The `"agent"` map in `opencode.json` does NOT apply to dispatched subagents (path-keyed entries are inert — GitHub issue #7). Do not add per-agent entries to `"agent"`, and do not set `model:` in agent `.md` frontmatter — doing so overrides the session model the user chose.
 
-**Model IDs must be provider-qualified.** The runtime resolves `model:` (and `opencode.json` `model`/`small_model`) as `<provider>/<model-id>`; a bare `google/gemma-...` is parsed against the built-in Google provider and fails with `Model not found`. Use the full registered ID from `opencode models` — e.g. `local lmstudio/google/gemma-4-26b-a4b-qat` (provider `local lmstudio`, model `google/gemma-4-26b-a4b-qat`).
-
-### Steps to change a model:
-
-1. **Root defaults** stay in `opencode/.config/opencode/opencode.json`:
-   - `model` — primary/default agent model
-   - `small_model` — lightweight task model
-2. **Per-agent** — edit `model:` in the agent's frontmatter (e.g. `opencode/.config/opencode/agents/dev/backend-engineer.md`):
-   ```yaml
-   ---
-   name: backend-engineer
-   model: local lmstudio/qwen/qwen2.5-coder-14b
-   mode: subagent
-   permission:
-     ...
-   ---
-   ```
-3. **Restart opencode** after any change.
-
-### Current assignments (issue #7 fix):
-
-- **gemma tier** (`local lmstudio/google/gemma-4-26b-a4b-qat`): team-lead, researcher, dev-team-lead, dev-architect, devops-team-lead, devops-architect, ai-security-auditor
-- **qwen tier** (`local lmstudio/qwen/qwen2.5-coder-14b`): backend-engineer, frontend-engineer, test-engineer, code-reviewer, devops-engineer, devops-verificator, test-auditor
-- **default (session model)**: web-scout (intentionally unassigned — "Model tier: balanced")
+- `opencode.json` `model` / `small_model` — default session model for new sessions
+- Per-agent model — inherited from the session; not overridden in frontmatter
+- **Model IDs must be provider-qualified** when set in `opencode.json`: use the full ID from `opencode models` (e.g. `opencode/big-pickle`, not bare `big-pickle`). Bare names parse against built-in providers and fail with `Model not found`.
+- **Restart opencode** after any change to `opencode.json`.
 
 ## Environment Variables
 

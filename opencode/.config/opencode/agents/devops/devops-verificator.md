@@ -2,7 +2,6 @@
 name: devops-verificator
 description: Confirms that merged GitOps changes have reconciled successfully in the live cluster. Includes diagnostic capability when checks fail.
 mode: subagent
-model: local lmstudio/qwen/qwen2.5-coder-14b
 permission:
   "*": "allow"
   "edit": "deny"

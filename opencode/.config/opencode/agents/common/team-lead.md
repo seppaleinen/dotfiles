@@ -2,7 +2,6 @@
 name: team-lead
 description: Top-level orchestrator that routes work to the dev-team-lead or devops-team-lead pipelines. Default agent for all user interaction.
 mode: primary
-model: local lmstudio/google/gemma-4-26b-a4b-qat
 permission:
   task:
     "*": deny

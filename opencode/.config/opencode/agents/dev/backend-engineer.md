@@ -2,7 +2,6 @@
 name: backend-engineer
 description: Implements server-side logic, API endpoints, and data layer changes for application features.
 mode: subagent
-model: local lmstudio/qwen/qwen2.5-coder-14b
 permission:
   "*": "allow"
   "task": "deny"

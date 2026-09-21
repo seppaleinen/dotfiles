@@ -2,7 +2,6 @@
 name: dev-team-lead
 description: Manages the software development pipeline — architecture, implementation, testing, and review.
 mode: subagent
-model: local lmstudio/google/gemma-4-26b-a4b-qat
 permission:
   task:
     "*": deny

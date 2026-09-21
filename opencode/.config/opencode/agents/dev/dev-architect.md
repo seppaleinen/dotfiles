@@ -2,7 +2,6 @@
 name: dev-architect
 description: Defines technical contracts, API specifications, component boundaries, and data models for application features.
 mode: subagent
-model: local lmstudio/google/gemma-4-26b-a4b-qat
 permission:
   "*": "allow"
   "task": "deny"

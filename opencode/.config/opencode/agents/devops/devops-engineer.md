@@ -2,7 +2,6 @@
 name: devops-engineer
 description: Executes precise GitOps file mutations based on the Engineering Brief, validates with flux-local, and pushes a feature branch.
 mode: subagent
-model: local lmstudio/qwen/qwen2.5-coder-14b
 permission:
   "*": "allow"
   "task": "deny"

@@ -2,7 +2,6 @@
 name: code-reviewer
 description: Reviews code for quality, security, and spec adherence. Use after implementation and before merge.
 mode: subagent
-model: local lmstudio/qwen/qwen2.5-coder-14b
 permission:
   "*": "allow"
   "edit": "deny"

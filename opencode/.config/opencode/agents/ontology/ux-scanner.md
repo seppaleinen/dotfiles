@@ -1,7 +1,6 @@
 ---
 description: Scans frontend code (React, Vue, pages, routers) to map user journeys.
 mode: subagent
-model: qwen3.6-35b
 ---
 
 ROLE: Frontend Flow & UX Extractor

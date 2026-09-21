@@ -2,7 +2,6 @@
 name: test-auditor
 description: Validates test quality.
 mode: subagent
-model: local lmstudio/qwen/qwen2.5-coder-14b
 ---
 
 1. System Prompt & Persona

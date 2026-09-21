@@ -2,7 +2,6 @@
 name: test-engineer
 description: Verifies feature correctness through automated tests and manual simulation.
 mode: subagent
-model: local lmstudio/qwen/qwen2.5-coder-14b
 permission:
   "*": "allow"
   "task": "deny"

@@ -232,7 +232,7 @@
       }
     }
   },
-  "model": "local lmstudio/google/gemma-4-26b-a4b-qat",
-  "small_model": "local lmstudio/qwen/qwen2.5-coder-14b",
+  "model": "opencode/big-pickle",
+  "small_model": "opencode/big-pickle",
   "default_agent": "team-lead"
 }

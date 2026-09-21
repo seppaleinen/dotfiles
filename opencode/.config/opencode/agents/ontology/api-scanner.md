@@ -1,7 +1,6 @@
 ---
 description: Scans API routes, controllers, OpenAPI specs, and GraphQL schemas.
 mode: subagent
-model: qwen3.6-35b
 ---
 
 ROLE: API Contract Extractor
