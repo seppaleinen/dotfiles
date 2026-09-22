@@ -379,7 +379,7 @@
     <div class="mast">
       <div><b>Config</b> default_agent: team-lead</div>
       <div><b>Mode</b> primary · reasoning model</div>
-      <div><b>Depth cap</b> 5 dispatch layers</div>
+      <div><b>Depth cap</b> 2 dispatch layers</div>
       <div><b>Rework budget</b> 2 retries, then escalate</div>
     </div>
   </header>
@@ -397,8 +397,8 @@
     <section id="role">
       <h2>What team-lead actually does</h2>
       <p>
-        Think CEO, not IC. Incoming work is either a raw user request or a Refinement Summary from
-        <code>issue-refiner</code>. Vague work gets refined first. Clear work gets classified, then
+        Think CEO, not IC. Incoming work is either a raw user request or a Research Brief from
+        <code>researcher</code>. Vague work gets refined first. Clear work gets classified, then
         dispatched with the <code>task</code> tool. Each dispatch is a fresh call: wait, evaluate
         status, then continue. Mixed app-plus-infra work splits and runs in parallel.
       </p>
@@ -424,7 +424,7 @@
       </p>
       <ol class="session">
         <li>You describe the work. If it is already a Refinement Summary, skip intake.</li>
-        <li>If the ask is vague, <code>team-lead</code> refines it or dispatches <code>issue-refiner</code> first.</li>
+        <li>If the ask is vague, <code>team-lead</code> dispatches <code>researcher</code> first.</li>
         <li>It classifies <strong>domain</strong>: software, infra, or both.</li>
         <li>It always dispatches <code>dev-team-lead</code> and/or <code>devops-team-lead</code>. Mixed work runs both in parallel. It cannot call engineers directly.</li>
         <li>Each child may dispatch further (shown in the tree). Results bubble back up as a handover.</li>
@@ -441,7 +441,7 @@
         <article class="card">
           <span class="tag lead">Always</span>
           <h3>Through the pipeline lead</h3>
-          <p>Same stages: investigate → design → implement → verify. Intake sits above both. Leads <code>[BLOCK]</code> if the ask is still vague.</p>
+          <p>Same stages: design → implement → verify → post-verification. Intake sits above both. Leads <code>[BLOCK]</code> if the ask is still vague.</p>
         </article>
       </div>
     </section>
@@ -454,23 +454,22 @@
       </p>
       <pre class="folders">agents/
   readme.html                 ← this overview
-  common/                     intake + shared
+  common/                     intake + shared + post-verification
     team-lead.md
-    issue-refiner.md
+    researcher.md
     web-scout.md
     docs.md
+    devops-cleanup.md
+    post-mortem-analyst.md
   dev/                        software pipeline only
     dev-team-lead.md
-    researcher.md
     dev-architect.md
-    dev-engineer.md
     backend-engineer.md
     frontend-engineer.md
     test-engineer.md
     code-reviewer.md
   devops/                     infra pipeline only
     devops-team-lead.md
-    devops-investigator.md
     devops-architect.md
     devops-engineer.md
     devops-verificator.md
@@ -489,7 +488,7 @@
       <p>
         Left to right is time. Below a stage, stacked nodes are helpers or parallel workers.
         Wide screens show software and infra as two windows; narrow screens stack them.
-        Each fact-finding job has one owner: <code>web-scout</code> (internet identity), <code>researcher</code> (app source), <code>devops-investigator</code> (GitOps + cluster reuse).
+        Each fact-finding job has one owner: <code>web-scout</code> (internet identity) and <code>researcher</code> (app source + GitOps/cluster reuse).
         Click an agent for what it does.
       </p>
 
@@ -501,7 +500,7 @@
         <span class="arrow" aria-hidden="true">→</span>
         <div class="col">
           <span class="note">If vague</span>
-          <button class="node support" data-agent="issue-refiner" type="button"><span class="id">issue-refiner</span><span class="role">Refinement Summary</span></button>
+          <button class="node support" data-agent="researcher" type="button"><span class="id">researcher</span><span class="role">Research Brief</span></button>
           <button class="node support" data-agent="web-scout" type="button"><span class="id">web-scout</span><span class="role">what software / which chart</span></button>
         </div>
         <span class="arrow" aria-hidden="true">→</span>
@@ -535,16 +534,25 @@
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
               <span class="note">3 Implement</span>
-              <button class="node dev" data-agent="dev-engineer" type="button"><span class="id">dev-engineer</span><span class="role">integrator</span></button>
               <button class="node dev" data-agent="backend-engineer" type="button"><span class="id">backend-engineer</span><span class="role">API / data</span></button>
               <button class="node dev" data-agent="frontend-engineer" type="button"><span class="id">frontend-engineer</span><span class="role">UI / client</span></button>
               <span class="badge">parallel</span>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">4 Test</span>
               <button class="node dev" data-agent="test-engineer" type="button"><span class="id">test-engineer</span><span class="role">then verify</span></button>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
-              <span class="note">4 Review</span>
+              <span class="note">5 Review</span>
               <button class="node dev" data-agent="code-reviewer" type="button"><span class="id">code-reviewer</span><span class="role">quality gate</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">6 Post-Verification</span>
+              <button class="node support" data-agent="devops-cleanup" type="button"><span class="id">devops-cleanup</span><span class="role">close issue + branch</span></button>
+              <button class="node support" data-agent="post-mortem-analyst" type="button"><span class="id">post-mortem-analyst</span><span class="role">improvement proposals</span></button>
             </div>
           </div>
         </article>
@@ -559,23 +567,24 @@
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
-              <span class="note">1 Investigate</span>
-              <button class="node ops" data-agent="devops-investigator" type="button"><span class="id">devops-investigator</span><span class="role">GitOps + cluster reuse</span></button>
-            </div>
-            <span class="arrow" aria-hidden="true">→</span>
-            <div class="col">
-              <span class="note">2 Design</span>
+              <span class="note">1 Design</span>
               <button class="node ops" data-agent="devops-architect" type="button"><span class="id">devops-architect</span><span class="role">Engineering Brief</span></button>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
-              <span class="note">3 Implement</span>
+              <span class="note">2 Implement</span>
               <button class="node ops" data-agent="devops-engineer" type="button"><span class="id">devops-engineer</span><span class="role">GitOps + flux-local</span></button>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
-              <span class="note">4 Verify</span>
+              <span class="note">3 Verify</span>
               <button class="node ops" data-agent="devops-verificator" type="button"><span class="id">devops-verificator</span><span class="role">cluster reconcile</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">4 Post-Verification</span>
+              <button class="node support" data-agent="devops-cleanup" type="button"><span class="id">devops-cleanup</span><span class="role">close issue + branch</span></button>
+              <button class="node support" data-agent="post-mortem-analyst" type="button"><span class="id">post-mortem-analyst</span><span class="role">improvement proposals</span></button>
             </div>
           </div>
         </article>
@@ -586,7 +595,7 @@
         <p>Click any node. Results return to the parent, then to <code>team-lead</code>, then to you.</p>
       </div>
 
-      <p>Dispatch depth is capped at five layers. Software: <code>team-lead → dev-team-lead → dev-engineer → backend-engineer</code> is four; <code>test-engineer</code> is the fifth. Infra: <code>team-lead → devops-team-lead → devops-investigator</code> is three.</p>
+      <p>Dispatch depth is capped at two layers from <code>team-lead</code>. Software: <code>team-lead → dev-team-lead → backend-engineer</code> is the deepest chain. Infra: <code>team-lead → devops-team-lead → devops-engineer</code> is the deepest. The post-verification agents (<code>devops-cleanup</code>, <code>post-mortem-analyst</code>) are dispatched directly by <code>team-lead</code> at that same depth.</p>
     </section>
 
     <section id="handover">
@@ -629,15 +638,7 @@
     const agents = {
       "team-lead": {
         title: "team-lead",
-        blurb: "Primary orchestrator. Classifies domain (dev / ops / mixed) and always dispatches the pipeline lead. Permission-locked to issue-refiner, dev-team-lead, and devops-team-lead. Never implements, never calls engineers directly."
-      },
-      "issue-refiner": {
-        title: "issue-refiner",
-        blurb: "Turns a fuzzy idea into a Refinement Summary. May call web-scout only to identify official repo / chart / image. Does not scan GitOps or app source."
-      },
-      "dev-engineer": {
-        title: "dev-engineer",
-        blurb: "Application integrator. Called only by dev-team-lead with an architect CONTRACT. Splits work to backend-engineer and frontend-engineer in parallel, then test-engineer. Returns to the pipeline lead; code-reviewer is the next gate."
+        blurb: "Primary orchestrator. Classifies domain (dev / ops / mixed) and always dispatches the pipeline lead. Permission-locked to researcher, dev-team-lead, and devops-team-lead. Never implements, never calls engineers directly."
       },
       "devops-engineer": {
         title: "devops-engineer",
@@ -645,11 +646,11 @@
       },
       "dev-team-lead": {
         title: "dev-team-lead",
-        blurb: "Software pipeline manager. Always the software entry from team-lead. Permission-locked to researcher, dev-architect, dev-engineer, code-reviewer. Blocks if the task is still vague — does not re-run intake."
+        blurb: "Software pipeline manager. Always the software entry from team-lead. Permission-locked to researcher, dev-architect, backend-engineer, frontend-engineer, test-engineer, code-reviewer. Blocks if the task is still vague — does not re-run intake."
       },
       "devops-team-lead": {
         title: "devops-team-lead",
-        blurb: "Infra pipeline manager. Always the infra entry from team-lead. Permission-locked to devops-investigator, devops-architect, devops-engineer, devops-verificator. Does not edit manifests. Reuse of shared backends is mandatory when investigation finds them."
+        blurb: "Infra pipeline manager. Always the infra entry from team-lead. Permission-locked to devops-architect, devops-engineer, devops-verificator. Does not edit manifests. Reuse of shared backends is mandatory when investigation finds them."
       },
       "researcher": {
         title: "researcher",
@@ -663,37 +664,41 @@
         title: "devops-architect",
         blurb: "Prompt-only designer. Turns refined requirements plus the investigation report into an Engineering Brief. Must reuse listed shared backends (e.g. existing CNPG). Does not kubectl, does not explore the repo, does not implement."
       },
-      "devops-investigator": {
-        title: "devops-investigator",
-        blurb: "GitOps repo + live cluster facts, including reusable CNPG/Postgres. One agent — no nested repo-inspector. Does not search the internet. Does not scan application source."
-      },
       "devops-verificator": {
         title: "devops-verificator",
         blurb: "After merge, confirms Flux reconciled. On failure, returns diagnostics as REWORK for devops-engineer."
       },
       "code-reviewer": {
         title: "code-reviewer",
-        blurb: "Post-implementation gate on the software pipeline. Checks quality, security, and CONTRACT adherence. Critical findings: one rework cycle through dev-engineer."
+        blurb: "Post-implementation gate on the software pipeline. Checks quality, security, and CONTRACT adherence. Critical findings: one rework cycle through the engineer stage."
       },
       "backend-engineer": {
         title: "backend-engineer",
-        blurb: "Implements the server half of the CONTRACT. Called only by dev-engineer. small_model when the spec is clear."
+        blurb: "Implements the server half of the CONTRACT. Called only by dev-team-lead. small_model when the spec is clear."
       },
       "frontend-engineer": {
         title: "frontend-engineer",
-        blurb: "Implements the UI / client half of the CONTRACT. Called only by dev-engineer, usually in parallel with backend-engineer."
+        blurb: "Implements the UI / client half of the CONTRACT. Called only by dev-team-lead, usually in parallel with backend-engineer."
       },
       "test-engineer": {
         title: "test-engineer",
-        blurb: "Checks the integrated feature against expected behavior. Called by dev-engineer after backend and frontend land."
+        blurb: "Checks the integrated feature against expected behavior. Called by dev-team-lead after backend and frontend land."
       },
       "web-scout": {
         title: "web-scout",
-        blurb: "Internet only: official repo, Helm chart, image, upstream deps. Called only by issue-refiner. Not used inside either pipeline."
+        blurb: "Internet only: official repo, Helm chart, image, upstream deps. Called only by researcher. Not used inside either pipeline."
       },
       "explore": {
         title: "explore",
         blurb: "Built-in OpenCode explore agent. researcher uses it for codebase discovery before design. Not a custom file in agents/."
+      },
+      "devops-cleanup": {
+        title: "devops-cleanup",
+        blurb: "Post-verification cleanup. Dispatched by team-lead after [SUCCESS]. Asks the user before any destructive action: closes the working issue and deletes the branch only if its PR was merged."
+      },
+      "post-mortem-analyst": {
+        title: "post-mortem-analyst",
+        blurb: "Post-verification workflow analyst. Dispatched by team-lead after [SUCCESS]. Reviews the full workflow for errors and dead ends, posts a summary comment on the issue, and drafts PRs for proposed improvements — but never auto-merges or commits."
       }
     };
 
