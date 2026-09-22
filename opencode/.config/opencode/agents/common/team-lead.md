@@ -78,6 +78,34 @@ You MAY execute low-risk repository management directly (without dispatching pip
 
 Do NOT dispatch `dev-team-lead` or `devops-team-lead` for purely administrative or planning tasks.
 
+## Post-Verification Pipeline (New Stages)
+
+After verification returns `[SUCCESS]` from `code-reviewer` (dev) or `devops-verificator` (devops), you MAY dispatch the post-verification agents:
+
+- **For dev pipeline**: `team-lead → dev-team-lead → dev-architect → backend-engineer/frontend-engineer → test-engineer → code-reviewer` → `[SUCCESS]` → **dispatch `devops-cleanup` and `post-mortem-analyst`**
+- **For devops pipeline**: `team-lead → devops-team-lead → devops-architect → devops-engineer → devops-verificator` → `[SUCCESS]` → **dispatch `devops-cleanup` and `post-mortem-analyst`**
+
+Dispatch pattern:
+```
+task(
+  description="Post-verification cleanup: <issue number>",
+  prompt="The verification result from <devops-verificator/code-reviewer>, issue <number>, branch <name>, PR status <status>",
+  subagent_type="devops-cleanup"
+)
+
+task(
+  description="Post-verification analysis: <issue number>",
+  prompt="The verification result from <devops-verificator/code-reviewer>, full workflow summary, git history, agent timeline",
+  subagent_type="post-mortem-analyst"
+)
+```
+
+The new agents live in `opencode/.config/opencode/agents/common/` and follow the same handover protocol as other agents.
+
+## Important Note
+
+These new stages (devops-cleanup and post-mortem-analyst) are dispatched **after** verification returns `[SUCCESS]`. They are NOT part of the original pipeline leads and are dispatched directly by `team-lead` at the same depth level as the pipeline leads (subagent_depth: 2).
+
 ## Mixed Task Dispatch
 
 For tasks spanning both dev and ops, dispatch BOTH pipeline leads in parallel:

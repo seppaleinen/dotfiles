@@ -27,11 +27,20 @@ The agent pipeline is defined in `opencode/.config/opencode/agents/`. Default ag
 **Pipeline structure (flat 2-level tree):**
 - `researcher` (subagent, auto-dispatched by `team-lead`) — grills the user, does web/source/GitOps investigation, writes a **Research Brief** to a file
 - `team-lead` → routes a Research Brief to `dev-team-lead` or `devops-team-lead`
-- `dev-team-lead` → `dev-architect` → `backend-engineer` / `frontend-engineer` → `test-engineer` → `code-reviewer`
-- `devops-team-lead` → `devops-architect` → `devops-engineer` → `devops-verificator`
+- `dev-team-lead` → `dev-architect` → `backend-engineer` / `frontend-engineer` → `test-engineer` → `code-reviewer` → **`devops-cleanup` & `post-mortem-analyst`**
+- `devops-team-lead` → `devops-architect` → `devops-engineer` → `devops-verificator` → **`devops-cleanup` & `post-mortem-analyst`**
 - `web-scout` (subagent of researcher) → identifies upstream repos/charts/images
 
 `researcher` is a `mode: subagent`, auto-dispatched by `team-lead` via `task()` when a task is raw/ambiguous. No manual Tab-switching.
+
+**Post-Verification Pipeline (New Stages)**
+
+After verification returns `[SUCCESS]` from `code-reviewer` (dev) or `devops-verificator` (devops), `team-lead` dispatches two new agents:
+
+- **`devops-cleanup`**: Asks the user whether cleanup is wanted, then closes the working issue (if objectives met) and deletes the working branch (only if its PR was merged; asks user if no PR or unmerged)
+- **`post-mortem-analyst`**: Reviews the full workflow conversation + git history + agent timeline for errors, dead ends, rework loops; identifies improvement opportunities; posts summary comment on original issue; auto-creates follow-up issue for high-priority items; drafts PR for proposed changes
+
+Both new agents live in `opencode/.config/opencode/agents/common/` (shared across dev/devops pipelines) and follow the same handover protocol as other agents.
 
 **Deleted agents:** the old subagent `researcher`, `dev-engineer` (coordinator/integrator role removed — integration check now done by dev-team-lead), `issue-refiner`, and `devops-investigator` have been removed; their investigative work is consolidated into the `researcher` subagent.
 

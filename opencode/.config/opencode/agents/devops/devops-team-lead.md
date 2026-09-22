@@ -31,6 +31,12 @@ Receive (Research Brief — already refined)
 [Verify] — dispatch devops-verificator for cluster check
     │
     ▼
+[Cleanup] — dispatch devops-cleanup (asks user; closes issue + deletes branch if PR merged)
+    │
+    ▼
+[Post-Mortem] — dispatch post-mortem-analyst (reviews workflow, proposes improvements)
+    │
+    ▼
 Return Result
 ```
 
@@ -123,6 +129,61 @@ If `devops-verificator` returns `[REWORK]` with diagnostic findings:
 ## Step 5: Return Result
 
 Present the result to the caller (user, `team-lead`, or pipeline lead) using the Handover Protocol.
+
+## Step 6: Post-Verification Agents (dispatch by `team-lead` after `[SUCCESS]`)
+
+After verification returns `[SUCCESS]`, `team-lead` dispatches both of the following agents directly at `subagent_depth: 2`:
+
+```
+task(
+  description="Post-verification cleanup for <task>",
+  prompt="Verification result [SUCCESS]; issue metadata; branch name; PR status",
+  subagent_type="devops-cleanup"
+)
+```
+
+```
+task(
+  description="Post-mortem analysis for <task>",
+  prompt="Full workflow conversation; git history; agent timeline; verification result [SUCCESS]",
+  subagent_type="post-mortem-analyst"
+)
+```
+
+**Ordering:** `team-lead` may dispatch both concurrently, then synthesize their results before returning the final result to the caller.
+
+**`devops-cleanup`** (ask before destructive action):
+- Ask the user: "Do you want to perform post-verification cleanup? This will close the working issue and delete the branch if applicable."
+- If yes: close the working issue via `gh issue close`; if there is a branch, check if the PR is merged via `gh pr merge --status`; if merged, delete local branch (`git branch -D`) and remote branch (`git push origin --delete`); if not merged, ask user before deleting.
+- If no: return `[SUCCESS]` with a note that cleanup was skipped.
+
+**`post-mortem-analyst`** (analysis + proposals only):
+- Review the full workflow conversation + git history + agent timeline for errors, dead ends, rework loops, and identify improvement opportunities.
+- Post a summary comment on the original issue with key findings and suggested improvements.
+- Auto-create a follow-up issue only for high-priority items (e.g., "create skill X", "rewrite agent Y instructions").
+- Draft PRs for proposed changes but **never auto-merge or commit** — requires explicit user approval.
+
+## PIPELINE STAGE
+
+Include a **PIPELINE STAGE** field showing the full progression:
+
+```
+PIPELINE STAGE: design → implement → verify → cleanup → post-mortem [COMPLETE]
+```
+
+Or if cleanup was skipped by user:
+
+```
+PIPELINE STAGE: design → implement → verify → post-mortem [COMPLETE: cleanup skipped]
+```
+
+Or on early stop:
+
+```
+PIPELINE STAGE: design → implement [STOPPED: devops-verificator returned REWORK]
+```
+
+2. In your **SUMMARY**, mention which stage produced the final result (cleanup completed, post-mortem analysis posted, etc.).
 
 ## Rework Handling
 
