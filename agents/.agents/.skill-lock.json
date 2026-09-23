@@ -75,6 +75,96 @@
       "pluginName": "mattpocock-skills",
       "installedAt": "2026-08-10T15:23:10.439Z",
       "updatedAt": "2026-08-10T15:23:10.439Z"
+    },
+    "boy-scout-rule": {
+      "source": "JordanCoin/codingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/JordanCoin/codingskills.git",
+      "skillPath": "skills/boy-scout-rule/SKILL.md",
+      "skillFolderHash": "8d69ea7bc36f12024c17bcd86fe8732eb3a5befd",
+      "pluginName": "coding-skills",
+      "installedAt": "2026-09-22T13:52:47.781Z",
+      "updatedAt": "2026-09-22T13:52:47.781Z"
+    },
+    "convention-over-configuration": {
+      "source": "JordanCoin/codingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/JordanCoin/codingskills.git",
+      "skillPath": "skills/convention-over-configuration/SKILL.md",
+      "skillFolderHash": "80aad587e987b60367b98898206b8a11c0884589",
+      "pluginName": "coding-skills",
+      "installedAt": "2026-09-22T13:52:47.784Z",
+      "updatedAt": "2026-09-22T13:52:47.784Z"
+    },
+    "detect-stack": {
+      "source": "JordanCoin/codingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/JordanCoin/codingskills.git",
+      "skillPath": "skills/detect-stack/SKILL.md",
+      "skillFolderHash": "95f92cac3206f9925d7326e9af63fdb61817115e",
+      "pluginName": "coding-skills",
+      "installedAt": "2026-09-22T13:52:47.784Z",
+      "updatedAt": "2026-09-22T13:52:47.784Z"
+    },
+    "dry": {
+      "source": "JordanCoin/codingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/JordanCoin/codingskills.git",
+      "skillPath": "skills/dry/SKILL.md",
+      "skillFolderHash": "bb0c711ff11279d72f4f9e72752e0e528cd0b23d",
+      "pluginName": "coding-skills",
+      "installedAt": "2026-09-22T13:52:47.785Z",
+      "updatedAt": "2026-09-22T13:52:47.785Z"
+    },
+    "kiss": {
+      "source": "JordanCoin/codingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/JordanCoin/codingskills.git",
+      "skillPath": "skills/kiss/SKILL.md",
+      "skillFolderHash": "4913871aff338e22b06fdac4970c75adda5e7cc6",
+      "pluginName": "coding-skills",
+      "installedAt": "2026-09-22T13:52:47.786Z",
+      "updatedAt": "2026-09-22T13:52:47.786Z"
+    },
+    "law-of-demeter": {
+      "source": "JordanCoin/codingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/JordanCoin/codingskills.git",
+      "skillPath": "skills/law-of-demeter/SKILL.md",
+      "skillFolderHash": "3e1c43ee187d998868e44c291b5a8eb0240334f9",
+      "pluginName": "coding-skills",
+      "installedAt": "2026-09-22T13:52:47.786Z",
+      "updatedAt": "2026-09-22T13:52:47.786Z"
+    },
+    "separation-of-concerns": {
+      "source": "JordanCoin/codingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/JordanCoin/codingskills.git",
+      "skillPath": "skills/separation-of-concerns/SKILL.md",
+      "skillFolderHash": "fe1141e9f41f497d113149bd494653b461185aee",
+      "pluginName": "coding-skills",
+      "installedAt": "2026-09-22T13:52:47.787Z",
+      "updatedAt": "2026-09-22T13:52:47.787Z"
+    },
+    "solid": {
+      "source": "JordanCoin/codingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/JordanCoin/codingskills.git",
+      "skillPath": "skills/solid/SKILL.md",
+      "skillFolderHash": "33eefbbd28dc4a9a8772ac618befffbcf05fefd7",
+      "pluginName": "coding-skills",
+      "installedAt": "2026-09-22T13:52:47.787Z",
+      "updatedAt": "2026-09-22T13:52:47.787Z"
+    },
+    "yagni": {
+      "source": "JordanCoin/codingskills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/JordanCoin/codingskills.git",
+      "skillPath": "skills/yagni/SKILL.md",
+      "skillFolderHash": "16de1859d92c37c6fb7b666245c568faa48c6f09",
+      "pluginName": "coding-skills",
+      "installedAt": "2026-09-22T13:52:47.788Z",
+      "updatedAt": "2026-09-22T13:52:47.788Z"
     }
   },
   "dismissed": {
@@ -82,14 +172,13 @@
   },
   "lastSelectedAgents": [
     "amp",
-    "antigravity",
-    "antigravity-cli",
     "cline",
     "codex",
     "cursor",
-    "deepagents",
+    "droid",
     "gemini-cli",
     "github-copilot",
+    "kilo",
     "kimi-code-cli",
     "opencode",
     "warp",
