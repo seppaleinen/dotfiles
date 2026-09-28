@@ -10,8 +10,7 @@
   },
   "subagent_depth": 2,
   "lsp": true,
-  "mcp": {  
-  },
+  "mcp": {},
   "permission": {
     "external_directory": {
       "~/workspace/personal/**": "allow",
@@ -114,7 +113,7 @@
   "plugin": [
     "opentmux@latest",
     "opencode-plugin-litellm@latest",
-    "/Users/seppa/.hindsight/coding-agents"
+    "/Users/daveri/.hindsight/coding-agents"
   ],
   "provider": {
     "litellm": {
