@@ -12,27 +12,6 @@ macros:
   "llama-bin": "/home/seppa/workspace/llama.cpp/build/bin/llama-server"
 
 models:
-  gemma-4-12b-vllm:
-    concurrencyLimit: 3
-    cmd: >-
-      docker run --rm --name gemma4-12b-vllm-${PORT}
-      --runtime nvidia --gpus all --ipc=host --network host
-      -v /home/seppa/.cache/huggingface:/root/.cache/huggingface
-      -e HF_XET_HIGH_PERFORMANCE=1
-      -e HF_TOKEN
-      vllm/vllm-openai:latest
-      google/gemma-4-12B-it-qat-w4a16-ct
-      --port ${PORT} --host 0.0.0.0
-      --max-model-len 16384
-      --gpu-memory-utilization 0.92
-      --kv-cache-dtype fp8
-      --enable-prefix-caching
-      --max-num-batched-tokens 4096
-      --max-num-seqs 3
-      --speculative-config '{"method":"mtp","model":"google/gemma-4-12B-it-assistant","num_speculative_tokens":8}'
-      --trust-remote-code
-      --hf-overrides '{"text_config": {"allow_global_per_layer_attribute_access": true}, "allow_global_per_layer_attribute_access": true}'
-
   gemma-4-12b:
     concurrencyLimit: 4
     cmdStop: "kill -9 ${PID}"
@@ -50,14 +29,6 @@ models:
       --model-draft ${models_dir}/gemma-4-26B/mtp-gemma-4-26B-A4B-it.gguf --spec-type draft-mtp --spec-draft-n-max 2
       -c 65536 ${default_flags}
       --parallel 1 --jinja ${reasoning}
-
-  gemma-4-31b:
-    cmd: >-
-      ${llama-bin} --port ${PORT}
-      -m ${models_dir}/gemma-4-31B/gemma-4-31B-it-qat-UD-Q4_K_XL.gguf
-      --model-draft ${models_dir}/gemma-4-31B/mtp-gemma-4-31B-it.gguf --spec-type draft-mtp --spec-draft-n-max 2
-      -c 65536 ${default_flags}
-      --parallel 1 --jinja ${reasoning} --flash-attn on
 
   qwen3-8b:
     concurrencyLimit: 4
@@ -88,28 +59,12 @@ models:
       --flash-attn on --parallel 1 --jinja --reasoning-preserve
       ${default_flags} --chat-template-file ${models_dir}/custom-template.jinja
 
-  qwen3.8-27b-twin-turbo-gsq-rco:
-    concurrencyLimit: 2
-    cmd: >-
-      ${llama-bin} --port ${PORT}
-      -m ${models_dir}/qwen3.8-27b/Qwen3.8-27B-TWIN-TURBO-GSQ-RCO-IQ3_S-MTP.gguf
-      -c 70000 -b 4096 -ub 2048 --cache-reuse 256 -ngl all
-      --spec-type draft-mtp --spec-draft-n-max 3 --spec-draft-p-min 0.75
-      --flash-attn on --parallel 1 --jinja --reasoning-preserve
-      ${default_flags} --chat-template-file ${models_dir}/custom-template.jinja
-
-  qwen3.6-27b:
-    cmd: >-
-      ${llama-bin} --port ${PORT} -m ${models_dir}/qwen3.6-27b/Qwen3.6-27B-UD-Q4_K_XL.gguf
-      --spec-type draft-mtp --spec-draft-n-max 2 --spec-draft-p-min 0.75
-      -c 65536 --cache-type-k q8_0 --cache-type-v q8_0
-      --flash-attn on --parallel 1 --jinja ${default_flags}
-
   qwen3.6-35b:
-    cmd: ${llama-bin} --port ${PORT} -m ${models_dir}/qwen3.6-35b/Qwen3.6-35B-A3B-UD-Q4_K_M.gguf
+    cmd: ${llama-bin} --port ${PORT} -m ${models_dir}/qwen3.6-35b/Qwen3.6-35B-A3B-GSQ-hybrid.gguf
+      -ngl all --ngld all -b 4096 -ub 2048
       --spec-type draft-mtp --spec-draft-n-max 2 --spec-draft-p-min 0.75
       -c 65536 --cache-type-k q8_0 --cache-type-v q8_0 --no-mmap --mlock
-      --flash-attn on --parallel 1 --jinja ${reasoning}
+      --flash-attn on --parallel 1 --jinja
 
   gpt-oss-20b:
     concurrencyLimit: 8
@@ -117,20 +72,6 @@ models:
       ${llama-bin} --port ${PORT} -m ${models_dir}/gpt-oss-20b/gpt-oss-20b-Q4_K_M.gguf
       -c 131072 -b 4096 -ub 1024 ${default_flags}
       --flash-attn on --parallel 8 --jinja ${reasoning}
-
-  qwen3.8-27b:
-    concurrencyLimit: 1
-    cmd: >-
-      ${llama-bin} --port ${PORT} -m ${models_dir}/qwen3.8-27b/Qwen3.8-27B-Q4_K_M.gguf
-      -c 65536 ${default_flags}
-      --spec-type draft-mtp --spec-draft-n-max 3 --spec-draft-p-min 0.75
-      --flash-attn on --parallel 1 --jinja ${reasoning} --reasoning-format deepseek
-
-  thinkingcap-qwen3.6-27b:
-    cmd: >-
-      ${llama-bin} --port ${PORT} -m ${models_dir}/thinkingcap-qwen3.6-27b/ThinkingCap-Qwen3.6-27B-Q4_K_M.gguf
-      -c 65536 ${default_flags}
-      --flash-attn on --parallel 1 --jinja ${reasoning}
 
   llama3.1-8b:
     concurrencyLimit: 4
@@ -195,14 +136,10 @@ routing:
           swap: true
           exclusive: false
           members:
-            - gemma-4-12b-vllm
             - gemma-4-12b
             - gemma-4-26b
-            - gemma-4-31b
             - qwen3.5-9b-fable
-            - qwen3.6-27b
             - qwen3.6-35b
-            - qwen3.8-27b
-            - thinkingcap-qwen3.6-27b
+            - qwen3.8-27b-gsq-rco
             - gpt-oss-20b
             - qwen2.5-coder-7b
