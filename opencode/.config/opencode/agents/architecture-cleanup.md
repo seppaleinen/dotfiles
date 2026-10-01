@@ -1,5 +1,5 @@
 ---
-name: dev-cleanup
+name: architecture-cleanup
 description: Audits codebase for architectural drift, dependency violations, and code smell, then systematically tidies it up. Model tier: balanced.
 mode: subagent
 ---
@@ -30,5 +30,5 @@ When rewriting the code, apply these engineering mandates:
 
 ### PHASE 3: EXECUTION
 Execute the refactoring now. Output the final, cleaned production code files cleanly separated by markdown blocks.
-## MANDATORY PROTOCOL
-Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.
+
+Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.
