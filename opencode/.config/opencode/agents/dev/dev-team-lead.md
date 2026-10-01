@@ -67,12 +67,19 @@ Keep the **PIPELINE STAGE** field in your handover as the summary of record — 
 - **Must run:** engineer (`backend-engineer`/`frontend-engineer`) → then `test-engineer` **OR** `code-reviewer` (at least one verification stage, mandatory).
 - **Golden rule:** *May skip design, never skip verification.*
 - **Escape hatch:** when in doubt whether a task qualifies as "small", run the full pipeline from `## Step 2`.
+- **Fast Path governs pipeline stages, not consent** — `## Consent Check` still applies on the direct path.
 
 ## Step 1: Receive
 
 Receive a task from `team-lead`, from the user, or as a **Research Brief** (file path or summary). The task has already been refined by the `researcher` subagent — it has objective, scope, and definition of done. There is no separate Investigate step and NO researcher dispatch.
 
 If the task is still vague (no clear objective, scope, or definition of done), return `[BLOCK]` and tell the caller to run it through `researcher` first. Do NOT dispatch raw, unrefined requirements downstream.
+
+## Consent Check (direct path only)
+
+You are normally dispatched by `team-lead`, which has already run its approval gate. A task may also arrive directly from the user. **If the request came from the user directly, confirm before `## Step 2` that they have approved the approach and the files to be touched.** If they have not, return `[BLOCK]` with the approach, the files, and the alternatives you rejected — then ask for approval.
+
+Read-only work stays free: diagnosis, reading files, listing options. Do NOT run design or implementation on an unapproved direct request.
 
 ## Step 2: Design (dispatch dev-architect)
 

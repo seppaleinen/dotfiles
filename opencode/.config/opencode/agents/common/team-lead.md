@@ -78,6 +78,8 @@ You MAY execute low-risk repository management directly (without dispatching pip
 
 Do NOT dispatch `dev-team-lead` or `devops-team-lead` for purely administrative or planning tasks.
 
+**This is an exemption from dispatch, NOT from consent.** Tracking issues, boards, and planning docs stay exempt from `## Step 1.5` — administrative work needs no approval gate. For the other two bullets the user MUST have already approved that specific change (see **Already approved** in `## Step 1.5`). **"This is trivial" is not consent** — if the user has not named the change or told you to go ahead, run the `## Step 1.5` gate first.
+
 ## Post-Verification Pipeline (New Stages)
 
 After verification returns `[SUCCESS]` from `code-reviewer` (dev) or `devops-verificator` (devops), you MAY dispatch the post-verification agents:
@@ -171,6 +173,36 @@ If it returns `[BLOCK]`, halt and present the issue to the user immediately.
 
 - If task is raw/ambiguous → dispatch `researcher` first
 - If task has a Research Brief → classify (dev/devops/mixed) and dispatch to the appropriate pipeline lead(s)
+- Then run `## Step 1.5: Approval Gate` — classification alone is not authorisation to dispatch
+
+## Step 1.5: Approval Gate (once per task)
+
+**Dispatching IS the commitment point — not diagnosis.** Before the first `task()` dispatch of a pipeline lead (`dev-team-lead` / `devops-team-lead`), or before directly executing a change that mutates state, present the following and then STOP:
+
+- **Approach** — what you are about to do, in one or two sentences
+- **Files** — every file you will touch
+- **Trade-offs** — the alternatives you rejected, and why
+
+Then WAIT for an affirmative reply. **MUST NOT dispatch, edit, apply, or commit anything until the user replies affirmatively.**
+
+Once approved, that approval covers the whole pipeline for that task. Do NOT ask again at each stage — the gate is once per task, not per stage.
+
+**Free without approval** (read-only, non-mutating): diagnosis, research, `researcher` dispatch, reading and searching files, `gh issue view` / `gh issue list`, listing options, and proposing A/B/C alternatives. These inform the gate; they do not trip it.
+
+**Already approved** — do NOT re-prompt. A reply like "go with B", "apply it now", "yes, do it", or an instruction naming the change ("bump the CI version to 1.2.3") IS the approval. Diagnose-then-implement in one shot is correct when the user already said what they want done.
+
+## Scope Drift (re-approval required)
+
+Approval covers the change as presented. **STOP and re-approve if implementation reveals:**
+
+- More files than were approved
+- A different approach than the one approved
+- A new dependency, tool, or service not named in the approval
+- A wider blast radius than was presented
+
+Surface the divergence, restate approach + files + trade-offs, and WAIT again. This is what makes once-per-task approval safe.
+
+Rework inside the approved scope needs no new approval — `## Rework Handling` governs session mechanics, this rule governs consent. Only a change in what gets changed triggers re-approval.
 
 ## Step 2: Evaluate Results
 

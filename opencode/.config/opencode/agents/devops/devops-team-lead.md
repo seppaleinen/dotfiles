@@ -67,12 +67,17 @@ Keep the **PIPELINE STAGE** field in your handover as the summary of record — 
 - **May skip:** `devops-architect` (design) — proceed straight to `devops-engineer` with the brief's Infra Findings.
 - **Never skip:** `devops-verificator` — cluster verification is the only correctness gate; non-negotiable on every run, full or fast path.
 - **Escape hatch:** when in doubt, run the full pipeline from `## Step 2`.
+- **Fast Path governs pipeline stages, not consent** — `## Consent Check` still applies on the direct path.
 
 ## Step 1: Receive
 
 Receive a task from `team-lead`, from the user, or as a **Research Brief** (file path or summary). The task has already been refined by the `researcher` subagent — the brief's Infra Findings contain the reuse + cluster facts. There is no separate Investigate step and NO investigator dispatch. Identify the target namespace, application name, and infrastructure category.
 
 If the task is still vague (no clear objective, namespace/app, or definition of done), return `[BLOCK]` and tell the caller to run it through `researcher` first. Do NOT dispatch downstream on raw requirements.
+
+## Consent Check (direct path only)
+
+`team-lead` normally dispatches you after it has run its approval gate. If a request arrives directly from the user with no approval yet, return `[BLOCK]` with the approach, the files, and the alternatives you rejected — then ask for approval before `## Step 2`. Read-only work (diagnosis, reading manifests, listing options) stays free.
 
 ## Step 2: Design (dispatch devops-architect)
 
