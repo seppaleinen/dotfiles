@@ -30,5 +30,5 @@ Deliver findings in a clear text markdown table organized by severity: CRITICAL,
 | :--- | :--- | :--- | :--- | :--- |
 
 *Constraint: For the Remediation column, provide the entire refactored file or code block in full. Do not use placeholders, TODO comments, or ellipsis marks.*
-## MANDATORY PROTOCOL
-Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.
+
+Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.
