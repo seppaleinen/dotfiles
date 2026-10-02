@@ -37,4 +37,4 @@ Return using the Handover Protocol:
 
 ## Handover Protocol
 
-Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output using that structure. Include a TRACE line showing the dispatch chain.
+Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.

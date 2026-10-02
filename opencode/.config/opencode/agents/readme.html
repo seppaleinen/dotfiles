@@ -441,7 +441,7 @@
         <article class="card">
           <span class="tag lead">Always</span>
           <h3>Through the pipeline lead</h3>
-          <p>Same stages: design → implement → verify → post-verification. Intake sits above both. Leads <code>[BLOCK]</code> if the ask is still vague.</p>
+          <p>Same stages: design → implement → verify → docs → post-verification. Intake sits above both. Leads <code>[BLOCK]</code> if the ask is still vague.</p>
         </article>
       </div>
     </section>
@@ -476,7 +476,7 @@
   *.md                        on-demand (not dispatched by team-lead)
     ai-security-auditor.md
     context-drift-auditor.md
-    dev-cleanup.md
+    architecture-cleanup.md
     performance-auditor.md
     seo-aeo-auditor.md
     test-auditor.md
@@ -522,31 +522,30 @@
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
-              <span class="note">1 Investigate</span>
-              <button class="node dev" data-agent="researcher" type="button"><span class="id">researcher</span><span class="role">codebase facts</span></button>
-              <button class="node support" data-agent="explore" type="button"><span class="id">explore</span><span class="role">built-in search</span></button>
-            </div>
-            <span class="arrow" aria-hidden="true">→</span>
-            <div class="col">
-              <span class="note">2 Design</span>
+              <span class="note">1 Design</span>
               <button class="node dev" data-agent="dev-architect" type="button"><span class="id">dev-architect</span><span class="role">CONTRACT</span></button>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
-              <span class="note">3 Implement</span>
+              <span class="note">2 Implement</span>
               <button class="node dev" data-agent="backend-engineer" type="button"><span class="id">backend-engineer</span><span class="role">API / data</span></button>
               <button class="node dev" data-agent="frontend-engineer" type="button"><span class="id">frontend-engineer</span><span class="role">UI / client</span></button>
               <span class="badge">parallel</span>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
-              <span class="note">4 Test</span>
+              <span class="note">3 Test</span>
               <button class="node dev" data-agent="test-engineer" type="button"><span class="id">test-engineer</span><span class="role">then verify</span></button>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
-              <span class="note">5 Review</span>
+              <span class="note">4 Review</span>
               <button class="node dev" data-agent="code-reviewer" type="button"><span class="id">code-reviewer</span><span class="role">quality gate</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">5 Docs</span>
+              <button class="node support" data-agent="docs" type="button"><span class="id">docs</span><span class="role">ADRs · PR · changelog</span></button>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
@@ -582,9 +581,8 @@
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
-              <span class="note">4 Post-Verification</span>
-              <button class="node support" data-agent="devops-cleanup" type="button"><span class="id">devops-cleanup</span><span class="role">close issue + branch</span></button>
-              <button class="node support" data-agent="post-mortem-analyst" type="button"><span class="id">post-mortem-analyst</span><span class="role">improvement proposals</span></button>
+              <span class="note">4 Docs</span>
+              <button class="node support" data-agent="docs" type="button"><span class="id">docs</span><span class="role">ADRs · PR · changelog</span></button>
             </div>
           </div>
         </article>
@@ -619,7 +617,7 @@
       <ul class="outside">
         <li><span class="id">ai-security-auditor</span><p>Vulnerability pass over the codebase.</p></li>
         <li><span class="id">context-drift-auditor</span><p>Structure / context-drift check.</p></li>
-        <li><span class="id">dev-cleanup</span><p>Architectural drift, dependency violations, systematic tidy.</p></li>
+        <li><span class="id">architecture-cleanup</span><p>Architectural drift, dependency violations, systematic tidy.</p></li>
         <li><span class="id">performance-auditor</span><p>Performance audit.</p></li>
         <li><span class="id">seo-aeo-auditor</span><p>SEO / AEO verification.</p></li>
         <li><span class="id">test-auditor</span><p>Test-quality validation (separate from test-engineer).</p></li>
@@ -654,7 +652,7 @@
       },
       "researcher": {
         title: "researcher",
-        blurb: "Application-source facts for the software architect. Dispatches explore only. Does not look up Helm charts and does not scan flux/ for shared Postgres."
+        blurb: "Unified intake & investigation agent for both pipelines. Grills the user, researches the web, analyzes application source with grep/glob/read directly (never dispatches explore), and investigates GitOps/cluster for reusable backends. Dispatches web-scout only to identify official repos, Helm charts, or images its own search could not resolve. Writes the Research Brief to file."
       },
       "dev-architect": {
         title: "dev-architect",
@@ -688,10 +686,6 @@
         title: "web-scout",
         blurb: "Internet only: official repo, Helm chart, image, upstream deps. Called only by researcher. Not used inside either pipeline."
       },
-      "explore": {
-        title: "explore",
-        blurb: "Built-in OpenCode explore agent. researcher uses it for codebase discovery before design. Not a custom file in agents/."
-      },
       "devops-cleanup": {
         title: "devops-cleanup",
         blurb: "Post-verification cleanup. Dispatched by team-lead after [SUCCESS]. Asks the user before any destructive action: closes the working issue and deletes the branch only if its PR was merged."
@@ -699,6 +693,10 @@
       "post-mortem-analyst": {
         title: "post-mortem-analyst",
         blurb: "Post-verification workflow analyst. Dispatched by team-lead after [SUCCESS]. Reviews the full workflow for errors and dead ends, posts a summary comment on the issue, and drafts PRs for proposed improvements — but never auto-merges or commits."
+      },
+      "docs": {
+        title: "docs",
+        blurb: "Technical documentation writer. Dispatched by both pipeline leads after verification returns [SUCCESS], before the post-verification stage. Produces ADRs, PR descriptions, and changelogs. Lives in common/ and is shared across pipelines."
       }
     };
 

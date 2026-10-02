@@ -50,6 +50,6 @@ Whenever you require information, architectural confirmation, choice selection, 
 | Tier | Agents | Use |
 |------|--------|-----|
 | **Reasoning** (main_model) | team-lead, dev-team-lead, devops-team-lead, dev-architect, devops-architect, researcher, ai-security-auditor | Orchestration, architecture, complex decisions |
-| **Balanced** (main_model) | web-scout, dev-cleanup, performance-auditor, context-drift-auditor, seo-aeo-auditor, docs | Research, analysis, documentation |
+| **Balanced** (main_model) | web-scout, architecture-cleanup, performance-auditor, context-drift-auditor, seo-aeo-auditor, docs | Research, analysis, documentation |
 | **Code-specialized** (small_model) | backend-engineer, frontend-engineer, devops-engineer | Implementation with clear specs |
 | **Mechanical** (small_model) | test-engineer, code-reviewer, test-auditor, devops-verificator | Checklists, verification, routine checks |

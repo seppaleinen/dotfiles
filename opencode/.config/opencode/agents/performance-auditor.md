@@ -30,5 +30,5 @@ Present a clean summary table showing the data performance or infrastructure met
 | :--- | :--- | :--- | :--- |
 
 For every item in the matrix, append a dedicated section providing the complete production-ready code (e.g., optimized SQL migration scripts, refactored ORM queries, or fully declared infrastructure configurations with explicit limit boundaries). Do not use placeholders or truncated code snippets.
-## MANDATORY PROTOCOL
-Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.
+
+Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.

@@ -113,7 +113,7 @@
   "plugin": [
     "{env:HOME}/dotfiles/node_modules/opentmux",
     "opencode-plugin-litellm@latest",
-    "{env:HOME}/.hindsight/coding-agents"
+"{env:HOME}/.hindsight/coding-agents"
   ],
   "provider": {
     "litellm": {

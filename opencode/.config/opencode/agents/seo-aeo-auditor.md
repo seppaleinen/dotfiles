@@ -55,5 +55,5 @@ Audit how the brand/domain exists in the broader LLM training sets and real-time
 Provide the audit results in a highly structured format. Every finding must be triaged by priority: CRITICAL, WARNING, or OPTIMIZATION. 
 
 Summarize the structural insights, metrics, or comparison points using clear Markdown tables. Do not use placeholders or ellipsis marks in any code-based remediation recommendations; provide complete examples ready for deployment.
-## MANDATORY PROTOCOL
-Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.
+
+Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.

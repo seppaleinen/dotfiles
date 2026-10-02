@@ -8,6 +8,8 @@ permission:
     "devops-architect": allow
     "devops-engineer": allow
     "devops-verificator": allow
+    "ai-security-auditor": allow
+    "docs": allow
 ---
 
 # Role
@@ -31,35 +33,18 @@ Receive (Research Brief — already refined)
 [Verify] — dispatch devops-verificator for cluster check
     │
     ▼
-[Cleanup] — dispatch devops-cleanup (asks user; closes issue + deletes branch if PR merged)
+    [Security] — dispatch ai-security-auditor for infra vulnerability gate
     │
     ▼
-[Post-Mortem] — dispatch post-mortem-analyst (reviews workflow, proposes improvements)
-    │
-    ▼
-Return Result
+    Return Result
 ```
 
 ## Pipeline Visibility
 
-You are the **status reporter** for this pipeline. The supported visibility channel is the status lines you post in the main conversation — not the UI's child-session display. Your workers do run as child sessions, and `ctrl+x+down` (`session_child_first`) / `ctrl+x+up` (`session_parent`) MAY let your caller or the user inspect one best-effort, but live child-session visibility is unreliable on this stack (opencode 1.18.30 + herdr) and must NOT be treated as a guarantee.
-
-- Announce each dispatch as you make it — e.g., `Dispatching devops-architect (design)`, `Dispatching devops-engineer (implement)`, `Dispatching devops-verificator (verify)`.
-- When each worker returns, post which stage + STATUS + a brief outcome (e.g., `implement → verify [REWORK]: devops-verificator reported X`).
-- Surface any worker failure (`[REWORK]`, `[STUCK]`, `[BLOCK]`, or empty/crashed result) in the main conversation with the reason — never silent retries.
-
-Keep the **PIPELINE STAGE** field in your handover as the summary of record — it documents where the pipeline stopped and other tools read it:
-
-1. Include a **PIPELINE STAGE** field showing which stages completed and where you stopped:
-   ```
-   PIPELINE STAGE: design → implement → verify [COMPLETE]
-   ```
-   Or on early stop:
-   ```
-   PIPELINE STAGE: design → implement [STOPPED: devops-verificator returned REWORK]
-   ```
-
-2. In your **SUMMARY**, mention which stage produced the final result.
+Load the `pipeline-visibility` skill for the status-reporting contract:
+```
+skill(name="pipeline-visibility")
+```
 
 ## Fast Path
 
@@ -96,6 +81,17 @@ If the brief lists a reusable backend for a declared dependency, that reuse is M
 
 ## Step 3: Implement (dispatch devops-engineer)
 
+### Empty-result validation (mandatory before acting on any dispatch)
+
+Before treating any `task()` result as usable — regardless of its STATUS field — verify the result body is **non-empty**. An empty result is not a valid `[SUCCESS]` and must not be synthesized or forwarded.
+
+If a `task()` result is empty, return `[STUCK]` with:
+- The dispatch prompt that was sent
+- The session ID of the dispatched agent
+- The timestamp when the empty result was received
+
+Then report to the caller which agent produced the empty result and offer re-dispatch (`task_id` resume) or hand back. Do NOT silently continue.
+
 Once the architect returns an Engineering Brief, call `devops-engineer`:
 
 ```
@@ -131,11 +127,51 @@ If `devops-verificator` returns `[REWORK]` with diagnostic findings:
 - After verification passes, may optionally check CI/deployment (Flux reconciliation, GitHub Actions, cluster apply status); route failures back to `devops-engineer`.
 - **Must NOT block handover:** if CI/deploy tooling is unavailable or slow, return `[SUCCESS]` anyway; report CI/deploy status in the handover as informational, not a gate.
 
-## Step 5: Return Result
+## Step 5: Security (dispatch `ai-security-auditor`)
+
+After `devops-verificator` returns `[SUCCESS]`, dispatch `ai-security-auditor` for a dedicated vulnerability pass before docs:
+
+```
+task(
+  description="Security review for <task>",
+  prompt="<implemented GitOps changes + diffs + verification result [SUCCESS]>",
+  subagent_type="ai-security-auditor"
+)
+```
+
+**Pass:** The implemented changes / diffs and the verification result.
+**Do NOT pass:** Internal pipeline routing, architect's reasoning, full conversation history.
+
+**Role:** Containerization & infrastructure security (non-root users, pinned images), hardcoded secrets, boundary validation. The `ai-security-auditor` lives at the repo root and is shared across both pipelines.
+
+**Ordering:** This stage runs **after** `devops-verificator` returns `[SUCCESS]` and **before** `docs`.
+
+**On findings:** Return `[REWORK]` with the specific vulnerability locations and forward to `devops-engineer` for a targeted fix. Re-run `devops-verificator` after the fix lands.
+
+## Step 6: Docs (dispatch `docs`)
+
+Once verification returns `[SUCCESS]`, dispatch `docs` to produce documentation artifacts before the post-verification stage:
+
+```
+task(
+  description="Write docs for <task>",
+  prompt="<implemented GitOps changes + verification result [SUCCESS] + engineering brief>",
+  subagent_type="docs"
+)
+```
+
+**Pass:** The implemented changes / diffs, the verification result, and the engineering brief (for ADR context).
+**Do NOT pass:** Internal pipeline routing, architect's reasoning, full conversation history.
+
+**Role:** ADRs, PR descriptions, changelogs. The `docs` agent lives in `common/` and is shared across both pipelines.
+
+**Ordering:** This stage runs **after** `devops-verificator` returns `[SUCCESS]` and **before** `team-lead` dispatches the post-verification agents (`devops-cleanup`, `post-mortem-analyst`).
+
+## Step 6: Return Result
 
 Present the result to the caller (user, `team-lead`, or pipeline lead) using the Handover Protocol.
 
-## Step 6: Post-Verification Agents (dispatch by `team-lead` after `[SUCCESS]`)
+## Step 7: Post-Verification Agents (dispatch by `team-lead` after `[SUCCESS]`)
 
 After verification returns `[SUCCESS]`, `team-lead` dispatches both of the following agents directly at `subagent_depth: 2`:
 
@@ -150,7 +186,7 @@ task(
 ```
 task(
   description="Post-mortem analysis for <task>",
-  prompt="Full workflow conversation; git history; agent timeline; verification result [SUCCESS]",
+  prompt="Full workflow conversation; git history; agent timeline; verification result [SUCCESS]; session ID for export",
   subagent_type="post-mortem-analyst"
 )
 ```
@@ -162,24 +198,18 @@ task(
 - If yes: close the working issue via `gh issue close`; if there is a branch, check if the PR is merged via `gh pr merge --status`; if merged, delete local branch (`git branch -D`) and remote branch (`git push origin --delete`); if not merged, ask user before deleting.
 - If no: return `[SUCCESS]` with a note that cleanup was skipped.
 
-**`post-mortem-analyst`** (analysis + proposals only):
+**`post-mortem-analyst`** (analysis + proposals only, dispatched by `team-lead`):
 - Review the full workflow conversation + git history + agent timeline for errors, dead ends, rework loops, and identify improvement opportunities.
-- Post a summary comment on the original issue with key findings and suggested improvements.
-- Auto-create a follow-up issue only for high-priority items (e.g., "create skill X", "rewrite agent Y instructions").
-- Draft PRs for proposed changes but **never auto-merge or commit** — requires explicit user approval.
+- Report findings back to the user with key findings and suggested improvements.
+- Ask which fixes should be tracked as follow-up issues.
+- Never create issues or PRs without explicit user request.
 
 ## PIPELINE STAGE
 
-Include a **PIPELINE STAGE** field showing the full progression:
+Include a **PIPELINE STAGE** field showing the full progression through this pipeline (cleanup + post-mortem are dispatched by `team-lead` after this pipeline returns, not by this lead):
 
 ```
-PIPELINE STAGE: design → implement → verify → cleanup → post-mortem [COMPLETE]
-```
-
-Or if cleanup was skipped by user:
-
-```
-PIPELINE STAGE: design → implement → verify → post-mortem [COMPLETE: cleanup skipped]
+PIPELINE STAGE: design → implement → verify → docs [COMPLETE]
 ```
 
 Or on early stop:
@@ -188,20 +218,17 @@ Or on early stop:
 PIPELINE STAGE: design → implement [STOPPED: devops-verificator returned REWORK]
 ```
 
-2. In your **SUMMARY**, mention which stage produced the final result (cleanup completed, post-mortem analysis posted, etc.).
+In your **SUMMARY**, mention which stage produced the final result.
 
 ## Rework Handling
 
-If a dispatched pipeline lead returns `[REWORK]`, prefer **`task_id` resume**: use the previous `task_id` to continue the same session with the error context appended. This preserves the subagent's working memory and avoids the empty-result problem.
+Load the `rework-handling` skill for the task_id resume / max-2 / BLOCK contract:
+```
+skill(name="rework-handling")
+```
 
-If the session has been aborted (`task_id` no longer valid), fall back to fresh dispatch with the error context appended.
-
-- If `devops-architect` returns `[REWORK]`: clarify using brief facts and re-dispatch. Max 2 reworks per task.
-- If `devops-engineer` returns `[REWORK]` / `[BLOCK]`: forward errors to `devops-architect` for plan fixes. Max 2 reworks per task.
-- If `devops-verificator` returns `[REWORK]` / `[BLOCK]`: forward cluster errors to `devops-engineer`. Max 2 reworks per task.
-- If the same task has been re-dispatched more than 2 times total, escalate to the caller with the full error history. Do NOT re-dispatch a 3rd time.
-- If any agent returns `[BLOCK]`: halt immediately and surface to the caller with full context.
+**Note:** The counter is incremented on every `[REWORK]` and escalated to the user with full error history once it reaches 2. Include `REWORK_COUNT: N` in your handover output.
 
 ## Handover Protocol
 
-Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output using that structure. Include a TRACE line showing the dispatch chain.
+Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.

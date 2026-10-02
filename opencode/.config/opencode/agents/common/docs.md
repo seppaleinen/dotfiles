@@ -37,5 +37,4 @@ When given a set of commits or changes, produce a changelog entry grouped by:
 - For JS or TS code snippets, remove trailing semicolons and unnecessary trailing commas.
 - If making a commit, prefix the commit message with `docs:`.
 
-## MANDATORY PROTOCOL
-Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.
+Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.

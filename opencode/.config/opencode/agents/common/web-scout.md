@@ -59,5 +59,5 @@ Your single output artifact is a direct reply comment starting with the success 
 ## Phase 4: Clean State
 
 Set your status metadata to done.
-## MANDATORY PROTOCOL
-Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.
+
+Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.
