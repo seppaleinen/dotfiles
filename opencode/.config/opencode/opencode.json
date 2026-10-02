@@ -111,9 +111,9 @@
     "write": "ask"
   },
   "plugin": [
-    "opentmux@latest",
+    "{env:HOME}/dotfiles/node_modules/opentmux",
     "opencode-plugin-litellm@latest",
-    "/Users/daveri/.hindsight/coding-agents"
+    "{env:HOME}/.hindsight/coding-agents"
   ],
   "provider": {
     "litellm": {
