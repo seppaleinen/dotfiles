@@ -5,6 +5,21 @@ description: Rework contract for pipeline leads: task_id resume on [REWORK], fre
 
 # Rework Handling
 
+## Automatic task_id Capture (mandatory, no manual extraction)
+
+After **every** `task()` call — success or failure — extract the `task_id` mechanically and store it as `LAST_TASK_ID`. This is not optional; it is a required step before any re-dispatch.
+
+The `task_id` is always present in the result. It appears in one of two forms — scan for both:
+
+| Result form | Pattern to extract |
+|---|---|
+| Success / running / completed | `<task id="ses_xxx" state="...">` → capture `ses_xxx` |
+| Failure (error thrown) | Error message contains `task_id: ses_xxx` → capture `ses_xxx` |
+
+**Rule:** If neither pattern is found, the dispatch did not produce a session — treat as `[STUCK]` and report. Do NOT guess or fabricate a `task_id`.
+
+**On re-dispatch:** always pass `task_id="$LAST_TASK_ID"` in the new `task()` call. The tool will reuse the existing session if it is still alive, or fall back to a fresh session if it has been aborted — either way, no manual lookup is needed.
+
 ## On [REWORK]
 If a dispatched pipeline lead returns `[REWORK]`, prefer **`task_id` resume**: use the previous `task_id` to continue the same session with the error context appended. This preserves the subagent's working memory and avoids the empty-result problem.
 

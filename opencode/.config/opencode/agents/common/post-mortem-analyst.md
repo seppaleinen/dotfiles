@@ -39,6 +39,15 @@ Receive from `team-lead`:
 
    Rationale: silently absorbing an empty dispatch result masks a stalled or failed agent and corrupts every downstream step that depends on it. Surface it immediately.
 
+   **task_id capture pattern (for reviewing prior dispatches):** When scanning the workflow for dispatch results, extract every `task_id` mechanically. It appears in one of two forms:
+
+   | Result form | Pattern to extract |
+   |---|---|
+   | Success / running / completed | `<task id="ses_xxx" state="...">` → capture `ses_xxx` |
+   | Failure (error thrown) | Error message contains `task_id: ses_xxx` → capture `ses_xxx` |
+
+   **Rule:** If neither pattern is found for a dispatch, that dispatch did not produce a session — flag it as a gap in the workflow analysis. Do NOT guess or fabricate a `task_id`.
+
 1. **Analyze**: Review the conversation, git history, and timeline for:
    - Errors and dead ends
    - Rework loops and duplicated work

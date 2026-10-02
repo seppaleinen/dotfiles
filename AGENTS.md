@@ -105,6 +105,23 @@ Do NOT treat an empty result as success, do NOT synthesize or forward it, and do
 
 This rule is enforced in the workflow of every agent that dispatches `task()`: `team-lead`, `dev-team-lead`, `devops-team-lead`, and `post-mortem-analyst`.
 
+### Automatic task_id capture (mandatory, no manual extraction)
+
+After **every** `task()` call — success or failure — extract the `task_id` mechanically and store it as `LAST_TASK_ID`. This is not optional; it is a required step before any re-dispatch. Do NOT rely on manual lookup or user recall.
+
+The `task_id` is always present in the result. It appears in one of two forms — scan for both:
+
+| Result form | Pattern to extract |
+|---|---|
+| Success / running / completed | `<task id="ses_xxx" state="...">` → capture `ses_xxx` |
+| Failure (error thrown) | Error message contains `task_id: ses_xxx` → capture `ses_xxx` |
+
+**Rule:** If neither pattern is found, the dispatch did not produce a session — treat as `[STUCK]` and report. Do NOT guess or fabricate a `task_id`.
+
+**On re-dispatch:** always pass `task_id="$LAST_TASK_ID"` in the new `task()` call. The tool will reuse the existing session if it is still alive, or fall back to a fresh session if it has been aborted — either way, no manual lookup is needed.
+
+This rule is enforced in the workflow of every agent that dispatches `task()`: `team-lead`, `dev-team-lead`, `devops-team-lead`, `researcher`, and `post-mortem-analyst`.
+
 ### rtk find loop prevention
 
 `rtk find` filters and hides results by default. When the filtered output is uninformative, repeating the command produces identical filtered output indefinitely — a loop that wastes cycles without gaining information.
