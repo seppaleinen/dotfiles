@@ -4,3 +4,5 @@
 # generator/runtime state (never commit)
 opencode/.config/opencode/openviking/
 opencode/.config/opencode/opencode-agent-tmux/update-state.json
+# opencode serve runtime password (regenerated on every start) — never commit
+opencode/.config/opencode/service.json
