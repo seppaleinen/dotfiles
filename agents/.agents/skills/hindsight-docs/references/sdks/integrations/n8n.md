@@ -3,6 +3,8 @@
 
 Persistent memory for [n8n](https://n8n.io) workflows via [Hindsight](https://hindsight.vectorize.io). The `@vectorize-io/n8n-nodes-hindsight` community node package adds three operations — **Retain**, **Recall**, **Reflect** — that work alongside any other n8n node.
 
+[View Changelog →](../../changelog/integrations/n8n.md)
+
 ## Why this matters
 
 n8n is the connective tissue of automation: triggers from Gmail, Slack, Sheets, Stripe, Notion; actions across 400+ apps. Until now it has been **stateless** — every workflow run starts fresh. With Hindsight nodes you can:
@@ -32,8 +34,8 @@ Restart n8n; the **Hindsight** node appears in the node panel.
 
 > **💡 Recommended: Hindsight Cloud**
 >
-[Sign up free](https://ui.hindsight.vectorize.io/signup) and grab an API key — no self-hosting required.
-1. **Sign up** at [Hindsight Cloud](https://ui.hindsight.vectorize.io/signup) (free tier) or [self-host](../../developer/installation.md)
+[Sign up free](https://ui.hindsight.vectorize.io) and grab an API key — no self-hosting required.
+1. **Sign up** at [Hindsight Cloud](https://ui.hindsight.vectorize.io) (free tier) or [self-host](../../developer/installation.md)
 2. **Get an API key** from the Hindsight dashboard
 3. **In n8n**, create a new **Hindsight API** credential with your API URL (defaults to Hindsight Cloud) and the `hsk_...` key
 

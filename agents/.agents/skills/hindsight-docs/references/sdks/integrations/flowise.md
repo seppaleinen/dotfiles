@@ -3,6 +3,8 @@
 
 Persistent memory for [Flowise](https://flowiseai.com) chatflows and agents via [Hindsight](https://hindsight.vectorize.io). Three Tool nodes — **Hindsight Retain**, **Hindsight Recall**, **Hindsight Reflect** — drop into any flow alongside your other LangChain tools.
 
+[View Changelog →](../../changelog/integrations/flowise.md)
+
 ## Why this matters
 
 Flowise is the LangChain-derived visual builder for non-developers and developers alike. Until now, Flowise chatflows have been **stateless across sessions**. With Hindsight tool nodes you can:
@@ -37,8 +39,8 @@ pnpm start  # opens http://localhost:3000
 
 > **💡 Hindsight Cloud (recommended)**
 >
-[Sign up free](https://ui.hindsight.vectorize.io/signup) — no infrastructure to run. Skip straight to creating your credential below.
-1. **Sign up** at [Hindsight Cloud](https://ui.hindsight.vectorize.io/signup) (free tier) or [self-host](../../developer/installation.md)
+[Sign up free](https://ui.hindsight.vectorize.io) — no infrastructure to run. Skip straight to creating your credential below.
+1. **Sign up** at [Hindsight Cloud](https://ui.hindsight.vectorize.io) (free tier) or [self-host](../../developer/installation.md)
 2. **Get an API key** from the Hindsight dashboard
 3. **In Flowise**, create a new credential of type **Hindsight API**:
    - **API URL** — defaults to `https://api.hindsight.vectorize.io` (Cloud); change for self-hosted

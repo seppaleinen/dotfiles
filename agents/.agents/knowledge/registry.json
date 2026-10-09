@@ -1,1 +1,369 @@
-[]
+[
+  {
+    "name": "security-guidelines",
+    "type": "knowledge",
+    "team": "TeamAppSec",
+    "title": "Security Guidelines",
+    "tags": [
+      "security",
+      "appsec",
+      "avanza",
+      "guidelines"
+    ],
+    "description": "Avanza Technical Security Requirements as agent-loadable concepts. Follow these. Use general bug-class knowledge only when you need more detail to investigate a finding.",
+    "install_path": "/Users/daveri/.agents/knowledge/marketplace/security-guidelines",
+    "profile": "bundle",
+    "concepts": [
+      {
+        "id": "avanza/apollo-authorization",
+        "type": "Avanza Guideline",
+        "title": "Apollo authorization",
+        "description": "Limit Apollo services to intended callers. CustomerId is sharding, not ownership — REST must still check access.",
+        "tags": [
+          "avanza",
+          "apollo",
+          "idor",
+          "authorization",
+          "customerid",
+          "mesh"
+        ]
+      },
+      {
+        "id": "avanza/approved-dependencies",
+        "type": "Avanza Guideline",
+        "title": "Dependency and vendor management",
+        "description": "Pull only from Artifact Registry, pin versions, prefer the Java platform BOM, vet authors, and send new vendors through Tech Procurement.",
+        "tags": [
+          "avanza",
+          "dependencies",
+          "artifact-registry",
+          "renovate",
+          "bom",
+          "supply-chain"
+        ]
+      },
+      {
+        "id": "avanza/backups",
+        "type": "Avanza Guideline",
+        "title": "Backups and recovery",
+        "description": "Backups must exist, be encrypted, be stored separately from primary data, and be periodically restore-tested.",
+        "tags": [
+          "avanza",
+          "backups",
+          "disaster-recovery",
+          "encryption"
+        ]
+      },
+      {
+        "id": "avanza/centralized-auth",
+        "type": "Avanza Guideline",
+        "title": "Centralized authentication",
+        "description": "Do not roll your own authentication. Use platform @LoggedIn for customer REST. Internal admin portals use Active Directory SECURITYGROUPS.",
+        "tags": [
+          "avanza",
+          "authentication",
+          "loggedin",
+          "spring",
+          "rest"
+        ]
+      },
+      {
+        "id": "avanza/compartmentalization",
+        "type": "Avanza Guideline",
+        "title": "Compartmentalization",
+        "description": "Limit blast radius with timeouts, mesh and app rate limits, bulkheads, and circuit breakers. Watch capacity asymmetry on fan-out.",
+        "tags": [
+          "avanza",
+          "timeouts",
+          "rate-limiting",
+          "circuit-breaker",
+          "blast-radius",
+          "apollo"
+        ]
+      },
+      {
+        "id": "avanza/container-base-images",
+        "type": "Avanza Guideline",
+        "title": "Container base images",
+        "description": "Production GCP workloads should use platform-area base images, not ad-hoc public images.",
+        "tags": [
+          "avanza",
+          "docker",
+          "base-images",
+          "containers",
+          "gcp"
+        ]
+      },
+      {
+        "id": "avanza/csrf-request-mapping",
+        "type": "Avanza Guideline",
+        "title": "CSRF and HTTP methods",
+        "description": "State-changing REST endpoints must use verb-specific mappings, not @RequestMapping that accepts GET.",
+        "tags": [
+          "avanza",
+          "csrf",
+          "spring",
+          "requestmapping",
+          "rest"
+        ]
+      },
+      {
+        "id": "avanza/data-classification",
+        "type": "Avanza Guideline",
+        "title": "Data classification",
+        "description": "All production data is restricted (customer/PII) unless explicitly classified otherwise. If in doubt, treat as PII.",
+        "tags": [
+          "avanza",
+          "pii",
+          "classification",
+          "gdpr",
+          "encryption"
+        ]
+      },
+      {
+        "id": "avanza/environment-separation",
+        "type": "Avanza Guideline",
+        "title": "Environment separation",
+        "description": "No production secrets or config in non-prod. No real customer data in tests without anonymization or synthetic substitution.",
+        "tags": [
+          "avanza",
+          "environment",
+          "testdata",
+          "secrets",
+          "production"
+        ]
+      },
+      {
+        "id": "avanza/fail-safe-defaults",
+        "type": "Avanza Guideline",
+        "title": "Fail-safe defaults",
+        "description": "If an access-control dependency is down, deny. Fail-open turns an outage into a bypass.",
+        "tags": [
+          "avanza",
+          "fail-closed",
+          "availability",
+          "authorization",
+          "rate-limiting"
+        ]
+      },
+      {
+        "id": "avanza/frontend",
+        "type": "Avanza Guideline",
+        "title": "Frontend (CSP and safe rendering)",
+        "description": "Browser pages need CSP that blocks non-Avanza script. Treat all backend and client data as untrusted. Do not bypass Angular sanitization.",
+        "tags": [
+          "avanza",
+          "frontend",
+          "csp",
+          "xss",
+          "angular",
+          "avanza-se",
+          "aza-nu"
+        ]
+      },
+      {
+        "id": "avanza/gitlab-ci",
+        "type": "Avanza Guideline",
+        "title": "GitLab CI and security tooling",
+        "description": "No GitLab secure_files for secrets. Protect main, four-eyes on production-bound branches, guard pipeline IAM, enroll the security pipeline.",
+        "tags": [
+          "avanza",
+          "gitlab-ci",
+          "secure-files",
+          "secrets",
+          "ci-cd",
+          "sonar",
+          "dependency-track"
+        ]
+      },
+      {
+        "id": "avanza/iac-production",
+        "type": "Avanza Guideline",
+        "title": "IaC and hands-off production",
+        "description": "Define infrastructure in Git with Terraform. Manual production access is the exception — use PAM for time-limited, audited access.",
+        "tags": [
+          "avanza",
+          "terraform",
+          "iac",
+          "pam",
+          "production"
+        ]
+      },
+      {
+        "id": "avanza/identity-and-pii",
+        "type": "Avanza Guideline",
+        "title": "Minimize PII",
+        "description": "Do not handle, log, key, or leak more PII than needed. Never use personnummer, name, or email as a database key. Oracle responses and KYC checks apply when PII is a lookup.",
+        "tags": [
+          "avanza",
+          "pii",
+          "personnummer",
+          "gdpr",
+          "kyc",
+          "oracle",
+          "database"
+        ]
+      },
+      {
+        "id": "avanza/impersonation",
+        "type": "Avanza Guideline",
+        "title": "Impersonation rights",
+        "description": "Sensitive customer REST actions must declare @ImpersonationRightsRequired and audit who acted in impersonated mode.",
+        "tags": [
+          "avanza",
+          "impersonation",
+          "spring",
+          "rest",
+          "crm"
+        ]
+      },
+      {
+        "id": "avanza/incident-readiness",
+        "type": "Avanza Guideline",
+        "title": "Incident readiness",
+        "description": "Documented break-glass, secret rotation, escalation, and recovery. Enough logs to investigate. Annual DR exercise. Unknown endpoints are tech debt.",
+        "tags": [
+          "avanza",
+          "incident",
+          "break-glass",
+          "disaster-recovery",
+          "runbooks"
+        ]
+      },
+      {
+        "id": "avanza/input-validation",
+        "type": "Avanza Guideline",
+        "title": "Input validation and defensive programming",
+        "description": "Treat all input as hostile. Validate origin, size, lexicon, syntax, and semantics. Prefer domain types over raw String/int. Write negative tests.",
+        "tags": [
+          "avanza",
+          "validation",
+          "domain-types",
+          "defensive-programming",
+          "backend"
+        ]
+      },
+      {
+        "id": "avanza/logging-tokens",
+        "type": "Avanza Guideline",
+        "title": "Logging and audit",
+        "description": "Never log PII, session tokens, or credentials. csid is the only cookie allowed in logs. Do log security-sensitive actions.",
+        "tags": [
+          "avanza",
+          "logging",
+          "cstoken",
+          "csid",
+          "pii",
+          "audit"
+        ]
+      },
+      {
+        "id": "avanza/parameterized-queries",
+        "type": "Avanza Guideline",
+        "title": "Parameterized queries",
+        "description": "All database, LDAP, and structured queries must be parameterized or ORM-safe. Validation does not prevent injection if the query is concatenated.",
+        "tags": [
+          "avanza",
+          "injection",
+          "sql",
+          "ldap",
+          "orm",
+          "parameterized"
+        ]
+      },
+      {
+        "id": "avanza/rest-authorization",
+        "type": "Avanza Guideline",
+        "title": "REST access control",
+        "description": "Check ownership in the REST controller. Every user-supplied ID must be authorized for the authenticated caller. Do not assume Apollo or downstream will do it.",
+        "tags": [
+          "avanza",
+          "rest",
+          "idor",
+          "authorization",
+          "restuser",
+          "access-control"
+        ]
+      },
+      {
+        "id": "avanza/secrets-management",
+        "type": "Avanza Guideline",
+        "title": "Secrets management",
+        "description": "No secrets in source, config files, or image-baked env. Use Vault or GCP Secret Manager. Have emergency and regular rotation.",
+        "tags": [
+          "avanza",
+          "secrets",
+          "vault",
+          "secret-manager",
+          "rotation"
+        ]
+      },
+      {
+        "id": "avanza/securitygroups",
+        "type": "Avanza Guideline",
+        "title": "SECURITYGROUPS",
+        "description": "Internal admin portals must authorize via Active Directory SECURITYGROUPS with appropriate granularity, not custom roles or hard-coded usernames.",
+        "tags": [
+          "avanza",
+          "securitygroups",
+          "authorization",
+          "admin",
+          "aza-nu"
+        ]
+      },
+      {
+        "id": "avanza/sensitive-changes",
+        "type": "Avanza Guideline",
+        "title": "Sensitive changes",
+        "description": "Extra review for auth, IAM, network, secrets, data classification, and external integrations. Check threat model, blast radius, access control, and audit logs.",
+        "tags": [
+          "avanza",
+          "code-review",
+          "iam",
+          "secrets",
+          "authorization",
+          "threat-model"
+        ]
+      },
+      {
+        "id": "avanza/threat-modeling",
+        "type": "Avanza Guideline",
+        "title": "Threat modeling",
+        "description": "Design-time security. Ask blast radius and which controls contain it. Keep the threat model current; use it as NPaP risk-workshop input.",
+        "tags": [
+          "avanza",
+          "threat-model",
+          "design",
+          "npap",
+          "blast-radius"
+        ]
+      },
+      {
+        "id": "avanza/three-perimeters",
+        "type": "Avanza Guideline",
+        "title": "Three perimeters",
+        "description": "Identity (least privilege, Workload Identity, PAM), network (GKE NetworkPolicy, predetermined paths), and workload/supply chain. Treat other teams as separate customers.",
+        "tags": [
+          "avanza",
+          "gcp",
+          "iam",
+          "network-policy",
+          "workload-identity",
+          "pam"
+        ]
+      },
+      {
+        "id": "precedence",
+        "type": "Playbook",
+        "title": "How to apply these guidelines",
+        "description": "Follow the Avanza Technical Security Requirements. Load matching avanza/ concepts. Use model knowledge of bug classes when you need more detail to investigate.",
+        "tags": [
+          "avanza",
+          "precedence",
+          "how-to"
+        ]
+      }
+    ],
+    "entry": "index.md"
+  }
+]

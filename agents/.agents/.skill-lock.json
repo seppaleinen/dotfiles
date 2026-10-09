@@ -52,9 +52,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/vectorize-io/hindsight.git",
       "skillPath": "skills/hindsight-docs/SKILL.md",
-      "skillFolderHash": "292679ef4f22fe192a35d27fafaf03490c1b4ea2",
+      "skillFolderHash": "b834812ff8f97b82a8cbc0567a510b67d905ef26",
       "installedAt": "2026-07-08T10:14:09.000Z",
-      "updatedAt": "2026-08-12T06:45:30.533Z"
+      "updatedAt": "2026-09-29T12:34:23.394Z"
     },
     "codebase-design": {
       "source": "mattpocock/skills",
@@ -175,6 +175,15 @@
       "pluginName": "mattpocock-skills",
       "installedAt": "2026-09-23T16:09:46.233Z",
       "updatedAt": "2026-09-23T16:09:46.233Z"
+    },
+    "flux-topology": {
+      "source": "seppaleinen/flux-topology-mcp",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/seppaleinen/flux-topology-mcp.git",
+      "skillPath": "skills/flux-topology/SKILL.md",
+      "skillFolderHash": "551f6253c79b09319eeffde2d7dac3ec730138c0",
+      "installedAt": "2026-09-28T18:02:56.896Z",
+      "updatedAt": "2026-09-28T18:02:56.896Z"
     }
   },
   "dismissed": {
@@ -191,8 +200,8 @@
     "kilo",
     "kimi-code-cli",
     "opencode",
+    "pi",
     "warp",
-    "zed",
-    "pi"
+    "zed"
   ]
 }

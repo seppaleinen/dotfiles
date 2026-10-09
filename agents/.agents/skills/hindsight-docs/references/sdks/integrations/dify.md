@@ -3,6 +3,8 @@
 
 Persistent memory for [Dify](https://dify.ai) workflows via [Hindsight](https://hindsight.vectorize.io). The Hindsight Dify plugin adds three tools — **Retain**, **Recall**, **Reflect** — that work alongside any other Dify node in workflows, chatflows, and agent apps.
 
+[View Changelog →](../../changelog/integrations/dify.md)
+
 ## Why this matters
 
 Dify is one of the most popular open-source LLM app platforms — visual workflow builder, prompt management, and a growing tool/plugin ecosystem. Until now, Dify workflows have been **stateless across runs**. With Hindsight tools you can:
@@ -25,8 +27,8 @@ After install, the **Hindsight** plugin appears under **Tools** in the workflow 
 
 > **💡 Recommended: Hindsight Cloud**
 >
-[Sign up free](https://ui.hindsight.vectorize.io/signup) and grab an API key — no self-hosting required.
-1. **Sign up** at [Hindsight Cloud](https://ui.hindsight.vectorize.io/signup) (free tier) or [self-host](../../developer/installation.md)
+[Sign up free](https://ui.hindsight.vectorize.io) and grab an API key — no self-hosting required.
+1. **Sign up** at [Hindsight Cloud](https://ui.hindsight.vectorize.io) (free tier) or [self-host](../../developer/installation.md)
 2. **Get an API key** from the Hindsight dashboard
 3. **In Dify**, open the Hindsight plugin and add credentials:
    - **API URL** — defaults to `https://api.hindsight.vectorize.io` (Cloud); change for self-hosted

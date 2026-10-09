@@ -3,6 +3,8 @@
 
 Persistent memory tools for [SmolAgents](https://github.com/huggingface/smolagents) agents via Hindsight. Give your agents long-term memory with retain, recall, and reflect — using SmolAgents' native Tool pattern.
 
+[View Changelog →](../../changelog/integrations/smolagents.md)
+
 ## Features
 
 - **Native Tool Subclasses** - Each tool extends SmolAgents' `Tool` base class
@@ -21,7 +23,7 @@ pip install hindsight-smolagents
 
 > **💡 Recommended: Hindsight Cloud**
 >
-[Sign up free](https://ui.hindsight.vectorize.io/signup) and grab an API key — no self-hosting required.
+[Sign up free](https://ui.hindsight.vectorize.io) and grab an API key — no self-hosting required.
 ```python
 from smolagents import CodeAgent, HfApiModel
 from hindsight_smolagents import create_hindsight_tools

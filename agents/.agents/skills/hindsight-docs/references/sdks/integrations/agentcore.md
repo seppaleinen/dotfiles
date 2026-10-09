@@ -5,6 +5,8 @@ Persistent memory for [Amazon Bedrock AgentCore Runtime](https://docs.aws.amazon
 
 AgentCore Runtime sessions are explicitly ephemeral — they terminate on inactivity and reprovision fresh environments. `hindsight-agentcore` adds durable cross-session memory so agents remember users, decisions, and learned patterns across any number of Runtime sessions.
 
+[View Changelog →](../../changelog/integrations/agentcore.md)
+
 ## How It Works
 
 ```
@@ -37,7 +39,7 @@ pip install hindsight-agentcore
 
 > **💡 Recommended: Hindsight Cloud**
 >
-[Sign up free](https://ui.hindsight.vectorize.io/signup) and grab an API key — no self-hosting required.
+[Sign up free](https://ui.hindsight.vectorize.io) and grab an API key — no self-hosting required.
 ```python
 import os
 from hindsight_agentcore import HindsightRuntimeAdapter, TurnContext, configure

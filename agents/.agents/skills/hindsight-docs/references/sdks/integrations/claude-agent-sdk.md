@@ -3,11 +3,13 @@
 
 Persistent long-term memory for Anthropic's [Claude Agent SDK](https://pypi.org/project/claude-agent-sdk/) via [Hindsight](https://vectorize.io/hindsight). Expose retain/recall/reflect as MCP tools so the agent decides when to use memory, or wire up hooks to inject relevant memories automatically before every turn.
 
+[View Changelog →](../../changelog/integrations/claude-agent-sdk.md)
+
 ## Quick Start
 
 > **💡 Recommended: Hindsight Cloud**
 >
-[Sign up free](https://ui.hindsight.vectorize.io/signup) and grab an API key — no self-hosting required.
+[Sign up free](https://ui.hindsight.vectorize.io) and grab an API key — no self-hosting required.
 ```bash
 pip install hindsight-claude-agent-sdk
 ```
