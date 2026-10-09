@@ -1,5 +1,5 @@
 ---
-description: Use this agent when you are asked to do an seo and or aeo audit or verification. Model tier: balanced.
+description: "Use this agent when you are asked to do an seo and or aeo audit or verification. Model tier: balanced."
 mode: subagent
 name: seo-aeo-auditor
 ---

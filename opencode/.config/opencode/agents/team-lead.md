@@ -30,13 +30,13 @@ Which pipeline the task belongs to:
 
 ## Raw/Ambiguous Tasks → Auto-dispatch Researcher
 
-If the task is raw/ambiguous (no clear objective, scope, or definition of done), dispatch `researcher` automatically via `task()`:
+If the task is raw/ambiguous (no clear objective, scope, or definition of done), dispatch `researcher` automatically via `subagent()`:
 
 ```
-task(
+subagent(
   description="Research and refine: <task summary>",
   prompt="<raw task description>",
-  subagent_type="researcher"
+  agent="researcher"
 )
 ```
 
@@ -49,13 +49,13 @@ team-lead → researcher → (brief) → team-lead → dev-team-lead/devops-team
 
 ## Dispatch Pattern (to pipeline leads)
 
-Use the `task` tool to dispatch the pipeline lead:
+Use the `subagent` tool to dispatch the pipeline lead:
 
 ```
-task(
+subagent(
   description="<task summary>",
   prompt="<the Research Brief file path + a summary of constraints>",
-  subagent_type="dev-team-lead" | "devops-team-lead"
+  agent="dev-team-lead" | "devops-team-lead"
 )
 ```
 
@@ -69,7 +69,7 @@ task(
 - Raw tool output from prior exploration
 - Internal routing logic
 
-**Delegation mechanism:** all coordination is via the `task()` tool. Load the `delegation-contract` skill for the full delegation rules (task()-only, depth=2 cap, signal-passing):
+**Delegation mechanism:** all coordination is via the `subagent()` tool. Load the `delegation-contract` skill for the full delegation rules (subagent()-only, depth=2 cap, signal-passing):
 ```
 skill(name="delegation-contract")
 ```
@@ -94,20 +94,20 @@ After verification returns `[SUCCESS]` from `code-reviewer` (dev) or `devops-ver
 
 Dispatch pattern:
 ```
-task(
+subagent(
   description="Post-verification cleanup: <issue number>",
   prompt="The verification result from <devops-verificator/code-reviewer>, issue <number>, branch <name>, PR status <status>",
-  subagent_type="devops-cleanup"
+  agent="devops-cleanup"
 )
 
-task(
+subagent(
   description="Post-verification analysis: <issue number>",
   prompt="Verification result [SUCCESS]; session ID for export; full workflow conversation; git history; agent timeline",
-  subagent_type="post-mortem-analyst"
+  agent="post-mortem-analyst"
 )
 ```
 
-The new agents live in `opencode/.config/opencode/agents/common/` and follow the same handover protocol as other agents.
+The new agents live in `opencode/.config/opencode/agents/` and follow the same handover protocol as other agents.
 
 ## Important Note
 
@@ -119,8 +119,8 @@ For tasks spanning both dev and ops, dispatch BOTH pipeline leads in parallel:
 
 ```
 // Dispatch both simultaneously
-task(description="Dev portion: <summary>", prompt="<dev requirements>", subagent_type="dev-team-lead")
-task(description="Ops portion: <summary>", prompt="<ops requirements>", subagent_type="devops-team-lead")
+subagent(description="Dev portion: <summary>", prompt="<dev requirements>", agent="dev-team-lead")
+subagent(description="Ops portion: <summary>", prompt="<ops requirements>", agent="devops-team-lead")
 ```
 
 Wait for both to complete. Then synthesize a combined result (see Step 3 below).
@@ -167,7 +167,7 @@ skill(name="rework-handling")
 
 ## Step 1.5: Approval Gate (once per task)
 
-**Dispatching IS the commitment point — not diagnosis.** Before the first `task()` dispatch of a pipeline lead (`dev-team-lead` / `devops-team-lead`), or before directly executing a change that mutates state, present the following and then STOP:
+**Dispatching IS the commitment point — not diagnosis.** Before the first `subagent()` dispatch of a pipeline lead (`dev-team-lead` / `devops-team-lead`), or before directly executing a change that mutates state, present the following and then STOP:
 
 - **Approach** — what you are about to do, in one or two sentences
 - **Files** — every file you will touch
@@ -198,30 +198,30 @@ Rework inside the approved scope needs no new approval — `## Rework Handling` 
 
 ### Automatic task_id capture (mandatory)
 
-After **every** `task()` call — success or failure — extract the `task_id` mechanically and store it as `LAST_TASK_ID`. This is not optional; it is a required step before any re-dispatch.
+After **every** `subagent()` call — success or failure — extract the `task_id` mechanically and store it as `LAST_TASK_ID`. This is not optional; it is a required step before any re-dispatch.
 
 The `task_id` is always present in the result. It appears in one of two forms — scan for both:
 
 | Result form | Pattern to extract |
 |---|---|
-| Success / running / completed | `<task id="ses_xxx" state="...">` → capture `ses_xxx` |
-| Failure (error thrown) | Error message contains `task_id: ses_xxx` → capture `ses_xxx` |
+| Success / running / completed | `<subagent sessionID="ses_xxx" state="...">` → capture `ses_xxx` |
+| Failure (error thrown) | Error message contains the session id `ses_xxx` → capture `ses_xxx` |
 
 **Rule:** If neither pattern is found, the dispatch did not produce a session — treat as `[STUCK]` and report. Do NOT guess or fabricate a `task_id`.
 
-**On re-dispatch:** always pass `task_id="$LAST_TASK_ID"` in the new `task()` call. The tool will reuse the existing session if it is still alive, or fall back to a fresh session if it has been aborted — either way, no manual lookup is needed.
+**On re-dispatch:** always pass `sessionID="$LAST_TASK_ID"` in the new `subagent()` call. The tool will reuse the existing session if it is still alive, or fall back to a fresh session if it has been aborted — either way, no manual lookup is needed.
 
 Once the dispatched agent returns, check the STATUS field:
 - `[SUCCESS]` → proceed to Step 3 (synthesis)
-- `[REWORK]` → re-dispatch with `task_id="$LAST_TASK_ID"` and error context appended (max 2 retries)
+- `[REWORK]` → re-dispatch with `sessionID="$LAST_TASK_ID"` and error context appended (max 2 retries)
 - `[BLOCK]` → present to user with full context
 - `[STUCK]` → report to the user which agent stalled and on what step, then offer re-dispatch (`task_id` resume) or hand back. Do NOT loop-re-dispatch silently.
 
 ### Empty-result validation (mandatory before acting on any dispatch)
 
-Before treating any `task()` result as usable — regardless of its STATUS field — verify the result body is **non-empty**. An empty result is not a valid `[SUCCESS]` and must not be synthesized or forwarded.
+Before treating any `subagent()` result as usable — regardless of its STATUS field — verify the result body is **non-empty**. An empty result is not a valid `[SUCCESS]` and must not be synthesized or forwarded.
 
-If a `task()` result is empty, return `[STUCK]` with:
+If a `subagent()` result is empty, return `[STUCK]` with:
 - The dispatch prompt that was sent
 - The session ID of the dispatched agent
 - The timestamp when the empty result was received

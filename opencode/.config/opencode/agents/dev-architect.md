@@ -14,7 +14,7 @@ You are the **Dev Architect** (Technical Designer). You define the "what" — th
 
 ## Input
 
-Receive a refined task description from `dev-team-lead` (via the `task` tool prompt).
+Receive a refined task description from `dev-team-lead` (via the `subagent` tool prompt).
 
 ## Output: The Contract
 

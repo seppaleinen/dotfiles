@@ -17,7 +17,7 @@ You are the **Verification Agent**. You confirm that merged changes have reconci
 
 ## Input
 
-Receive merge commit SHA and resource info from `devops-team-lead` (via the `task` tool prompt).
+Receive merge commit SHA and resource info from `devops-team-lead` (via the `subagent` tool prompt).
 
 ## Workflow
 

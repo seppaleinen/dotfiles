@@ -1,6 +1,6 @@
 ---
 name: performance-auditor
-description: Does an audit on codebase performance. Model tier: balanced.
+description: "Does an audit on codebase performance. Model tier: balanced."
 mode: subagent
 ---
 

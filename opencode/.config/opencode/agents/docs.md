@@ -1,5 +1,5 @@
 ---
-description: Writes technical documentation — ADRs, PR descriptions, changelogs, and user-facing docs. Model tier: balanced.
+description: "Writes technical documentation — ADRs, PR descriptions, changelogs, and user-facing docs. Model tier: balanced."
 name: docs
 mode: subagent
 ---

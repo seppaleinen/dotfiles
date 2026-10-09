@@ -14,7 +14,7 @@ You are the **DevOps Engineer** (GitOps Implementer). You implement exactly what
 
 ## Input
 
-Receive an Engineering Brief from `devops-team-lead` (via the `task` tool prompt).
+Receive an Engineering Brief from `devops-team-lead` (via the `subagent` tool prompt).
 
 ## Workflow
 

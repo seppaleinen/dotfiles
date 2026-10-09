@@ -379,7 +379,8 @@
     <div class="mast">
       <div><b>Config</b> default_agent: team-lead</div>
       <div><b>Mode</b> primary · reasoning model</div>
-      <div><b>Depth cap</b> 2 dispatch layers</div>
+      <div><b>IDs</b> path-derived (v2)</div>
+      <div><b>Depth cap</b> experimental.subagent_depth 2</div>
       <div><b>Rework budget</b> 2 retries, then escalate</div>
     </div>
   </header>
@@ -399,8 +400,8 @@
       <p>
         Think CEO, not IC. Incoming work is either a raw user request or a Research Brief from
         <code>researcher</code>. Vague work gets refined first. Clear work gets classified, then
-        dispatched with the <code>task</code> tool. Each dispatch is a fresh call: wait, evaluate
-        status, then continue. Mixed app-plus-infra work splits and runs in parallel.
+        dispatched with <code>subagent(agent=...)</code>. Each dispatch is a fresh call: wait,
+        evaluate the handover status, then continue. Mixed app-plus-infra work splits and runs in parallel.
       </p>
       <div class="grid-2">
         <article class="card">
@@ -411,7 +412,7 @@
         <article class="card">
           <span class="tag support">Does not</span>
           <h3>Write the change itself</h3>
-          <p>No application code, no GitOps manifests, no cluster mutation. Never skip to an engineer. If a pipeline lead returns <code>[REWORK]</code>, retry with error context. If <code>[BLOCK]</code>, stop and show the user.</p>
+          <p>No application code, no GitOps manifests, no cluster mutation. Never skip to an engineer. If a pipeline lead returns <code>[REWORK]</code>, resume that child session with <code>sessionID=</code> and error context. If <code>[BLOCK]</code>, stop and show the user.</p>
         </article>
       </div>
     </section>
@@ -423,12 +424,12 @@
         waits for each handover, then answers you. Nested agents only talk to their parent — they do not chat with you.
       </p>
       <ol class="session">
-        <li>You describe the work. If it is already a Refinement Summary, skip intake.</li>
+        <li>You describe the work. If it is already a Research Brief, skip intake.</li>
         <li>If the ask is vague, <code>team-lead</code> dispatches <code>researcher</code> first.</li>
         <li>It classifies <strong>domain</strong>: software, infra, or both.</li>
         <li>It always dispatches <code>dev-team-lead</code> and/or <code>devops-team-lead</code>. Mixed work runs both in parallel. It cannot call engineers directly.</li>
         <li>Each child may dispatch further (shown in the tree). Results bubble back up as a handover.</li>
-        <li><code>team-lead</code> checks status: <code>[SUCCESS]</code> → report to you; <code>[REWORK]</code> → retry (max 2); <code>[BLOCK]</code> → stop and ask you.</li>
+        <li><code>team-lead</code> checks status: <code>[SUCCESS]</code> → report to you; <code>[REWORK]</code> → retry via <code>sessionID=</code> (max 2); <code>[BLOCK]</code> → stop and ask you.</li>
       </ol>
       <div class="grid-2">
         <article class="card">
@@ -449,38 +450,45 @@
     <section id="layout">
       <h2>Where the files live</h2>
       <p>
-        Folders are for humans. OpenCode still addresses agents by the <code>name:</code> field in frontmatter
-        (<code>dev-team-lead</code>, not <code>dev/dev-team-lead</code>). This file is HTML on purpose so it is not loaded as an agent.
+        Folders are for humans. In OpenCode v2 the agent ID is derived from the file path:
+        <code>agents/team-lead.md</code> registers as <code>team-lead</code>,
+        <code>agents/ontology/ontology-auditor.md</code> as <code>ontology-auditor</code>.
+        The <code>name:</code> frontmatter field is ignored — every ID below is the bare basename.
+        The old <code>common/</code>, <code>dev/</code>, and <code>devops/</code> subfolders are gone;
+        all pipeline agents live directly in <code>agents/</code>, with only <code>ontology/</code> separate.
+        This file is HTML on purpose so it is not loaded as an agent.
       </p>
       <pre class="folders">agents/
-  readme.html                 ← this overview
-  common/                     intake + shared + post-verification
-    team-lead.md
-    researcher.md
-    web-scout.md
-    docs.md
-    devops-cleanup.md
-    post-mortem-analyst.md
-  dev/                        software pipeline only
-    dev-team-lead.md
-    dev-architect.md
-    backend-engineer.md
-    frontend-engineer.md
-    test-engineer.md
-    code-reviewer.md
-  devops/                     infra pipeline only
-    devops-team-lead.md
-    devops-architect.md
-    devops-engineer.md
-    devops-verificator.md
-  *.md                        on-demand (not dispatched by team-lead)
-    ai-security-auditor.md
-    context-drift-auditor.md
-    architecture-cleanup.md
-    performance-auditor.md
-    seo-aeo-auditor.md
-    test-auditor.md
-  ontology/                   separate primary (Ontology Auditor)</pre>
+  readme.html                 ← this overview (HTML, not an agent)
+  team-lead.md                primary · default_agent
+  researcher.md               unified intake + investigation
+  web-scout.md                internet identity · subagent of researcher
+  docs.md                     ADRs · PR · changelog · shared by both pipelines
+  devops-cleanup.md           post-verification cleanup
+  post-mortem-analyst.md      post-verification analysis
+  dev-team-lead.md            software pipeline lead
+  dev-architect.md            design · CONTRACT
+  backend-engineer.md         API / data
+  frontend-engineer.md        UI / client
+  test-engineer.md            test + verify
+  code-reviewer.md            quality gate
+  devops-team-lead.md         infra pipeline lead
+  devops-architect.md         design · Engineering Brief
+  devops-engineer.md          GitOps + flux-local
+  devops-verificator.md       cluster reconcile
+  ai-security-auditor.md      on-demand · vulnerability pass
+  context-drift-auditor.md    on-demand · structure check
+  architecture-cleanup.md     on-demand · architectural tidy
+  performance-auditor.md      on-demand · performance audit
+  seo-aeo-auditor.md          on-demand · SEO / AEO
+  test-auditor.md             on-demand · test quality
+  ontology/                   separate primary (Ontology Auditor)
+    ontology-auditor.md       orchestrates recon + Socratic interview
+    api-scanner.md            API routes · OpenAPI · GraphQL
+    db-scanner.md             models → technical ontology
+    matrix-generator.md       interview findings → Discrepancy Matrix
+    socratic-questioner.md    cross-reference → sharp questions
+    ux-scanner.md             frontend → user journeys</pre>
     </section>
 
     <section id="tree">
@@ -513,7 +521,7 @@
 
       <div class="panes">
         <article class="pane dev">
-          <span class="tag dev">Software · agents/dev/</span>
+          <span class="tag dev">Software · agents/</span>
           <h3>dev-team-lead</h3>
           <div class="hflow">
             <div class="col">
@@ -557,7 +565,7 @@
         </article>
 
         <article class="pane ops">
-          <span class="tag ops">Infrastructure · agents/devops/</span>
+          <span class="tag ops">Infrastructure · agents/</span>
           <h3>devops-team-lead</h3>
           <div class="hflow">
             <div class="col">
@@ -584,6 +592,12 @@
               <span class="note">4 Docs</span>
               <button class="node support" data-agent="docs" type="button"><span class="id">docs</span><span class="role">ADRs · PR · changelog</span></button>
             </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
+              <span class="note">5 Post-Verification</span>
+              <button class="node support" data-agent="devops-cleanup" type="button"><span class="id">devops-cleanup</span><span class="role">close issue + branch</span></button>
+              <button class="node support" data-agent="post-mortem-analyst" type="button"><span class="id">post-mortem-analyst</span><span class="role">improvement proposals</span></button>
+            </div>
           </div>
         </article>
       </div>
@@ -593,7 +607,7 @@
         <p>Click any node. Results return to the parent, then to <code>team-lead</code>, then to you.</p>
       </div>
 
-      <p>Dispatch depth is capped at two layers from <code>team-lead</code>. Software: <code>team-lead → dev-team-lead → backend-engineer</code> is the deepest chain. Infra: <code>team-lead → devops-team-lead → devops-engineer</code> is the deepest. The post-verification agents (<code>devops-cleanup</code>, <code>post-mortem-analyst</code>) are dispatched directly by <code>team-lead</code> at that same depth.</p>
+      <p>Dispatch goes through <code>subagent(agent=...)</code> and is capped at two layers from <code>team-lead</code> by <code>experimental.subagent_depth: 2</code> in <code>opencode.json</code>. Software: <code>team-lead → dev-team-lead → backend-engineer</code> is the deepest chain. Infra: <code>team-lead → devops-team-lead → devops-engineer</code> is the deepest. The post-verification agents (<code>devops-cleanup</code>, <code>post-mortem-analyst</code>) are dispatched directly by <code>team-lead</code> at that same depth. Rework does not restart the call chain: the pipeline lead resumes the failed child session with <code>sessionID=</code> plus the error context.</p>
     </section>
 
     <section id="handover">
@@ -611,92 +625,94 @@
     <section id="outside">
       <h2>Outside the team-lead chain</h2>
       <p>
-        Live at <code>agents/*.md</code> (parent folder), not under <code>dev/</code>.
-        <code>team-lead</code> does not dispatch them. Invoke yourself for an audit or cleanup.
+        Live at top level as <code>agents/*.md</code>, in the same folder as the pipeline agents —
+        the old <code>common/</code>, <code>dev/</code>, and <code>devops/</code> subfolders no longer exist.
+        <code>docs</code> is also top level (<code>agents/docs.md</code>) and is the one shared stage dispatched
+        by both pipeline leads after verification returns <code>[SUCCESS]</code>.
+        <code>team-lead</code> does not dispatch the auditors below — invite one yourself for an audit or cleanup.
       </p>
       <ul class="outside">
-        <li><span class="id">ai-security-auditor</span><p>Vulnerability pass over the codebase.</p></li>
-        <li><span class="id">context-drift-auditor</span><p>Structure / context-drift check.</p></li>
-        <li><span class="id">architecture-cleanup</span><p>Architectural drift, dependency violations, systematic tidy.</p></li>
-        <li><span class="id">performance-auditor</span><p>Performance audit.</p></li>
-        <li><span class="id">seo-aeo-auditor</span><p>SEO / AEO verification.</p></li>
+        <li><span class="id">ai-security-auditor</span><p>Looks through the codebase for vulnerabilities.</p></li>
+        <li><span class="id">context-drift-auditor</span><p>Verifies / audits context drift and code structure.</p></li>
+        <li><span class="id">architecture-cleanup</span><p>Audits architectural drift and dependency violations, then systematically tidies up.</p></li>
+        <li><span class="id">performance-auditor</span><p>Audits codebase performance.</p></li>
+        <li><span class="id">seo-aeo-auditor</span><p>SEO / AEO audit and verification.</p></li>
         <li><span class="id">test-auditor</span><p>Test-quality validation (separate from test-engineer).</p></li>
-        <li><span class="id">docs</span><p>ADRs, PR descriptions, changelogs — lives in <code>common/</code>.</p></li>
       </ul>
       <h3>Ontology (separate primary)</h3>
-      <p><code>ontology-auditor</code> plus <code>db-scanner</code>, <code>api-scanner</code>, <code>ux-scanner</code>, <code>socratic-questioner</code>, <code>matrix-generator</code> in <code>agents/ontology/</code>. Not part of team-lead.</p>
+      <p><code>ontology-auditor</code> plus <code>api-scanner</code>, <code>db-scanner</code>, <code>ux-scanner</code>, <code>matrix-generator</code>, and <code>socratic-questioner</code> live in <code>agents/ontology/</code>. Not part of team-lead. In v2 their IDs are path-derived too: <code>agents/ontology/ontology-auditor.md</code> → <code>ontology/ontology-auditor</code> (the file's <code>name: Ontology Auditor</code> is ignored).</p>
     </section>
   </main>
 
   <footer>
-    This file: opencode/.config/opencode/agents/readme.html · markdown agents nearby · opencode.json default_agent: team-lead
+    This file: opencode/.config/opencode/agents/readme.html · agents/*.md beside it · opencode.json default_agent: team-lead · experimental.subagent_depth: 2
   </footer>
 
   <script>
     const agents = {
       "team-lead": {
         title: "team-lead",
-        blurb: "Primary orchestrator. Classifies domain (dev / ops / mixed) and always dispatches the pipeline lead. Permission-locked to researcher, dev-team-lead, and devops-team-lead. Never implements, never calls engineers directly."
-      },
-      "devops-engineer": {
-        title: "devops-engineer",
-        blurb: "GitOps implementer. Called only by devops-team-lead with an Engineering Brief. Mutates listed Flux files, validates with flux-local, pushes agent/devops/<id>. If the brief says reuse Postgres, attach Database/User only — no new install."
+        blurb: "Top-level orchestrator and default agent for all user interaction. Classifies domain (dev / ops / mixed) and always dispatches the matching pipeline lead. Never implements and never calls engineers directly."
       },
       "dev-team-lead": {
         title: "dev-team-lead",
-        blurb: "Software pipeline manager. Always the software entry from team-lead. Permission-locked to researcher, dev-architect, backend-engineer, frontend-engineer, test-engineer, code-reviewer. Blocks if the task is still vague — does not re-run intake."
+        blurb: "Software pipeline manager. Always the software entry from team-lead. Dispatches dev-architect, backend-engineer, frontend-engineer, test-engineer, code-reviewer. Blocks if the task is still vague — does not re-run intake."
       },
       "devops-team-lead": {
         title: "devops-team-lead",
-        blurb: "Infra pipeline manager. Always the infra entry from team-lead. Permission-locked to devops-architect, devops-engineer, devops-verificator. Does not edit manifests. Reuse of shared backends is mandatory when investigation finds them."
+        blurb: "Infra pipeline manager. Always the infra entry from team-lead. Dispatches devops-architect, devops-engineer, devops-verificator. Does not edit manifests; reuse of shared backends is mandatory when investigation finds them."
       },
       "researcher": {
         title: "researcher",
-        blurb: "Unified intake & investigation agent for both pipelines. Grills the user, researches the web, analyzes application source with grep/glob/read directly (never dispatches explore), and investigates GitOps/cluster for reusable backends. Dispatches web-scout only to identify official repos, Helm charts, or images its own search could not resolve. Writes the Research Brief to file."
-      },
-      "dev-architect": {
-        title: "dev-architect",
-        blurb: "Writes the CONTRACT: backend API, frontend components, data model, verification criteria. Does not implement."
-      },
-      "devops-architect": {
-        title: "devops-architect",
-        blurb: "Prompt-only designer. Turns refined requirements plus the investigation report into an Engineering Brief. Must reuse listed shared backends (e.g. existing CNPG). Does not kubectl, does not explore the repo, does not implement."
-      },
-      "devops-verificator": {
-        title: "devops-verificator",
-        blurb: "After merge, confirms Flux reconciled. On failure, returns diagnostics as REWORK for devops-engineer."
-      },
-      "code-reviewer": {
-        title: "code-reviewer",
-        blurb: "Post-implementation gate on the software pipeline. Checks quality, security, and CONTRACT adherence. Critical findings: one rework cycle through the engineer stage."
-      },
-      "backend-engineer": {
-        title: "backend-engineer",
-        blurb: "Implements the server half of the CONTRACT. Called only by dev-team-lead. small_model when the spec is clear."
-      },
-      "frontend-engineer": {
-        title: "frontend-engineer",
-        blurb: "Implements the UI / client half of the CONTRACT. Called only by dev-team-lead, usually in parallel with backend-engineer."
-      },
-      "test-engineer": {
-        title: "test-engineer",
-        blurb: "Checks the integrated feature against expected behavior. Called by dev-team-lead after backend and frontend land."
+        blurb: "Unified intake & investigation agent for both dev and devops pipelines. Grills the user, investigates app source + GitOps/cluster for reusable backends, and writes the Research Brief to file. Dispatches web-scout only for external lookups its own search cannot resolve."
       },
       "web-scout": {
         title: "web-scout",
-        blurb: "Internet only: official repo, Helm chart, image, upstream deps. Called only by researcher. Not used inside either pipeline."
+        blurb: "Internet only: official repos, artifact hubs, Helm charts, images, documentation. Called only by researcher, never inside either pipeline. Lives at top level as agents/web-scout.md."
+      },
+      "dev-architect": {
+        title: "dev-architect",
+        blurb: "Design stage of the software pipeline. Writes the CONTRACT: backend API, frontend components, data model, verification criteria. Does not implement."
+      },
+      "backend-engineer": {
+        title: "backend-engineer",
+        blurb: "Implements the server half of the CONTRACT — API endpoints and data layer. Called only by dev-team-lead."
+      },
+      "frontend-engineer": {
+        title: "frontend-engineer",
+        blurb: "Implements the UI / client half of the CONTRACT — components, state, interaction. Called only by dev-team-lead, usually in parallel with backend-engineer."
+      },
+      "test-engineer": {
+        title: "test-engineer",
+        blurb: "Verifies feature correctness through automated tests and manual simulation. Called by dev-team-lead after implementation lands."
+      },
+      "code-reviewer": {
+        title: "code-reviewer",
+        blurb: "Post-implementation quality gate on the software pipeline. Reviews code for quality, security, and CONTRACT adherence. Critical findings trigger a rework cycle through the engineer stage."
+      },
+      "devops-architect": {
+        title: "devops-architect",
+        blurb: "Design stage of the infra pipeline. Produces a precise Engineering Brief from refined requirements plus the Research Brief's Infra Findings. Does not scout cluster or repo, does not implement."
+      },
+      "devops-engineer": {
+        title: "devops-engineer",
+        blurb: "Executes precise GitOps file mutations based on the Engineering Brief, validates with flux-local, and pushes a feature branch. Called only by devops-team-lead."
+      },
+      "devops-verificator": {
+        title: "devops-verificator",
+        blurb: "Confirms that merged GitOps changes have reconciled successfully in the live cluster. Includes diagnostic capability when checks fail."
       },
       "devops-cleanup": {
         title: "devops-cleanup",
-        blurb: "Post-verification cleanup. Dispatched by team-lead after [SUCCESS]. Asks the user before any destructive action: closes the working issue and deletes the branch only if its PR was merged."
+        blurb: "Post-verification cleanup. Dispatched by team-lead after [SUCCESS]. Asks the user first, then closes the working issue and deletes the branch only if its PR was merged. Lives at top level as agents/devops-cleanup.md."
       },
       "post-mortem-analyst": {
         title: "post-mortem-analyst",
-        blurb: "Post-verification workflow analyst. Dispatched by team-lead after [SUCCESS]. Reviews the full workflow for errors and dead ends, posts a summary comment on the issue, and drafts PRs for proposed improvements — but never auto-merges or commits."
+        blurb: "Post-verification workflow analyst. Dispatched by team-lead after [SUCCESS]. Reviews the full workflow and git history for errors, dead ends, and rework loops; proposes improvements and asks which to track as issues. Never creates issues or PRs without explicit request."
       },
       "docs": {
         title: "docs",
-        blurb: "Technical documentation writer. Dispatched by both pipeline leads after verification returns [SUCCESS], before the post-verification stage. Produces ADRs, PR descriptions, and changelogs. Lives in common/ and is shared across pipelines."
+        blurb: "Technical documentation writer — ADRs, PR descriptions, changelogs, and user-facing docs. Dispatched by both pipeline leads after verification returns [SUCCESS]. Lives at top level as agents/docs.md, shared across pipelines."
       }
     };
 

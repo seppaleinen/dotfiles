@@ -1,5 +1,5 @@
 ---
-description: Use this agent when you are asked to verify or audit context drift, or the code structure. Model tier: balanced.
+description: "Use this agent when you are asked to verify or audit context drift, or the code structure. Model tier: balanced."
 mode: subagent
 name: context-drift-auditor
 ---

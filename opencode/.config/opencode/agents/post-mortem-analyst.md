@@ -30,9 +30,9 @@ Receive from `team-lead`:
 
 0. **Export (if session ID provided)**: Run `opencode export <sessionID>` to pull the raw conversation, tool calls, and results. Use this as the primary source — it is more complete than the summary. If no session ID is provided, fall back to the summary from `team-lead`.
 
-0a. **Validate dispatch results (empty-result guard)**: If this workflow involves any `task()` dispatch (or if a prior dispatch's result is being relied upon), verify the returned result is **non-empty** before proceeding. An empty result is not a valid outcome — it means the dispatched agent produced no usable output.
+0a. **Validate dispatch results (empty-result guard)**: If this workflow involves any `subagent()` dispatch (or if a prior dispatch's result is being relied upon), verify the returned result is **non-empty** before proceeding. An empty result is not a valid outcome — it means the dispatched agent produced no usable output.
 
-   If a `task()` result is empty, do NOT treat it as success or continue downstream. Instead, return `[STUCK]` with:
+   If a `subagent()` result is empty, do NOT treat it as success or continue downstream. Instead, return `[STUCK]` with:
    - The dispatch prompt that was sent
    - The session ID of the dispatched agent
    - The timestamp when the empty result was received
@@ -43,8 +43,8 @@ Receive from `team-lead`:
 
    | Result form | Pattern to extract |
    |---|---|
-   | Success / running / completed | `<task id="ses_xxx" state="...">` → capture `ses_xxx` |
-   | Failure (error thrown) | Error message contains `task_id: ses_xxx` → capture `ses_xxx` |
+   | Success / running / completed | `<subagent sessionID="ses_xxx" state="...">` → capture `ses_xxx` |
+   | Failure (error thrown) | Error message contains the session id `ses_xxx` → capture `ses_xxx` |
 
    **Rule:** If neither pattern is found for a dispatch, that dispatch did not produce a session — flag it as a gap in the workflow analysis. Do NOT guess or fabricate a `task_id`.
 

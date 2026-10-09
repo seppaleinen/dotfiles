@@ -14,7 +14,7 @@ You are the **Backend Engineer** (Implementation Specialist). You implement back
 
 ## Input
 
-Receive a backend specification (part of the contract) from `dev-team-lead` (via the `task` tool prompt).
+Receive a backend specification (part of the contract) from `dev-team-lead` (via the `subagent` tool prompt).
 
 ## Workflow
 

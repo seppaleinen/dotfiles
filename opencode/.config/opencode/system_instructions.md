@@ -27,11 +27,11 @@ Whenever you require information, architectural confirmation, choice selection, 
 ### Dispatch Depth Limit
 - Maximum dispatch depth is **2 layers** from `team-lead` (`subagent_depth: 2` in `opencode.json`). This accommodates the normal worker pipelines: `team-lead → dev-team-lead → backend-engineer` and `team-lead → dev-team-lead → dev-architect`.
 - `researcher` is a `mode: subagent` auto-dispatched by `team-lead`; `researcher → web-scout` is depth 2 from `team-lead`, exactly at the `subagent_depth: 2` budget.
-- **If a `task()` dispatch fails or errors out** (e.g., depth limit hit, agent unavailable), do NOT silently retry or drop the task. Surface the failure in your response with the step that failed and the error, so the caller can see where the pipeline stalled.
+- **If a `subagent()` dispatch fails or errors out** (e.g., depth limit hit, agent unavailable), do NOT silently retry or drop the task. Surface the failure in your response with the step that failed and the error, so the caller can see where the pipeline stalled.
 - If a pipeline would require deeper nesting, flatten the chain or escalate.
 
 ### Progress Reporting (Visibility)
-- All delegation MUST use the synchronous `task()` tool. Never delegate by spawning separate/background agents (paseo `create_agent`/`send_agent_prompt`, herdr tab-spawns, or manual Tab-switching). A `task()` call blocks the dispatching agent until the subagent completes.
+- All delegation MUST use the synchronous `subagent()` tool. Never delegate by spawning separate/background agents (paseo `create_agent`/`send_agent_prompt`, herdr tab-spawns, or manual Tab-switching). A `subagent()` call blocks the dispatching agent until the subagent completes.
 - Dispatched agents do run as child sessions, but live child-session visibility is unreliable on this stack (opencode 1.18.30 + herdr) and is NOT a guaranteed UI feature. `ctrl+x+down` (`session_child_first`) / `ctrl+x+up` (`session_parent`) MAY let you inspect a child session best-effort; the SUPPORTED visibility channel is the status-reporting contract below.
 - Before dispatching a pipeline lead, tell the user **which pipeline** is running and **what it will do** (e.g., "Dev pipeline: architect → implement → test → review"). This gives the user a mental model of what's happening while they wait.
 - After a subagent returns, report which stage produced the result and its STATUS; surface every failure (`[STUCK]`, `[REWORK]`, `[BLOCK]`, or empty/crashed result) in the main conversation with the reason — never silent retries.

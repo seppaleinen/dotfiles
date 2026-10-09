@@ -1,6 +1,6 @@
 ---
 name: architecture-cleanup
-description: Audits codebase for architectural drift, dependency violations, and code smell, then systematically tidies it up. Model tier: balanced.
+description: "Audits codebase for architectural drift, dependency violations, and code smell, then systematically tidies it up. Model tier: balanced."
 mode: subagent
 ---
 
