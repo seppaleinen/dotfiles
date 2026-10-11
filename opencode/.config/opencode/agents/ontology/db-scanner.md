@@ -1,7 +1,6 @@
 ---
 description: Scans project models and outputs a technical ontology summary.
 mode: subagent
-#model: qwen3.6-35b
 ---
 
 ROLE: You are a Codebase Schema Extractor.

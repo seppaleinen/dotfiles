@@ -3,11 +3,13 @@
 
 Persistent long-term memory for [Pipecat](https://github.com/pipecat-ai/pipecat) voice AI pipelines via [Hindsight](https://vectorize.io/hindsight). A single `FrameProcessor` slots between your user context aggregator and LLM service — recalling relevant memories before each turn and retaining conversation content after.
 
+[View Changelog →](../../changelog/integrations/pipecat.md)
+
 ## Quick Start
 
 > **💡 Recommended: Hindsight Cloud**
 >
-[Sign up free](https://ui.hindsight.vectorize.io/signup) and grab an API key — no self-hosting required.
+[Sign up free](https://ui.hindsight.vectorize.io) and grab an API key — no self-hosting required.
 ```bash
 pip install hindsight-pipecat
 ```
@@ -127,4 +129,4 @@ export HINDSIGHT_API_LLM_API_KEY=your-api-key
 hindsight-api  # starts on http://localhost:8888
 ```
 
-**Hindsight Cloud:** [Sign up](https://ui.hindsight.vectorize.io/signup) — no self-hosting required.
+**Hindsight Cloud:** [Sign up](https://ui.hindsight.vectorize.io) — no self-hosting required.

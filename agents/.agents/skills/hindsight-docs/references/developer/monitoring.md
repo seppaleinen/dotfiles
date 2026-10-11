@@ -100,6 +100,13 @@ version, move the liveness path over.
 
 ## Available Metrics
 
+:::note High-cardinality labels are opt-in
+`bank_id` and `tenant` (the tenant schema) are left off every metric by default, because each
+one adds a series set per bank or tenant. Turn them on with
+`HINDSIGHT_API_METRICS_INCLUDE_BANK_ID=true` / `HINDSIGHT_API_METRICS_INCLUDE_TENANT=true`
+only on deployments with few banks or tenants. The backlog gauges always carry `tenant`.
+:::
+
 ### Operation Metrics
 
 | Metric | Type | Labels | Description |
@@ -160,6 +167,40 @@ sum(rate(hindsight_retain_documents_total{outcome="no_facts"}[15m]))
 - `scope`: What the LLM call is for (`memory`, `reflect`, `consolidation`, `answer`)
 - `success`: Whether the call succeeded (`true`, `false`)
 - `token_bucket`: Token count bucket for cardinality control (`0-100`, `100-500`, `500-1k`, `1k-5k`, `5k-10k`, `10k-50k`, `50k+`)
+
+### Consolidation Metrics
+
+| Metric | Type | Labels | Description |
+|--------|------|--------|-------------|
+| `hindsight.consolidation.batch_failures` | Counter | failure_class, error_type | Consolidation LLM batch calls that failed, including those whose facts were later recovered |
+
+**Labels:**
+- `failure_class`: How the call was treated (`fail_fast` — the model returned something the response schema rejects, so a re-send of the same payload cannot help; `retry` — transport-shaped, an unchanged re-send may succeed; `propagate` — not a batch failure, re-raised to the task handler)
+- `error_type`: Exception class name (e.g. `ValidationError`, `JSONDecodeError`)
+
+This is not the same signal as the `failed_consolidation` field in bank stats. That
+field counts *facts* still waiting to be consolidated after a failure; when a batch
+call fails, consolidation halves the batch and retries, so a call that failed at
+batch size 8 and succeeded at size 1 leaves `failed_consolidation` at 0. Everything
+the failed response asked for is dropped, though — including any observations it
+wanted to delete — so a bank can look completely healthy while its
+supersession cleanup does nothing.
+
+Alert on the schema-rejection rate, which no other metric exposes:
+
+```promql
+sum(rate(hindsight_consolidation_batch_failures_total{failure_class="fail_fast"}[15m]))
+```
+
+A sustained non-zero rate usually means the consolidation model does not reliably
+emit valid JSON for the response schema. Switching to a model with stronger
+structured output, or enabling `HINDSIGHT_API_LLM_STRICT_SCHEMA_CONSOLIDATION` if
+the provider supports grammar-enforced schemas, is the usual fix.
+
+The same count is reported per run as `llm_batch_failures` in the consolidation
+operation's result, and the consolidation log summary prints a warning line
+whenever it is non-zero. Both count *attempts* — one batch call retried three times
+contributes three — so they are not bounded by the number of batches in the run.
 
 ### HTTP Request Metrics
 
@@ -290,7 +331,7 @@ Hindsight supports OpenTelemetry distributed tracing for memory operations and L
 
 ### Configuration
 
-See [Configuration - OpenTelemetry Tracing](./configuration#opentelemetry-tracing) for environment variables.
+See [Configuration - OpenTelemetry Tracing](./configuration.md#opentelemetry-tracing) for environment variables.
 
 **Quick Start:**
 ```bash
@@ -344,3 +385,19 @@ Supports any OTLP-compatible backend (Grafana LGTM, Langfuse, OpenLIT, DataDog, 
 
 **Events:**
 - `gen_ai.client.inference.operation.details` - Full prompts and completions
+
+### Trace Context Propagation
+
+Hindsight participates in your existing traces rather than starting parallel ones. When a caller sends W3C trace context (the standard `traceparent` header, which most OpenTelemetry HTTP client instrumentations add automatically), Hindsight continues that trace: the API request appears as a server span under the caller, and every memory operation and LLM call it triggers nests beneath it.
+
+Requests that arrive without trace context still start their own trace, so nothing changes for un-instrumented callers.
+
+Health and metrics endpoints are excluded from tracing so probe traffic doesn't drown out real work. Set `OTEL_PYTHON_FASTAPI_EXCLUDED_URLS` to a comma-separated list of URL patterns to override this.
+
+### Worker Processes
+
+Standalone worker processes honour the same `HINDSIGHT_API_OTEL_*` variables as the API and export their own spans. This matters for deployments that run dedicated workers, since consolidation, background retain and mental model refresh — most of the long-running work and token spend — happen there.
+
+Give the worker its own `HINDSIGHT_API_OTEL_SERVICE_NAME` to separate it from the API in your tracing backend. When left unset, workers report themselves as `hindsight-worker`.
+
+Worker spans are currently their own traces: a background operation is not linked to the request that queued it, because it runs long after that request has returned.

@@ -3,6 +3,8 @@
 
 Persistent memory tools for [Strands Agents SDK](https://github.com/strands-agents/sdk-python) agents via Hindsight. Give your agents long-term memory with retain, recall, and reflect — using Strands' native `@tool` pattern.
 
+[View Changelog →](../../changelog/integrations/strands.md)
+
 ## Features
 
 - **Native `@tool` Functions** - Tools are plain Python functions, compatible with `Agent(tools=[...])`
@@ -20,7 +22,7 @@ pip install hindsight-strands
 
 > **💡 Recommended: Hindsight Cloud**
 >
-[Sign up free](https://ui.hindsight.vectorize.io/signup) and grab an API key — no self-hosting required.
+[Sign up free](https://ui.hindsight.vectorize.io) and grab an API key — no self-hosting required.
 ```python
 from strands import Agent
 from hindsight_strands import create_hindsight_tools

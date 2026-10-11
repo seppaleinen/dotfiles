@@ -68,7 +68,7 @@ How it works:
 - **Automatic splitting**: Hindsight automatically splits large batches (>10,000 tokens) into optimized sub-batches
 - **Parallel processing**: Sub-batches are processed concurrently in the background
 - **Status tracking**: Parent operation aggregates status from all sub-batches
-- **Token-based**: Batching uses tiktoken for accurate token counting, not character counts
+- **Token-based**: Batching counts real tokens, not characters
 
 Benefits:
 - Send entire documents or datasets in one API call
@@ -130,7 +130,7 @@ export HINDSIGHT_API_REFLECT_LLM_MODEL=<small-fast-model>
 export HINDSIGHT_API_RETAIN_LLM_MODEL=<structured-output-model>
 ```
 
-If your model exposes a reasoning/thinking budget, keep it low (the default) — extra reasoning tokens are pure latency for the extraction and consolidation paths:
+If your model exposes a reasoning/thinking budget, set it low — extra reasoning tokens are pure latency for the extraction and consolidation paths. Nothing is sent unless you set it, so an unconfigured deployment runs at whatever effort the model defaults to (`none` is the value that switches thinking off entirely, where the backend supports it):
 
 ```bash
 export HINDSIGHT_API_LLM_REASONING_EFFORT=low
@@ -155,7 +155,7 @@ export HINDSIGHT_API_LLAMACPP_EXTRA_ARGS="--n_threads 8"  # match physical cores
 # export HINDSIGHT_API_LLAMACPP_NO_GRAMMAR=true  # faster, but less reliable JSON output
 ```
 
-See [Built-in llama.cpp](./configuration#built-in-llamacpp) for the full option list.
+See [Built-in llama.cpp](./configuration.md#built-in-llamacpp) for the full option list.
 
 ### Reranker on CPU
 

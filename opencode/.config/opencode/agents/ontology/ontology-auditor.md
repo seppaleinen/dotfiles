@@ -2,7 +2,6 @@
 name: Ontology Auditor
 description: Orchestrates full multi-layer recon (DB, API, UX), Socratic interview, and final discrepancy matrix.
 mode: primary
-#model: qwen3.6-35b
 ---
 
 ROLE: Lead Architecture Orchestrator

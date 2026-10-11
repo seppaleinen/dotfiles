@@ -30,5 +30,5 @@ Group findings by threat category. Use the following structured format for each 
 *   **Location:** `[File Path:Line Number]`
 *   **Vector:** Description of how an attacker or untrusted input exploits this logic.
 *   **Remediation:** Provide the complete, drop-in replacement code file or block to secure the endpoint or configuration. Do not leave placeholder lines or partial blocks.
-## MANDATORY PROTOCOL
-Before providing your final response, read the skill at `~/.config/opencode/skills/handover/SKILL.md` and format your output exactly as defined there to ensure the pipeline remains synchronized. Include a TRACE line showing the dispatch chain.
+
+Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.

@@ -3,6 +3,8 @@
 
 Give your [Obsidian](https://obsidian.md) vault an agent that actually knows your notes, powered by [Hindsight](https://hindsight.vectorize.io). The plugin syncs your vault into a Hindsight bank and adds a chat panel whose answers are grounded on your notes — and cite them.
 
+[View Changelog →](../../changelog/integrations/obsidian.md)
+
 ## Why this matters
 
 Obsidian is where your knowledge lives. Vector-search plugins can find related notes, but they can't reason across them, remember what you asked, or keep a running synthesis as your vault grows. Hindsight adds that layer:
@@ -37,7 +39,7 @@ Your own frontmatter `tags`/`aliases` are carried through too.
 
 ## Installation
 
-> ✨ **Recommended:** [Hindsight Cloud](https://ui.hindsight.vectorize.io/signup) — sign up free, get an API key, and skip self-hosting.
+> ✨ **Recommended:** [Hindsight Cloud](https://ui.hindsight.vectorize.io) — sign up free, get an API key, and skip self-hosting.
 
 While the plugin is in beta it installs via [BRAT](https://github.com/TfTHacker/obsidian42-brat): add the repository [`vectorize-io/hindsight-obsidian`](https://github.com/vectorize-io/hindsight-obsidian) (the dedicated plugin repo BRAT installs from) and enable it in **Settings → Community plugins**.
 
