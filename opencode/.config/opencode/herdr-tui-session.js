@@ -48,7 +48,11 @@ function requestOnce(sessionID, state, seq, isCurrent = () => true) {
         settle(false);
         return;
       }
-      client.write(`${JSON.stringify(request)}\n`);
+      try {
+        client.write(`${JSON.stringify(request)}\n`);
+      } catch {
+        settle(false);
+      }
     });
 
     // A plain timer, not socket.setTimeout, so a connection that never finishes
@@ -64,70 +68,10 @@ function requestOnce(sessionID, state, seq, isCurrent = () => true) {
 
 export default {
   id: "herdr.opencode.session-selection",
-  // Keep this plain object dependency-free: V1 and V2 expose different SDK
-  // packages, but both loaders accept their own lifecycle entry on this object.
   setup,
-  tui: async (api) => {
-    if (
-      process.env.HERDR_ENV !== "1" ||
-      !process.env.HERDR_SOCKET_PATH ||
-      !process.env.HERDR_PANE_ID
-    ) {
-      return;
-    }
-
-    let selectedSessionID;
-    let retryIndex = 0;
-    let nextReportAt = 0;
-    let reportPending = false;
-    const syncSelectedSession = async () => {
-      const route = api.route.current;
-      const sessionID = route?.name === "session" ? route.params?.sessionID : undefined;
-      const session =
-        typeof sessionID === "string" && sessionID
-          ? api.state.session.get(sessionID)
-          : undefined;
-      if (!session || session.parentID) {
-        selectedSessionID = undefined;
-        retryIndex = 0;
-        nextReportAt = 0;
-        return;
-      }
-      if (sessionID !== selectedSessionID) {
-        selectedSessionID = sessionID;
-        retryIndex = 0;
-        nextReportAt = 0;
-      }
-      if (reportPending || Date.now() < nextReportAt) {
-        return;
-      }
-
-      const reportingSessionID = sessionID;
-      reportPending = true;
-      try {
-        await requestOnce(reportingSessionID);
-      } catch {
-        // Best-effort reporting retries below while the selected route remains active.
-      } finally {
-        reportPending = false;
-      }
-      if (selectedSessionID !== reportingSessionID) {
-        retryIndex = 0;
-        nextReportAt = 0;
-        return;
-      }
-      const retryDelay = SELECTION_RETRY_DELAYS_MS[retryIndex];
-      retryIndex += 1;
-      nextReportAt = retryDelay === undefined ? Number.POSITIVE_INFINITY : Date.now() + retryDelay;
-    };
-
-    await syncSelectedSession();
-    const routePoll = setInterval(() => void syncSelectedSession(), ROUTE_POLL_INTERVAL_MS);
-    api.lifecycle.onDispose(() => clearInterval(routePoll));
-  },
 };
 
-function setup(api) {
+function setup(context) {
   if (process.env.HERDR_ENV !== "1" || !process.env.HERDR_SOCKET_PATH || !process.env.HERDR_PANE_ID) return;
 
   let disposed = false;
@@ -149,7 +93,7 @@ function setup(api) {
     const seen = new Set();
     while (typeof id === "string" && !seen.has(id)) {
       seen.add(id);
-      const session = api.data.session.get(id) ?? sessions.get(id);
+      const session = context.data.session.get(id) ?? sessions.get(id);
       if (!session) return;
       if (!session.parentID) return id;
       id = session.parentID;
@@ -157,7 +101,7 @@ function setup(api) {
   }
 
   function current() {
-    const route = api.ui.router.current();
+    const route = context.ui.router.current();
     return route.type === "session" ? root(route.sessionID) : undefined;
   }
 
@@ -201,11 +145,11 @@ function setup(api) {
   function reconcileBlockers() {
     const next = new Map();
     const hydrated = new Set();
-    const members = new Set([selected, ...api.data.session.family(selected), ...blockers.values()]);
+    const members = new Set([selected, ...context.data.session.family(selected), ...blockers.values()]);
     for (const member of members) {
       if (root(member) !== selected) continue;
       for (const kind of ["permission", "form"]) {
-        const items = api.data.session[kind].list(member);
+        const items = context.data.session[kind].list(member);
         if (items === undefined) {
           for (const [key, owner] of blockers) {
             if (owner === member && key.startsWith(`${kind}:`)) next.set(key, owner);
@@ -241,7 +185,7 @@ function setup(api) {
       blockers.clear();
       blockerChanges.clear();
       if (id) {
-        state = api.data.session.status(id) === "running" ? "working" : "idle";
+        state = context.data.session.status(id) === "running" ? "working" : "idle";
       }
     }
     if (!id) return;
@@ -312,7 +256,7 @@ function setup(api) {
     publish();
   }
 
-  const unsubscribe = api.data.listen(receive);
+  const unsubscribe = context.data.listen(receive);
   syncSelection();
   const poll = setInterval(syncSelection, ROUTE_POLL_INTERVAL_MS);
   return () => {
