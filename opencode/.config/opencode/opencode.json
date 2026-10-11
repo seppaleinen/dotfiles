@@ -116,19 +116,19 @@
     "opencode-plugin-litellm@latest",
     "{env:HOME}/.hindsight/coding-agents"
   ],
-  "provider": {
+  "providers": {
     "litellm": {
       "name": "LiteLLM",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
         "apiKey": "{env:LITELLM_API_KEY}",
         "baseURL": "https://litellm.labb.site/v1"
       }
     },
     "splash": {
       "name": "SPLASH",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
         "apiKey": "not-needed",
         "baseURL": "http://localhost:8000/v1"
       },
@@ -138,15 +138,22 @@
         }
       }
     },
-    "local lmstudio": {
+    "lmstudio": {
+      "name": "LM Studio",
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "apiKey": "not-needed",
+        "baseURL": "http://localhost:1234/v1"
+      },
       "models": {
         "google/gemma-4-26b-a4b-qat": {
           "name": "google/gemma-4-26b-a4b-qat",
           "settings": {
             "reasoningEffort": "on"
           },
-          "variants": {
-            "off": {
+          "variants": [
+            {
+              "id": "off",
               "settings": {
                 "reasoningEffort": "off",
                 "extraBody": {
@@ -155,7 +162,8 @@
                 }
               }
             },
-            "on": {
+            {
+              "id": "on",
               "settings": {
                 "reasoningEffort": "on",
                 "extraBody": {
@@ -164,7 +172,7 @@
                 }
               }
             }
-          }
+          ]
         },
         "qwen3.8-27b-gsq-rco": {
           "name": "qwen3.8-27b-gsq-rco",
@@ -197,51 +205,63 @@
           "settings": {
             "reasoningEffort": "medium"
           },
-          "variants": {
-            "none": {
-              "reasoningEffort": "none",
-              "extraBody": {
-                "reasoning_budget": 0
+          "variants": [
+            {
+              "id": "none",
+              "settings": {
+                "reasoningEffort": "none",
+                "extraBody": {
+                  "reasoning_budget": 0
+                }
               }
             },
-            "minimal": {
-              "reasoningEffort": "minimal",
-              "extraBody": {
-                "reasoning_budget": 512
+            {
+              "id": "minimal",
+              "settings": {
+                "reasoningEffort": "minimal",
+                "extraBody": {
+                  "reasoning_budget": 512
+                }
               }
             },
-            "low": {
-              "reasoningEffort": "low",
-              "extraBody": {
-                "reasoning_budget": 1024
+            {
+              "id": "low",
+              "settings": {
+                "reasoningEffort": "low",
+                "extraBody": {
+                  "reasoning_budget": 1024
+                }
               }
             },
-            "medium": {
-              "reasoningEffort": "medium",
-              "extraBody": {
-                "reasoning_budget": 4096
+            {
+              "id": "medium",
+              "settings": {
+                "reasoningEffort": "medium",
+                "extraBody": {
+                  "reasoning_budget": 4096
+                }
               }
             },
-            "high": {
-              "reasoningEffort": "high",
-              "extraBody": {
-                "reasoning_budget": -1
+            {
+              "id": "high",
+              "settings": {
+                "reasoningEffort": "high",
+                "extraBody": {
+                  "reasoning_budget": -1
+                }
               }
             },
-            "max": {
-              "reasoningEffort": "xhigh",
-              "extraBody": {
-                "reasoning_budget": -1
+            {
+              "id": "max",
+              "settings": {
+                "reasoningEffort": "xhigh",
+                "extraBody": {
+                  "reasoning_budget": -1
+                }
               }
             }
-          }
+          ]
         }
-      },
-      "name": "LM Studio",
-      "npm": "@ai-sdk/openai-compatible",
-      "options": {
-        "apiKey": "not-needed",
-        "baseURL": "http://localhost:1234/v1"
       }
     }
   },
