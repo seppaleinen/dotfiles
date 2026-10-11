@@ -10,17 +10,39 @@ macros:
     --cache-type-v q8_0
   "reasoning": >-
   "llama-bin": "/home/seppa/workspace/llama.cpp/build/bin/llama-server"
+  "docker-bin": "/usr/bin/docker"
 
 models:
+  gemma-4-12bb:
+    concurrencyLimit: 6
+    cmdStop: "/bin/sh -c '${docker-bin} rm -f vllm-gemma-4-12b >/dev/null 2>&1 || true'"
+    cmd: >-
+      ${docker-bin} run --rm --name vllm-gemma-4-12b
+      -v /home/seppa/.cache/huggingface:/root/.cache/huggingface
+      -v ${models_dir}:/models
+      --gpus all
+      --ipc=host
+      -p ${PORT}:8000
+      -e PYTHONFAULTHANDLER=1
+      -e VLLM_DISABLE_COMPILE=1
+      vllm/vllm-openai:v0.30.0
+      --model cyankiwi/gemma-4-12B-it-AWQ-INT4
+      --max-model-len 32768
+      --dtype float16
+      --enforce-eager
+      --max-num-seqs 6
+      --gpu-memory-utilization 0.85
+      --enable-prefix-caching
+
   gemma-4-12b:
     concurrencyLimit: 4
     cmdStop: "kill -9 ${PID}"
     cmd: >-
       ${llama-bin} --port ${PORT} -m ${models_dir}/gemma-4-12B/gemma-4-12B-it-qat-UD-Q4_K_XL.gguf
       -md ${models_dir}/gemma-4-12B/MTP/mtp-gemma-4-12B-it-Q8_0.gguf --spec-type draft-mtp --spec-draft-n-max 4
-      -ngl 99 -ngld 99 -b 8192 -ub 4096
-      -c 131072 ${default_flags} --reasoning off --reasoning-budget 0
-      --flash-attn on --parallel 4 --jinja --cont-batching
+      -ngl 99 -ngld 99 -b 4096 -ub 1024
+      -c 220144 --cache-prompt ${default_flags} --reasoning off --reasoning-budget 0
+      --flash-attn on --parallel 4 -np 4 --jinja --cont-batching
       --temp 0.0 --top-p 0.95 --top-k 64
 
   gemma-4-26b:
@@ -54,7 +76,7 @@ models:
     cmd: >-
       ${llama-bin} --port ${PORT}
       -m ${models_dir}/qwen3.8-27b/Qwen3.8-27B-GSQ-RCO-IQ3_XXS-mtp.gguf
-      -c 80000 -b 4096 -ub 2048 --cache-reuse 256 -ngl all
+      -c 80000 -b 2048 -ub 1024 --cache-reuse 256 -ngl all
       --spec-type draft-mtp --spec-draft-n-max 3 --spec-draft-p-min 0.75
       --flash-attn on --parallel 1 --jinja --reasoning-preserve
       ${default_flags} --chat-template-file ${models_dir}/custom-template.jinja
@@ -86,18 +108,19 @@ models:
       --temp 0.1 --repeat-penalty 1.05 --presence-penalty 0.0 --min-p 0.05 --top-p 0.9 --top-k 40
 
   qwen2.5-coder-7b:
-    concurrencyLimit: 4
+    concurrencyLimit: 2
     cmdStop: "kill -9 ${PID}"
     cmd: >-
       ${llama-bin} --port ${PORT}
       -m ${models_dir}/qwen2.5-coder-7b-instruct/qwen2.5-coder-7b-instruct-q6_k.gguf
-      -c 65536 --parallel 4
+      -c 65536 --parallel 2
       --cache-type-k q8_0 --cache-type-v q8_0
       -ngl 99
       -b 4096 -ub 2048
       --reasoning off
-      --cache-reuse 256 --jinja --flash-attn on ${default_flags}
-      --temp 0.1 --repeat-penalty 1.18 --presence-penalty 0.15 --top-p 0.95 --top-k 40
+      --cache-reuse 256 --flash-attn on ${default_flags}
+      --temp 0.1 --min-p 0.05 --top-p 0.95 --top-k 40
+      --repeat-penalty 1.0
 
   qwen2.5-7b:
     concurrencyLimit: 4
@@ -119,7 +142,8 @@ models:
     cmd: >-
       ${llama-bin} --port ${PORT}
       -m ${models_dir}/nomic-embed-text-v2/nomic-embed-text-v2-moe-q8_0.gguf
-      -c 8192 -b 8192 -ub 4096 --parallel 1 --rope-scaling yarn --rope-freq-scale 0.25 ${default_flags} --embeddings
+      -c 8192 -b 8192 -ub 8192 --parallel 1 --rope-scaling yarn --rope-freq-scale 0.25 ${default_flags} --embeddings
+
 
 routing:
   router:
