@@ -89,11 +89,12 @@ models:
       --flash-attn on --parallel 1 --jinja
 
   gpt-oss-20b:
-    concurrencyLimit: 8
+    concurrencyLimit: 4
     cmd: >-
       ${llama-bin} --port ${PORT} -m ${models_dir}/gpt-oss-20b/gpt-oss-20b-Q4_K_M.gguf
-      -c 131072 -b 4096 -ub 1024 ${default_flags}
-      --flash-attn on --parallel 8 --jinja ${reasoning}
+      -c 98304 -b 4096 -ub 1024 ${default_flags} --cache-prompt --cont-batching -np 4 -ngl 99 -ngld 99
+      --flash-attn on --parallel 4 --jinja ${reasoning} --reasoning on --chat-template-kwargs '{"reasoning_effort": "low"}'
+      --temp 0.1 --repeat-penalty 1 --top-p 0.9
 
   llama3.1-8b:
     concurrencyLimit: 4
