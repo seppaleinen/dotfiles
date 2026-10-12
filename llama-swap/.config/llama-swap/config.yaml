@@ -1,5 +1,5 @@
 globalTTL: 300
-sendLoadingState: true
+sendLoadingState: false
 healthCheckTimeout: 180
 unloadTimeout: 5
 startPort: 5800
@@ -158,7 +158,7 @@ routing:
             - nomic-embed-text-v2
         "chat":
           swap: true
-          exclusive: false
+          exclusive: true
           members:
             - gemma-4-12b
             - gemma-4-26b
