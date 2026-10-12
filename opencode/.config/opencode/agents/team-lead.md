@@ -153,6 +153,17 @@ skill(name="rework-handling")
 
 **Note:** The counter is incremented on every `[REWORK]` and escalated to the user with full error history once it reaches 2. Include `REWORK_COUNT: N` in your handover output.
 
+### Provider/Transport Diagnostic (issue #21)
+
+When a `subagent()` dispatch fails with a provider/transport error (e.g., litellm role=server errors, connection refused, timeout), diagnose provider health **before** counting a retry:
+
+1. Check DNS resolution: `dig +short litellm.labb.site`
+2. Check HTTP endpoint: `curl -sSf https://litellm.labb.site/v1/models > /dev/null` (or run `opencode models` to verify the live daemon)
+3. If both pass → the error was likely transient; proceed with retry (counts toward max-2)
+4. If either fails → the backend is unavailable; **do not retry**. Escalate to the user with the diagnostic output.
+
+Cap retries at 2 total (per `rework-handling`), and only retry after a passing diagnostic. This prevents wasting retries on backend outages.
+
 ## Follow-up Handling
 
 - **Rule 1 — Classify the follow-up.** Two buckets:
