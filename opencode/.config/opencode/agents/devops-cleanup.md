@@ -26,6 +26,20 @@ Receive from `team-lead`:
 
 ## Workflow
 
+### Gate #1 — Full branch-vs-main tree equivalence (issue #29) — runs FIRST, before any other gate
+
+Deletion is the destructive half of cleanup. It must not run until all branch content has landed on main. Run this check **before** issue closing or any other gate:
+
+```
+git diff main...<branch> --stat
+git ls-tree -r --name-only <branch> | while read f; do git cat-file -e "main:$f" 2>/dev/null || echo "BRANCH-ONLY: $f"; done
+```
+
+- If `git diff main...<branch> --stat` is empty **and** there are zero branch-only tracked files → gate #1 PASSES.
+- If any delta exists or any branch-only file is found → **immediate PENDING/BLOCK**. Do NOT proceed to other gates. Present the full diff and the branch-only file list, and require a land-or-drop decision from the user before deletion can be considered.
+
+**Landing → deletion dependency:** branch deletion is gated on gate #1 passing. Issue closing and hygiene checks are parallel-safe and may proceed independently — keep them separate from the deletion path so parallelism is preserved where safe.
+
 1. **Ask user**: "Do you want to perform post-verification cleanup? This will close the working issue and delete the branch if applicable."
 2. **If yes**:
    - Close the working issue via `gh issue close`
@@ -40,6 +54,13 @@ Receive from `team-lead`:
 - Always ask before any destructive action
 - Idempotent: safe to run multiple times
 - Only delete branch if PR is merged (ask user if uncertain)
+
+### opencode service lifecycle (issue #25)
+
+**NEVER run `opencode service restart`, `opencode service set env`, or `opencode service stop` from inside any opencode session.** These commands kill the daemon, which hosts ALL opencode sessions (subagents + the main session). A restart must be the LAST pipeline step, executed by the user in a plain terminal outside opencode, or via launchd/`setsid` outside the daemon tree.
+
+- If cleanup requires a service restart: return a `[RESTART_NEEDED]` handover with exact instructions — do NOT perform the restart in-session.
+- Guard script: `/tmp/oc-service-guard.sh` — run it before any service command to abort early if the current process tree descends from `opencode serve`.
 
 ## Output
 

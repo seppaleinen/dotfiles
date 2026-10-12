@@ -108,6 +108,14 @@ Return `[STATUS: BLOCK]` if:
 - Multiple services are affected
 - Data integrity is at risk
 
+### opencode service lifecycle (issue #25)
+
+**NEVER run `opencode service restart`, `opencode service set env`, or `opencode service stop` from inside any opencode session.** These commands kill the daemon, which hosts ALL opencode sessions (subagents + the main session). A restart must be the LAST pipeline step, executed by the user in a plain terminal outside opencode, or via launchd/`setsid` outside the daemon tree.
+
+- If verification requires a service restart: return `[RESTART_NEEDED]` with exact instructions — do NOT perform the restart in-session.
+- Verification after a restart is a fresh step (new session, or user-confirmed in a plain terminal).
+- Guard script: `/tmp/oc-service-guard.sh` — run it before any service command to abort early if the current process tree descends from `opencode serve`.
+
 ## Handover Protocol
 
 Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.

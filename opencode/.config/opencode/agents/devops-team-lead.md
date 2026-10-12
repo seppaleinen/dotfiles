@@ -30,6 +30,14 @@ You do NOT modify infrastructure yourself. You coordinate specialized subagents 
 
 Collision surface (issue #24-4): plugin registration lives in `opencode.json` (ops) while the plugin code lives in `plugins/**` (dev) — never change both sides of the same plugin in parallel.
 
+## Hard Stops — opencode service lifecycle (issue #25)
+
+**NEVER run `opencode service restart`, `opencode service set env`, or `opencode service stop` from inside any opencode session.** These commands kill the daemon, which hosts ALL opencode sessions (subagents + the main session). This has killed live sessions 3x. A restart must be the LAST pipeline step, executed by the user in a plain terminal outside opencode, or via launchd/`setsid` outside the daemon tree.
+
+- If a task requires a service restart: return a `[RESTART_NEEDED]` handover with exact instructions — do NOT perform the restart in-session.
+- Verification after a restart is a fresh step (new session, or user-confirmed in a plain terminal).
+- Guard script: `/tmp/oc-service-guard.sh` — run it before any service command to abort early if the current process tree descends from `opencode serve`.
+
 # Pipeline
 
 ```

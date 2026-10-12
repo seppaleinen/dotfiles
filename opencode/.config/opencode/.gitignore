@@ -5,3 +5,10 @@ bun.lock
 .gitignore
 herdr-opencode/
 opencode.json.hindsight-backup
+
+# --- Tracked exceptions (issue #30) ---
+# The entries above would silently ignore these force-added files.
+# `git check-ignore` passes tracked files, so the negations below document
+# that they are intentionally tracked and protect them from a future reset.
+!package.json
+!herdr-opencode/

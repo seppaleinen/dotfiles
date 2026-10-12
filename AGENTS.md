@@ -134,3 +134,12 @@ Do not run `rtk find` a third time after two consecutive filtered/hidden results
 
 - Prefer the dedicated tools (`Read`, `Glob`, `Grep`, `Edit`, `Write`) over raw shell commands (`cat`, `grep`, `find`, `head`, `tail`, `sed`, `awk`, `echo`) for file operations.
 - When a shell command is genuinely needed, capture its output and verify it is meaningful before repeating it with the same arguments.
+
+### opencode service lifecycle (issue #25)
+
+**NEVER run `opencode service restart`, `opencode service set env`, or `opencode service stop` from inside any opencode session.** These commands kill the daemon, which hosts ALL opencode sessions (subagents + the main session). This has killed live sessions 3x.
+
+- A restart must be the LAST pipeline step, executed by the user in a plain terminal (outside opencode), or via launchd/`setsid` outside the daemon tree.
+- Pipeline pattern: return a `[RESTART_NEEDED]` handover instead of performing the restart in-session; verification is a fresh step afterward.
+- Hard rule for: `devops-team-lead`, `devops-engineer`, `devops-verificator`, `devops-cleanup`.
+- Guard script: `/tmp/oc-service-guard.sh` — run it before any service command to abort early if the current process tree descends from `opencode serve`.
