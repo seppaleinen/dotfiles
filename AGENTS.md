@@ -44,7 +44,13 @@ Both new agents live in `opencode/.config/opencode/agents/` (shared across dev/d
 
 **Deleted agents:** `dev-engineer` (coordinator/integrator role removed — integration check now done by dev-team-lead), `issue-refiner`, and `devops-investigator` have been removed. Their former intake and investigation work is now handled by the active `researcher` subagent (see the pipeline structure above — `researcher` is **not** deleted).
 
-**Post-edit stale-reference scan:** After changing an agent's behavior (e.g. `post-mortem-analyst` from auto-create to ask-first), grep all agent `.md` files under `opencode/.config/opencode/agents/` for stale references to the changed agent's old behavior. Flag any file that still references the old behavior and update it before considering the edit complete.
+**Post-edit stale-reference scan:** After changing an agent's behavior (e.g. `post-mortem-analyst` from auto-create to ask-first), run the stale-reference scanner:
+
+```bash
+./scripts/check-stale-agent-refs.sh "old behavior pattern"
+```
+
+This script greps all agent `.md` files under `opencode/.config/opencode/agents/` for stale references to the changed agent's old behavior. Exit 0 if clean, 1 with file list if stale. Flag any file that still references the old behavior and update it before considering the edit complete.
 
 All inter-agent communication uses the handover protocol defined in `opencode/.config/opencode/skills/handover/SKILL.md`.
 
@@ -132,11 +138,11 @@ This rule is enforced in the workflow of every agent that dispatches `subagent()
 
 ### rtk find loop prevention
 
-`rtk find` filters and hides results by default. When the filtered output is uninformative, repeating the command produces identical filtered output indefinitely — a loop that wastes cycles without gaining information.
+See the `rtk-find-loop-prevention` skill at `opencode/.config/opencode/skills/rtk-find-loop-prevention/SKILL.md`. Load it when using `rtk find`:
 
-**Rule:** If `rtk find` returns filtered/hidden results **twice in a row**, stop repeating it. Switch to read-based directory exploration using the `Read` or `Glob` tools instead. The `Read`/`Glob` tools do not apply rtk's filter layer and will surface the actual files on disk.
-
-Do not run `rtk find` a third time after two consecutive filtered/hidden results. Break the loop by exploring the directory tree directly.
+```
+skill(name="rtk-find-loop-prevention")
+```
 
 ### General guidance
 
