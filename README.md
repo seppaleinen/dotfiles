@@ -7,7 +7,8 @@ Managed with GNU Stow. Symlinked to `~` on install.
 ```bash
 git clone git@github.com:seppaleinen/dotfiles.git ~/dotfiles  # if not done already
 cd ~/dotfiles
-stow -t ~ zsh opencode agents secrets
+stow -t ~ zsh opencode agents
+sops -d secrets/secrets.zsh > ~/.secrets.zsh
 ```
 
 ## Onboarding a new machine (via Ansible)
@@ -27,7 +28,7 @@ for the `dotfiles_packages` list).
 ```bash
 git clone git@github.com:seppaleinen/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-stow -t ~ zsh opencode agents secrets
+stow -t ~ zsh opencode agents
 sops -d secrets/secrets.zsh > ~/.secrets.zsh
 ```
 
