@@ -42,7 +42,7 @@ After verification returns `[SUCCESS]` from `code-reviewer` (dev) or `devops-ver
 
 Both new agents live in `opencode/.config/opencode/agents/` (shared across dev/devops pipelines) and follow the same handover protocol as other agents.
 
-**Deleted agents:** `dev-engineer` (coordinator/integrator role removed — integration check now done by dev-team-lead), `issue-refiner`, and `devops-investigator` have been removed; their investigative work is consolidated into the `researcher` subagent. (`researcher` is **not** deleted — it is a current, active subagent of `team-lead`.)
+**Deleted agents:** `dev-engineer` (coordinator/integrator role removed — integration check now done by dev-team-lead), `issue-refiner`, and `devops-investigator` have been removed. Their former intake and investigation work is now handled by the active `researcher` subagent (see the pipeline structure above — `researcher` is **not** deleted).
 
 **Post-edit stale-reference scan:** After changing an agent's behavior (e.g. `post-mortem-analyst` from auto-create to ask-first), grep all agent `.md` files under `opencode/.config/opencode/agents/` for stale references to the changed agent's old behavior. Flag any file that still references the old behavior and update it before considering the edit complete.
 
@@ -87,6 +87,14 @@ Secrets for LiteLLM auth stored at `~/.local/share/opencode/secrets/litellm-swap
 ## Hooks
 
 `opencode/.config/opencode/hooks.sh` bridges OpenCode lifecycle events to `cmux notify` for desktop notifications.
+
+## OpenCode plugins
+
+`opencode.json` `plugin:` array currently contains only `opencode-plugin-litellm@latest` and `{env:HOME}/.hindsight/coding-agents`. The v1 opentmux plugin (`opencode-agent-tmux`) was dropped in commit `1bb1c10` and must not be re-added.
+
+**Armed updater risk:** `node_modules/opentmux/dist/scripts/update-plugins.js` (installed as a dependency of the now-unused `opentmux` package) runs only when `OPENCODE_TMUX_UPDATE=1` is set in the environment — which it is not here, so the updater is effectively inert in this repo. However, its `ensurePluginEntry()` only recognizes the legacy name or a path ending in `/opentmux`; it never normalizes npm specs, so if opentmux is ever reinstalled or invoked with that env var set, it re-appends `opencode-agent-tmux` on every run.
+
+**Guard (non-committed, reversible):** a repo opt-out check has been added at the top of `main()` in `node_modules/opentmux/dist/scripts/update-plugins.js`. When `OPENCODE_TMUX_READD` is not set to `1`, the updater bails out early if `opencode-agent-tmux` is absent from `opencode.json` — so it cannot silently re-add the phantom entry. To opt back in, set `OPENCODE_TMUX_READD=1`. `node_modules/` is gitignored and not repo-managed; if you reinstall opentmux, re-apply the guard or set the env var.
 
 ## Tool call discipline
 
