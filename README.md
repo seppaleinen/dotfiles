@@ -10,22 +10,33 @@ cd ~/dotfiles
 stow -t ~ zsh opencode agents secrets
 ```
 
-## Onboarding a new machine
+## Onboarding a new machine (via Ansible)
 
-1. **Provision** with Ansible (`fleet-infra/machine-setup`):
-   ```bash
-   ansible-playbook playbook.yml --limit <host> --ask-become-pass
-   ```
-2. **Install dotfiles** with GNU Stow:
-   ```bash
-   git clone git@github.com:seppaleinen/dotfiles.git ~/dotfiles
-   cd ~/dotfiles
-   stow -t ~ zsh opencode agents secrets
-   ```
-3. **Decrypt secrets**:
-   ```bash
-   sops -d secrets/secrets.zsh > ~/.secrets.zsh
-   ```
+The recommended path: let Ansible handle it. Ansible clones + stows dotfiles for you.
+
+```bash
+ansible-playbook playbook.yml --limit <host> --ask-become-pass
+```
+
+This installs system packages, k3s, the SOPS age key, GNU Stow, and
+clones + stows dotfiles from `seppaleinen/dotfiles` (see `group_vars/all.yaml`
+for the `dotfiles_packages` list).
+
+## Manual install (if skipping Ansible)
+
+```bash
+git clone git@github.com:seppaleinen/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+stow -t ~ zsh opencode agents secrets
+sops -d secrets/secrets.zsh > ~/.secrets.zsh
+```
+
+## Verify after Ansible run
+
+```bash
+stow -n -t ~ zsh opencode agents secrets   # dry-run check
+source ~/.zshrc
+```
 
 ## Commands
 
