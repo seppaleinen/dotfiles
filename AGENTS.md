@@ -13,11 +13,13 @@ GNU Stow-managed dotfiles. Each top-level directory is a stow target symlinked t
 
 | Directory | Stows to | Purpose |
 |-----------|----------|---------|
+| `zsh/` | `~/.zshrc`, `~/.zsh_plugins.txt`, `~/.p10k.zsh` | Shell config — P10K, antidote, compdef catcher, completion, lazy NVM/SDKMAN, aliases. Source of truth for shell; Ansible only installs deps. |
 | `opencode/.config/opencode/` | `~/.config/opencode/` | OpenCode agent config: agents, skills, plugins, MCP servers, model providers |
 | `goose/.config/goose/` | `~/.config/goose/` | Goose agent config: extensions, MCP servers, providers |
 | `jcode/.jcode/` | `~/.jcode/` | jcode agent config: keybindings, MCP servers, providers |
 | `llama-swap/.config/llama-swap/` | `~/.config/llama-swap/` | Local LLM model swap server config |
 | `agents/.agents/` | `~/.agents/` | Shared agent skills (caveman, handover, ponytail, etc.) |
+| `secrets/` | `~/.secrets.zsh` | SOPS-encrypted user API keys; decrypt with `sops -d secrets/secrets.zsh > ~/.secrets.zsh` |
 | `.opencode/` | (not stowed) | OpenCode plugin deps when editing *this* repo |
 
 ## OpenCode Agent System

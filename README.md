@@ -5,10 +5,27 @@ Managed with GNU Stow. Symlinked to `~` on install.
 ## Install
 
 ```bash
-git clone <repo-url> ~/dotfiles  # if not done already
+git clone git@github.com:seppaleinen/dotfiles.git ~/dotfiles  # if not done already
 cd ~/dotfiles
-stow -t ~ opencode
+stow -t ~ zsh opencode agents secrets
 ```
+
+## Onboarding a new machine
+
+1. **Provision** with Ansible (`fleet-infra/machine-setup`):
+   ```bash
+   ansible-playbook playbook.yml --limit <host> --ask-become-pass
+   ```
+2. **Install dotfiles** with GNU Stow:
+   ```bash
+   git clone git@github.com:seppaleinen/dotfiles.git ~/dotfiles
+   cd ~/dotfiles
+   stow -t ~ zsh opencode agents secrets
+   ```
+3. **Decrypt secrets**:
+   ```bash
+   sops -d secrets/secrets.zsh > ~/.secrets.zsh
+   ```
 
 ## Commands
 
