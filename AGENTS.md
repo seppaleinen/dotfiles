@@ -38,7 +38,7 @@ The agent pipeline is defined in `opencode/.config/opencode/agents/`. Default ag
 After verification returns `[SUCCESS]` from `code-reviewer` (dev) or `devops-verificator` (devops), `team-lead` dispatches two new agents:
 
 - **`devops-cleanup`**: Asks the user whether cleanup is wanted, then closes the working issue (if objectives met) and deletes the working branch (only if its PR was merged; asks user if no PR or unmerged)
-- **`post-mortem-analyst`**: Reviews the full workflow conversation + git history + agent timeline for errors, dead ends, rework loops; identifies improvement opportunities; reports findings back to the user, then asks which fixes should be tracked as follow-up issues (never creates issues or PRs without explicit user request)
+- **`post-mortem-analyst`**: Reviews the full workflow conversation + git history + agent timeline for errors, dead ends, rework loops; diagnoses root causes (insufficient research, ambiguous requests, miscommunication, missing skills/scripts, pipeline gaps, tooling issues); identifies skill/script gaps ranked by impact; reports findings + concrete proposals back to the user, then asks which fixes should be tracked as follow-up issues (never creates issues or PRs without explicit user request)
 
 Both new agents live in `opencode/.config/opencode/agents/` (shared across dev/devops pipelines) and follow the same handover protocol as other agents.
 
