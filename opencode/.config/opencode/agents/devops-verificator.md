@@ -116,6 +116,23 @@ Return `[STATUS: BLOCK]` if:
 - Verification after a restart is a fresh step (new session, or user-confirmed in a plain terminal).
 - Guard script: `/tmp/oc-service-guard.sh` — run it before any service command to abort early if the current process tree descends from `opencode serve`.
 
+### Verification Oracle: Daemon Discovery & Env Inspection (issue #26)
+
+**pgrep cannot see the opencode daemon on this stack** (audit-session filter hides it). Do not use `pgrep -f "opencode serve"`.
+
+**Primary oracle (use these in order):**
+1. `ps -axo pid=,command= | grep "opencode serve"` — finds the daemon PID reliably.
+2. `lsof -tiTCP:<service_port>` — finds the PID listening on the opencode service port (default 9090, check `opencode.json`).
+3. `ps eww <daemon_pid> | grep <VAR>` — inspects the daemon's **actual environment** for `MCP_TOKEN`, `K8S_TOKEN`, `HINDSIGHT_API_TOKEN`, `LITELLM_API_KEY`, etc. This is the ground truth for what the daemon sees.
+4. `opencode models` — run against the live daemon (not a throwaway server) to verify model resolution works end-to-end.
+
+**Diagnostic-only (demoted from primary):**
+- Throwaway-server plugin STDOUT grep (`opencode serve --verbose` in a temp process + grep for plugin load lines) — non-deterministic (silent at times, working at others). Use only as a supplementary signal, never as a gate.
+
+**Checklist update:**
+- Replace any `pgrep`-based daemon check with the `ps -ax` / `lsof` pipeline above.
+- Document the pgrep limitation and the primary gate in any verification checklist or handover.
+
 ## Handover Protocol
 
 Before providing your final response, load the handover skill with `skill(name="handover")` and format your output using that structure. Include a TRACE line showing the dispatch chain.
