@@ -29,6 +29,14 @@ One of:
 - `[BLOCK]` — Critical issue requiring human intervention; include full context
 - `[STUCK]` — Task could not be progressed; the agent hit a dispatch failure, empty result, or unexplained stall at a known step. Include WHICH step failed, WHICH agent/dispatch failed, and any error. This is distinct from `[REWORK]` (which needs a content fix) and `[BLOCK]` (which needs a human decision) — `[STUCK]` means the machinery itself failed and the caller should decide whether to re-dispatch, escalate, or hand back to the user.
 
+### 1a. REWORK ACCOUNTING
+Include in the STATUS block (or as a separate line immediately after):
+```
+REWORK_COUNT: N | KILLED_BY_RESTART: M
+```
+- `REWORK_COUNT`: Number of formal `[REWORK]` resumes for this task (per `rework-handling` skill, max 2 before escalation).
+- `KILLED_BY_RESTART`: Number of times a subagent was cancelled by an external opencode service restart (per `rework-handling` skill). Independent of REWORK_COUNT.
+
 ### 2. SUMMARY
 A high-level, one-paragraph description of what was achieved or why it failed. The downstream agent should understand the outcome without reading anything else.
 
