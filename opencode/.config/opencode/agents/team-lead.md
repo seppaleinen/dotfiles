@@ -107,6 +107,14 @@ subagent(
 )
 ```
 
+### Cleanup dispatch contract (issue #29)
+
+When `devops-cleanup` is dispatched alongside concurrent dev work, the dispatch prompt **must** declare the landing→deletion dependency explicitly:
+
+> "Deletion requires all branch content on main. Gate #1 (full branch-vs-main tree equivalence) runs first — any delta or branch-only tracked file ⇒ PENDING/BLOCK with the diff, before issue closing or deletion. Parallel-safe cleanup (issue closing, hygiene) is separate from the deletion path and may proceed independently."
+
+Do NOT dispatch cleanup in parallel with unlanded dev work without this dependency declared in the prompt.
+
 The new agents live in `opencode/.config/opencode/agents/` and follow the same handover protocol as other agents.
 
 ## Important Note
