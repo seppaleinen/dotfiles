@@ -112,7 +112,6 @@
     "write": "ask"
   },
   "plugin": [
-    "{env:HOME}/dotfiles/node_modules/opentmux",
     "opencode-plugin-litellm@latest",
     "{env:HOME}/.hindsight/coding-agents"
   ],
