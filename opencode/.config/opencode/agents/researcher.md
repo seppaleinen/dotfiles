@@ -64,6 +64,17 @@ The `task_id` is always present in the result. It appears in one of two forms �
 
 **On re-dispatch:** always pass `sessionID="$LAST_TASK_ID"` in the new `subagent()` call. The tool will reuse the existing session if it is still alive, or fall back to a fresh session if it has been aborted — either way, no manual lookup is needed.
 
+### Empty-result validation (mandatory before acting on any dispatch)
+
+Before treating any `subagent()` result as usable — regardless of its STATUS field — verify the result body is **non-empty**. An empty result is not a valid `[SUCCESS]` and must not be synthesized or forwarded.
+
+If a `subagent()` result is empty, return `[STUCK]` with:
+- The dispatch prompt that was sent
+- The session ID of the dispatched agent
+- The timestamp when the empty result was received
+
+Then report to the user which agent produced the empty result and offer re-dispatch (`task_id` resume) or hand back. Do NOT silently continue.
+
 ### 1b. App source analysis (dev tasks)
 
 Read/grep/glob the relevant application source directly. You have `read`, `glob`, and `grep` — do NOT dispatch an `explore` subagent. Report:
