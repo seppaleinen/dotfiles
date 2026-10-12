@@ -46,6 +46,20 @@ Receive from `dev-team-lead`:
 - Error message format matches conventions
 - API response format matches existing endpoints
 
+### 5. Docs Coherence (issue #28)
+
+Every artifact a documentation file describes must be present **in the same commit batch** or already on main. Committed docs describing non-existent code is a spec violation, not a soft warning.
+
+**Check:** For each documentation file in the diff, enumerate the artifacts it references (files, paths, endpoints, symbols). Verify each artifact exists:
+- In the same commit batch (any file in the diff), OR
+- Already on main (`git cat-file -e main:<path>`)
+
+**Violation handling:**
+- If any referenced artifact is missing ⇒ **BLOCK** with the exact artifact list and a **land-or-drop decision** for the user — NOT an accept-as-is REWORK. Convert the soft escalation into one up-front decision:
+  - Land: implement the missing artifact before merge.
+  - Drop: remove the doc claim from the documentation file before merge.
+- Do NOT downgrade to a Warning. Do NOT accept the docs as-is. Do NOT rework silently — present the decision to the user.
+
 ## Output Format
 
 Return using the Handover Protocol:
