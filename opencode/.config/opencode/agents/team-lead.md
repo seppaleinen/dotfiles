@@ -102,7 +102,7 @@ subagent(
 
 subagent(
   description="Post-verification analysis: <issue number>",
-  prompt="Verification result [SUCCESS]; session ID for export; full workflow conversation; git history; agent timeline",
+  prompt="Verification result [SUCCESS]; session ID for export (`opencode export <sessionID>` is the primary source — do NOT paste the conversation body); git history summary; agent timeline",
   agent="post-mortem-analyst"
 )
 ```
@@ -215,37 +215,15 @@ Rework inside the approved scope needs no new approval — `## Rework Handling` 
 
 ## Step 2: Evaluate Results
 
-### Automatic task_id capture (mandatory)
+### Dispatch result hygiene
 
-After **every** `subagent()` call — success or failure — extract the `task_id` mechanically and store it as `LAST_TASK_ID`. This is not optional; it is a required step before any re-dispatch.
-
-The `task_id` is always present in the result. It appears in one of two forms — scan for both:
-
-| Result form | Pattern to extract |
-|---|---|
-| Success / running / completed | `<subagent sessionID="ses_xxx" state="...">` → capture `ses_xxx` |
-| Failure (error thrown) | Error message contains the session id `ses_xxx` → capture `ses_xxx` |
-
-**Rule:** If neither pattern is found, the dispatch did not produce a session — treat as `[STUCK]` and report. Do NOT guess or fabricate a `task_id`.
-
-**On re-dispatch:** always pass `sessionID="$LAST_TASK_ID"` in the new `subagent()` call. The tool will reuse the existing session if it is still alive, or fall back to a fresh session if it has been aborted — either way, no manual lookup is needed.
+Load `rework-handling` for the mandatory `task_id` capture table and the empty-result validation rule. Both are enforced on every `subagent()` call.
 
 Once the dispatched agent returns, check the STATUS field:
 - `[SUCCESS]` → proceed to Step 3 (synthesis)
 - `[REWORK]` → re-dispatch with `sessionID="$LAST_TASK_ID"` and error context appended (max 2 retries)
 - `[BLOCK]` → present to user with full context
 - `[STUCK]` → report to the user which agent stalled and on what step, then offer re-dispatch (`task_id` resume) or hand back. Do NOT loop-re-dispatch silently.
-
-### Empty-result validation (mandatory before acting on any dispatch)
-
-Before treating any `subagent()` result as usable — regardless of its STATUS field — verify the result body is **non-empty**. An empty result is not a valid `[SUCCESS]` and must not be synthesized or forwarded.
-
-If a `subagent()` result is empty, return `[STUCK]` with:
-- The dispatch prompt that was sent
-- The session ID of the dispatched agent
-- The timestamp when the empty result was received
-
-Then report to the user which agent produced the empty result and offer re-dispatch (`task_id` resume) or hand back. Do NOT silently continue.
 
 ## Step 3: Synthesize & Report
 

@@ -53,7 +53,7 @@ The core deliverable:
 ### 5. TRACE (Optional but recommended)
 A single-line call chain showing the dispatch path for debugging:
 ```
-TRACE: team-lead → dev-team-lead → dev-architect → dev-engineer → backend-engineer [SUCCESS]
+TRACE: team-lead → dev-team-lead → dev-architect → backend-engineer [SUCCESS]
 ```
 Append the status at the end. This gives full observability into which agents were invoked and where failures occurred.
 

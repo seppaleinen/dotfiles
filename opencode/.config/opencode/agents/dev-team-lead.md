@@ -25,10 +25,12 @@ You do NOT write code yourself. You coordinate specialized subagents via the `su
 
 `team-lead` may run the dev and devops pipelines concurrently. Each pipeline owns a disjoint file set — never edit a file the other pipeline owns. If your task requires the other pipeline's files, stop and serialize via `team-lead`.
 
+Serialization protocol: return `[BLOCK]` with `STATUS: SERIALIZE` — naming the file, the owning pipeline, and what you need — and STOP. `team-lead` holds your half until the owning pipeline returns `[SUCCESS]`, then re-dispatches you with the owner's handover. Do not poll, do not edit shared files concurrently. For `agents/*.md`, `skills/**`, `docs/**`: edit only after the other pipeline's handover reports that stage complete, or pre-announce via the same `STATUS: SERIALIZE` marker.
+
 | Owned by | Files |
 |---|---|
-| Dev pipeline | `opencode/.config/opencode/plugins/**`, `herdr-tui-session.js`, `herdr-opencode/**`, `cli.json`, `package.json` |
-| Devops/ops pipeline | `opencode.json`, `system_instructions.md`, `service.json`, `hooks.sh`, root `AGENTS.md`, `llama-swap/`, `goose/`, `jcode/` |
+| Dev pipeline | `opencode/.config/opencode/plugins/**`, `opencode/.config/opencode/package.json`, `opencode/.config/opencode/herdr-tui-session.js` (if present), `opencode/.config/opencode/herdr-opencode/**` (if present), `cli.json` (if present) |
+| Devops/ops pipeline | `opencode/.config/opencode/opencode.json`, `opencode/.config/opencode/hooks.sh`, root `AGENTS.md`, `llama-swap/`, `goose/`, `jcode/`, `secrets/` |
 | Shared — read freely, edit serially | `agents/*.md`, `skills/**`, `docs/**` |
 
 Collision surface (issue #24-4): plugin registration lives in `opencode.json` (ops) while the plugin code lives in `plugins/**` (dev) — never change both sides of the same plugin in parallel.
@@ -104,31 +106,9 @@ subagent(
 
 ## Step 3: Implement (dispatch engineers)
 
-### Empty-result validation (mandatory before acting on any dispatch)
+### Dispatch result hygiene
 
-Before treating any `subagent()` result as usable — regardless of its STATUS field — verify the result body is **non-empty**. An empty result is not a valid `[SUCCESS]` and must not be synthesized or forwarded.
-
-If a `subagent()` result is empty, return `[STUCK]` with:
-- The dispatch prompt that was sent
-- The session ID of the dispatched agent
-- The timestamp when the empty result was received
-
-Then report to the caller which agent produced the empty result and offer re-dispatch (`task_id` resume) or hand back. Do NOT silently continue.
-
-### Automatic task_id capture (mandatory)
-
-After **every** `subagent()` call — success or failure — extract the `task_id` mechanically and store it as `LAST_TASK_ID`. This is not optional; it is a required step before any re-dispatch.
-
-The `task_id` is always present in the result. It appears in one of two forms — scan for both:
-
-| Result form | Pattern to extract |
-|---|---|
-| Success / running / completed | `<subagent sessionID="ses_xxx" state="...">` → capture `ses_xxx` |
-| Failure (error thrown) | Error message contains the session id `ses_xxx` → capture `ses_xxx` |
-
-**Rule:** If neither pattern is found, the dispatch did not produce a session — treat as `[STUCK]` and report. Do NOT guess or fabricate a `task_id`.
-
-**On re-dispatch:** always pass `sessionID="$LAST_TASK_ID"` in the new `subagent()` call. The tool will reuse the existing session if it is still alive, or fall back to a fresh session if it has been aborted — either way, no manual lookup is needed.
+Load `rework-handling` for the mandatory `task_id` capture table and the empty-result validation rule. Both are enforced on every `subagent()` call.
 
 Once the architect returns a contract, dispatch `backend-engineer` AND/OR `frontend-engineer` directly (no separate integrator):
 
@@ -223,7 +203,7 @@ subagent(
 **Pass:** The implemented code / diffs and the review result.
 **Do NOT pass:** Internal pipeline routing, architect's reasoning, full conversation history.
 
-**Role:** Static secret & credential analysis, boundary validation & injection vulnerabilities (SQLi, XSS, BOLA, mass assignment), containerization & infrastructure security (non-root users, pinned images). The `ai-security-auditor` lives at the repo root and is shared across both pipelines.
+**Role:** Static secret & credential analysis, boundary validation & injection vulnerabilities (SQLi, XSS, BOLA, mass assignment), containerization & infrastructure security (non-root users, pinned images). The `ai-security-auditor` lives at `opencode/.config/opencode/agents/ai-security-auditor.md` and is shared across both pipelines.
 
 **Ordering:** This stage runs **after** `code-reviewer` returns `[SUCCESS]` and **before** `docs`.
 
@@ -244,7 +224,7 @@ subagent(
 **Pass:** The implemented code / diffs, the review result, and the original contract (for ADR context).
 **Do NOT pass:** Internal pipeline routing, architect's reasoning, full conversation history.
 
-**Role:** ADRs (Architecture Decision Records), PR descriptions, changelogs. The `docs` agent lives in `common/` and is shared across both pipelines.
+**Role:** ADRs (Architecture Decision Records), PR descriptions, changelogs. The `docs` agent lives at `opencode/.config/opencode/agents/docs.md` and is shared across both pipelines.
 
 **Ordering:** This stage runs **after** `code-reviewer` returns `[SUCCESS]` and **before** `team-lead` dispatches the post-verification agents (`devops-cleanup`, `post-mortem-analyst`).
 
@@ -267,7 +247,7 @@ subagent(
 ```
 subagent(
   description="Post-mortem analysis for <task>",
-  prompt="Full workflow conversation; git history; agent timeline; verification result [SUCCESS]; session ID for export",
+  prompt="Verification result [SUCCESS]; session ID for export (`opencode export <sessionID>` is the primary source — do NOT paste the conversation body); git history summary; agent timeline",
   agent="post-mortem-analyst"
 )
 ```

@@ -23,7 +23,7 @@ The `task_id` is always present in the result. It appears in one of two forms â€
 ## On [REWORK]
 If a dispatched pipeline lead returns `[REWORK]`, prefer **`task_id` resume**: use the previous `task_id` to continue the same session with the error context appended. This preserves the subagent's working memory and avoids the empty-result problem.
 
-If the session has been aborted (`task_id` no longer valid), fall back to fresh dispatch with the error context appended.
+If the session has been aborted (`task_id` no longer valid), fall back to fresh dispatch with the error context appended **and** the `REWORK_COUNT: N` value read from the previous handover, so the counter survives the fresh session. Never restart the count at 0 for a task that already has reworks.
 
 `[REWORK]` means **resume at the failed stage**, not re-run the pipeline from intake/design. Pass the error context verbatim with the resume.
 
