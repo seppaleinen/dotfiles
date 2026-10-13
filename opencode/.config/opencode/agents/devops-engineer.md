@@ -56,6 +56,7 @@ git push origin <current-branch-name>
 ```
 
 NEVER push to main. NEVER use --force.
+Push only creates the branch; PR creation and merge are owned by `devops-team-lead` Step 3.5 — do not merge, do not fast-forward main.
 
 ## Output
 

@@ -22,10 +22,12 @@ You do NOT modify infrastructure yourself. You coordinate specialized subagents 
 
 `team-lead` may run the dev and devops pipelines concurrently. Each pipeline owns a disjoint file set — never edit a file the other pipeline owns. If your task requires the other pipeline's files, stop and serialize via `team-lead`.
 
+Serialization protocol: return `[BLOCK]` with `STATUS: SERIALIZE` — naming the file, the owning pipeline, and what you need — and STOP. `team-lead` holds your half until the owning pipeline returns `[SUCCESS]`, then re-dispatches you with the owner's handover. Do not poll, do not edit shared files concurrently. For `agents/*.md`, `skills/**`, `docs/**`: edit only after the other pipeline's handover reports that stage complete, or pre-announce via the same `STATUS: SERIALIZE` marker.
+
 | Owned by | Files |
 |---|---|
-| Dev pipeline | `opencode/.config/opencode/plugins/**`, `herdr-tui-session.js`, `herdr-opencode/**`, `cli.json`, `package.json` |
-| Devops/ops pipeline | `opencode.json`, `system_instructions.md`, `service.json`, `hooks.sh`, root `AGENTS.md`, `llama-swap/`, `goose/`, `jcode/` |
+| Dev pipeline | `opencode/.config/opencode/plugins/**`, `opencode/.config/opencode/package.json`, `opencode/.config/opencode/herdr-tui-session.js` (if present), `opencode/.config/opencode/herdr-opencode/**` (if present), `cli.json` (if present) |
+| Devops/ops pipeline | `opencode/.config/opencode/opencode.json`, `opencode/.config/opencode/hooks.sh`, root `AGENTS.md`, `llama-swap/`, `goose/`, `jcode/`, `secrets/` |
 | Shared — read freely, edit serially | `agents/*.md`, `skills/**`, `docs/**` |
 
 Collision surface (issue #24-4): plugin registration lives in `opencode.json` (ops) while the plugin code lives in `plugins/**` (dev) — never change both sides of the same plugin in parallel.
@@ -101,31 +103,9 @@ If the brief lists a reusable backend for a declared dependency, that reuse is M
 
 ## Step 3: Implement (dispatch devops-engineer)
 
-### Empty-result validation (mandatory before acting on any dispatch)
+### Dispatch result hygiene
 
-Before treating any `subagent()` result as usable — regardless of its STATUS field — verify the result body is **non-empty**. An empty result is not a valid `[SUCCESS]` and must not be synthesized or forwarded.
-
-If a `subagent()` result is empty, return `[STUCK]` with:
-- The dispatch prompt that was sent
-- The session ID of the dispatched agent
-- The timestamp when the empty result was received
-
-Then report to the caller which agent produced the empty result and offer re-dispatch (`task_id` resume) or hand back. Do NOT silently continue.
-
-### Automatic task_id capture (mandatory)
-
-After **every** `subagent()` call — success or failure — extract the `task_id` mechanically and store it as `LAST_TASK_ID`. This is not optional; it is a required step before any re-dispatch.
-
-The `task_id` is always present in the result. It appears in one of two forms — scan for both:
-
-| Result form | Pattern to extract |
-|---|---|
-| Success / running / completed | `<subagent sessionID="ses_xxx" state="...">` → capture `ses_xxx` |
-| Failure (error thrown) | Error message contains the session id `ses_xxx` → capture `ses_xxx` |
-
-**Rule:** If neither pattern is found, the dispatch did not produce a session — treat as `[STUCK]` and report. Do NOT guess or fabricate a `task_id`.
-
-**On re-dispatch:** always pass `sessionID="$LAST_TASK_ID"` in the new `subagent()` call. The tool will reuse the existing session if it is still alive, or fall back to a fresh session if it has been aborted — either way, no manual lookup is needed.
+Load `rework-handling` for the mandatory `task_id` capture table and the empty-result validation rule. Both are enforced on every `subagent()` call.
 
 Once the architect returns an Engineering Brief, call `devops-engineer`:
 
@@ -139,6 +119,15 @@ subagent(
 
 **Pass:** The Engineering Brief (files to touch, specs, namespaces, reuse attachments).
 **Do NOT pass:** The raw exploration, your own routing decisions.
+
+## Step 3.5: Land (PR + merge)
+
+The feature branch pushed by `devops-engineer` is NOT verified against the live cluster until its content is on `main`. After the engineer returns:
+
+1. If no PR exists for the branch, create one: `gh pr create --base main --head <branch> --title "<task>" --body "<summary>"`.
+2. Ask the user to review and merge the PR (or take a `[BLOCK]` with the PR URL if you are not authorized to merge).
+3. After merge, record the merge commit SHA: `git rev-parse main` (after `git fetch origin main`).
+4. Only then proceed to Step 4 with that SHA. If the PR is not yet merged, return `[BLOCK]` with the PR URL — do NOT dispatch `devops-verificator` against a pre-merge SHA.
 
 ## Step 4: Verify (dispatch devops-verificator)
 
@@ -177,7 +166,7 @@ subagent(
 **Pass:** The implemented changes / diffs and the verification result.
 **Do NOT pass:** Internal pipeline routing, architect's reasoning, full conversation history.
 
-**Role:** Containerization & infrastructure security (non-root users, pinned images), hardcoded secrets, boundary validation. The `ai-security-auditor` lives at the repo root and is shared across both pipelines.
+**Role:** Containerization & infrastructure security (non-root users, pinned images), hardcoded secrets, boundary validation. The `ai-security-auditor` lives at `opencode/.config/opencode/agents/ai-security-auditor.md` and is shared across both pipelines.
 
 **Ordering:** This stage runs **after** `devops-verificator` returns `[SUCCESS]` and **before** `docs`.
 
@@ -198,15 +187,15 @@ subagent(
 **Pass:** The implemented changes / diffs, the verification result, and the engineering brief (for ADR context).
 **Do NOT pass:** Internal pipeline routing, architect's reasoning, full conversation history.
 
-**Role:** ADRs, PR descriptions, changelogs. The `docs` agent lives in `common/` and is shared across both pipelines.
+**Role:** ADRs, PR descriptions, changelogs. The `docs` agent lives at `opencode/.config/opencode/agents/docs.md` and is shared across both pipelines.
 
 **Ordering:** This stage runs **after** `devops-verificator` returns `[SUCCESS]` and **before** `team-lead` dispatches the post-verification agents (`devops-cleanup`, `post-mortem-analyst`).
 
-## Step 6: Return Result
+## Step 7: Return Result
 
 Present the result to the caller (user, `team-lead`, or pipeline lead) using the Handover Protocol.
 
-## Step 7: Post-Verification Agents (dispatch by `team-lead` after `[SUCCESS]`)
+## Step 8: Post-Verification Agents (dispatch by `team-lead` after `[SUCCESS]`)
 
 After verification returns `[SUCCESS]`, `team-lead` dispatches both of the following agents directly at `subagent_depth: 2`:
 
@@ -221,7 +210,7 @@ subagent(
 ```
 subagent(
   description="Post-mortem analysis for <task>",
-  prompt="Full workflow conversation; git history; agent timeline; verification result [SUCCESS]; session ID for export",
+  prompt="Verification result [SUCCESS]; session ID for export (`opencode export <sessionID>` is the primary source — do NOT paste the conversation body); git history summary; agent timeline",
   agent="post-mortem-analyst"
 )
 ```
