@@ -50,6 +50,9 @@ Receive (Research Brief — already refined)
     [Test] — dispatch test-engineer (test-auditor optional before this)
     │
     ▼
+    [Lint] — run `ruff check src/` (or `uv tool run ruff check src/`)
+    │
+    ▼
     [Review] — dispatch code-reviewer for quality gate
     │
     ▼
@@ -167,6 +170,28 @@ subagent(
 **Do NOT pass:** Full conversation history, raw tool outputs.
 
 **Routing rule:** `test-auditor` diagnoses; `test-engineer` implements. Never dispatch `test-auditor` to fix gaps — forward its TODO list to `test-engineer` instead.
+
+## Step 4b: Lint (run `ruff check`)
+
+After `test-engineer` returns `[SUCCESS]`, run the lint gate before code review:
+
+```
+ruff check src/
+```
+
+(or `uv tool run ruff check src/` if ruff is not installed globally)
+
+**Pass:** The `src/` directory path.
+**Do NOT pass:** Full conversation history, raw tool outputs beyond the lint result.
+
+**Role:** Catch dead code, unused imports/variables, syntax errors, and other pyflakes (F) and isort (I) violations. The ruff config lives in `pyproject.toml` under `[tool.ruff]`.
+
+**Ordering:** This stage runs **after** `test-engineer` returns `[SUCCESS]` and **before** `code-reviewer`.
+
+**On findings:** 
+- If lint passes (no errors): proceed to code review.
+- If lint fails: fix the violations in the source files, then re-run `ruff check src/`. Include the lint output in the handover.
+- Only proceed to code review once lint passes.
 
 ## Step 5: Review (dispatch code-reviewer)
 

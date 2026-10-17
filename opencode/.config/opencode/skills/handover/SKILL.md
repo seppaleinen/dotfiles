@@ -8,6 +8,13 @@ description: Standardized inter-agent communication protocol for structured hand
 ## Purpose
 Standardize inter-agent communication. Every agent MUST format its final response using this structure to ensure downstream agents receive enough context — but NOT everything.
 
+## Handover Invariants
+
+These invariants MUST hold before any agent returns `[SUCCESS]`:
+
+- **No untracked files.** The working tree must contain no untracked files that are not listed in the deliverables. (`*.bak`, `*.orig`, `*.tmp`, `*~` are covered by `.gitignore`; anything else must be explicitly listed or removed.)
+- **Lint clean.** `ruff check src/` must pass (or its output must be included in the handover and fixed before proceeding).
+
 ## Principle: Pass Signal, Drop Noise
 Pass forward only what the next agent needs. Do NOT pass:
 - Full conversation history
