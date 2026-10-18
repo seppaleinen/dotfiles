@@ -30,23 +30,9 @@ Receive from `team-lead`:
 
 0. **Export (if session ID provided)**: Run `opencode export <sessionID>` to pull the raw conversation, tool calls, and results. Use this as the primary source — it is more complete than the summary. If no session ID is provided, fall back to the summary from `team-lead`.
 
-0a. **Validate dispatch results (empty-result guard)**: If this workflow involves any `subagent()` dispatch (or if a prior dispatch's result is being relied upon), verify the returned result is **non-empty** before proceeding. An empty result is not a valid outcome — it means the dispatched agent produced no usable output.
+### Dispatch result hygiene
 
-   If a `subagent()` result is empty, do NOT treat it as success or continue downstream. Instead, return `[STUCK]` with:
-   - The dispatch prompt that was sent
-   - The session ID of the dispatched agent
-   - The timestamp when the empty result was received
-
-   Rationale: silently absorbing an empty dispatch result masks a stalled or failed agent and corrupts every downstream step that depends on it. Surface it immediately.
-
-   **task_id capture pattern (for reviewing prior dispatches):** When scanning the workflow for dispatch results, extract every `task_id` mechanically. It appears in one of two forms:
-
-   | Result form | Pattern to extract |
-   |---|---|
-   | Success / running / completed | `<subagent sessionID="ses_xxx" state="...">` → capture `ses_xxx` |
-   | Failure (error thrown) | Error message contains the session id `ses_xxx` → capture `ses_xxx` |
-
-   **Rule:** If neither pattern is found for a dispatch, that dispatch did not produce a session — flag it as a gap in the workflow analysis. Do NOT guess or fabricate a `task_id`.
+Load `rework-handling` for the mandatory `task_id` capture table and the empty-result validation rule. Both are enforced on every `subagent()` call.
 
 1. **Analyze**: Review the conversation, git history, and timeline for:
    - Errors and dead ends

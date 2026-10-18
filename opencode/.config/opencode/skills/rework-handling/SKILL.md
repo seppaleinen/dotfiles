@@ -1,6 +1,6 @@
 ---
 name: rework-handling
-description: Rework contract for pipeline leads: task_id resume on [REWORK], fresh-dispatch fallback, max-2 escalation, immediate halt on [BLOCK]. Includes REWORK_COUNT tracking.
+description: Rework contract for pipeline leads: task_id resume on [REWORK], fresh-dispatch fallback, max-2 escalation, immediate halt on [BLOCK]. Includes REWORK_COUNT and KILLED_BY_RESTART tracking.
 ---
 
 # Rework Handling
@@ -23,7 +23,7 @@ The `task_id` is always present in the result. It appears in one of two forms �
 ## On [REWORK]
 If a dispatched pipeline lead returns `[REWORK]`, prefer **`task_id` resume**: use the previous `task_id` to continue the same session with the error context appended. This preserves the subagent's working memory and avoids the empty-result problem.
 
-If the session has been aborted (`task_id` no longer valid), fall back to fresh dispatch with the error context appended.
+If the session has been aborted (`task_id` no longer valid), fall back to fresh dispatch with the error context appended **and** the `REWORK_COUNT: N` value read from the previous handover, so the counter survives the fresh session. Never restart the count at 0 for a task that already has reworks.
 
 `[REWORK]` means **resume at the failed stage**, not re-run the pipeline from intake/design. Pass the error context verbatim with the resume.
 
@@ -31,6 +31,15 @@ If the session has been aborted (`task_id` no longer valid), fall back to fresh 
 Add a `REWORK_COUNT: N` field to your handover output. Increment it on every `[REWORK]` for the same task. Once it reaches **2**, escalate to the user with the full error history instead of re-dispatching — do NOT dispatch a 3rd time.
 
 Start each lead's rework section with a note that the counter is incremented on every [REWORK] and escalated to the user with full error history once it reaches 2.
+
+## KILLED_BY_RESTART Counter (issue #27)
+
+A subagent cancelled by an external opencode service restart is a distinct rework event even without a formal `[REWORK]` resume. Track this separately:
+
+- Maintain a `KILLED_BY_RESTART: M` counter in the handover output.
+- Increment it when a dispatched subagent session is terminated by a service restart (detected via: the session disappears without `[REWORK]`/`[BLOCK]`/`[STUCK]`, and the parent observes the daemon restarted).
+- This counter is independent of `REWORK_COUNT` — a task can have both formal reworks and killed-by-restart events.
+- Include both in the handover template: `REWORK_COUNT: N | KILLED_BY_RESTART: M`
 
 ## On [BLOCK]
 If it returns `[BLOCK]`, halt immediately and present the issue to the user with full context. Do not route around it.

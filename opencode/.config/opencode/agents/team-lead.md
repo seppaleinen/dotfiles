@@ -102,7 +102,7 @@ subagent(
 
 subagent(
   description="Post-verification analysis: <issue number>",
-  prompt="Verification result [SUCCESS]; session ID for export; full workflow conversation; git history; agent timeline",
+  prompt="Verification result [SUCCESS]; session ID for export (`opencode export <sessionID>` is the primary source — do NOT paste the conversation body); git history summary; agent timeline",
   agent="post-mortem-analyst"
 )
 ```
@@ -152,6 +152,17 @@ skill(name="rework-handling")
 ```
 
 **Note:** The counter is incremented on every `[REWORK]` and escalated to the user with full error history once it reaches 2. Include `REWORK_COUNT: N` in your handover output.
+
+### Provider/Transport Diagnostic (issue #21)
+
+When a `subagent()` dispatch fails with a provider/transport error (e.g., litellm role=server errors, connection refused, timeout), diagnose provider health **before** counting a retry:
+
+1. Check DNS resolution: `dig +short litellm.labb.site`
+2. Check HTTP endpoint: `curl -sSf https://litellm.labb.site/v1/models > /dev/null` (or run `opencode models` to verify the live daemon)
+3. If both pass → the error was likely transient; proceed with retry (counts toward max-2)
+4. If either fails → the backend is unavailable; **do not retry**. Escalate to the user with the diagnostic output.
+
+Cap retries at 2 total (per `rework-handling`), and only retry after a passing diagnostic. This prevents wasting retries on backend outages.
 
 ## Follow-up Handling
 
@@ -204,20 +215,9 @@ Rework inside the approved scope needs no new approval — `## Rework Handling` 
 
 ## Step 2: Evaluate Results
 
-### Automatic task_id capture (mandatory)
+### Dispatch result hygiene
 
-After **every** `subagent()` call — success or failure — extract the `task_id` mechanically and store it as `LAST_TASK_ID`. This is not optional; it is a required step before any re-dispatch.
-
-The `task_id` is always present in the result. It appears in one of two forms — scan for both:
-
-| Result form | Pattern to extract |
-|---|---|
-| Success / running / completed | `<subagent sessionID="ses_xxx" state="...">` → capture `ses_xxx` |
-| Failure (error thrown) | Error message contains the session id `ses_xxx` → capture `ses_xxx` |
-
-**Rule:** If neither pattern is found, the dispatch did not produce a session — treat as `[STUCK]` and report. Do NOT guess or fabricate a `task_id`.
-
-**On re-dispatch:** always pass `sessionID="$LAST_TASK_ID"` in the new `subagent()` call. The tool will reuse the existing session if it is still alive, or fall back to a fresh session if it has been aborted — either way, no manual lookup is needed.
+Load `rework-handling` for the mandatory `task_id` capture table and the empty-result validation rule. Both are enforced on every `subagent()` call.
 
 Once the dispatched agent returns, check the STATUS field:
 - `[SUCCESS]` → proceed to Step 3 (synthesis)
@@ -225,16 +225,32 @@ Once the dispatched agent returns, check the STATUS field:
 - `[BLOCK]` → present to user with full context
 - `[STUCK]` → report to the user which agent stalled and on what step, then offer re-dispatch (`task_id` resume) or hand back. Do NOT loop-re-dispatch silently.
 
-### Empty-result validation (mandatory before acting on any dispatch)
+## Post-Dispatch Gate
 
-Before treating any `subagent()` result as usable — regardless of its STATUS field — verify the result body is **non-empty**. An empty result is not a valid `[SUCCESS]` and must not be synthesized or forwarded.
+After any pipeline lead returns `[SUCCESS]`, run this gate **before** accepting the result. It is a hard stop — a failure here is a `[BLOCK]`, not a `[SUCCESS]`.
 
-If a `subagent()` result is empty, return `[STUCK]` with:
-- The dispatch prompt that was sent
-- The session ID of the dispatched agent
-- The timestamp when the empty result was received
+### Gate checklist
 
-Then report to the user which agent produced the empty result and offer re-dispatch (`task_id` resume) or hand back. Do NOT silently continue.
+1. **Parse the handover.** Extract the `TRACE` line and `PIPELINE STAGE` field from the lead's handover. If either is missing or malformed, reject immediately: `[BLOCK]` with "incomplete handover — missing TRACE or PIPELINE STAGE field".
+
+2. **Verify mandatory stages.** Every mandatory stage must be recorded as **RAN** in the trace. A stage that was never dispatched, or that returned an empty/aborted result, is **MISSING** — not skipped, not assumed.
+
+   | Stage | Dev pipeline | DevOps pipeline | Mandatory? |
+   |---|---|---|---|
+   | Design | `dev-architect` | `devops-architect` | **Yes**, unless Fast Path with documented justification |
+   | Implement | `backend-engineer` / `frontend-engineer` | `devops-engineer` | **Yes** |
+   | Verify | `test-engineer` **or** `code-reviewer` (at least one) | `devops-verificator` | **Yes** — never skip |
+   | Security | `ai-security-auditor` | `ai-security-auditor` | **Yes** |
+
+3. **Fast Path skip of design.** If the design stage is marked SKIPPED (Fast Path), the handover must include a Fast-Path justification naming the change class and citing the Research Brief's findings. Without one: reject.
+
+4. **Skip of verification stage.** If the verification stage is marked SKIPPED, the handover must include a `SKIP_VERIFIED: <reason>` marker in the STATUS block. Without one: reject. With one: surface the skip to the user for explicit acceptance before proceeding. `devops-verificator` is never skippable per `devops-team-lead.md` — a skip here is a policy violation and is always a `[BLOCK]`.
+
+### Gate execution
+
+- If any mandatory stage is missing or invalid: return `[BLOCK]` with the gate trace, naming the missing stage and the exact dispatch needed to close it. Re-dispatch the pipeline lead with the gate trace appended.
+- Only when every row reads **OK** may the handover proceed to Step 3 (Synthesize & Report).
+- This gate runs **after** Step 2 (Evaluate Results) and **before** Step 3 (Synthesize & Report). It is the only path to `[SUCCESS]` acceptance.
 
 ## Step 3: Synthesize & Report
 

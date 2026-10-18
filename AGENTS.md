@@ -13,11 +13,13 @@ GNU Stow-managed dotfiles. Each top-level directory is a stow target symlinked t
 
 | Directory | Stows to | Purpose |
 |-----------|----------|---------|
+| `zsh/` | `~/.zshrc`, `~/.zsh_plugins.txt`, `~/.p10k.zsh` | Shell config — P10K, antidote, compdef catcher, completion, lazy NVM/SDKMAN, aliases. Source of truth for shell; Ansible only installs deps. |
 | `opencode/.config/opencode/` | `~/.config/opencode/` | OpenCode agent config: agents, skills, plugins, MCP servers, model providers |
 | `goose/.config/goose/` | `~/.config/goose/` | Goose agent config: extensions, MCP servers, providers |
 | `jcode/.jcode/` | `~/.jcode/` | jcode agent config: keybindings, MCP servers, providers |
 | `llama-swap/.config/llama-swap/` | `~/.config/llama-swap/` | Local LLM model swap server config |
 | `agents/.agents/` | `~/.agents/` | Shared agent skills (caveman, handover, ponytail, etc.) |
+| `secrets/` | `~/.secrets.zsh` | SOPS-encrypted user API keys; decrypt with `sops -d secrets/secrets.zsh > ~/.secrets.zsh` |
 | `.opencode/` | (not stowed) | OpenCode plugin deps when editing *this* repo |
 
 ## OpenCode Agent System
@@ -42,9 +44,23 @@ After verification returns `[SUCCESS]` from `code-reviewer` (dev) or `devops-ver
 
 Both new agents live in `opencode/.config/opencode/agents/` (shared across dev/devops pipelines) and follow the same handover protocol as other agents.
 
-**Deleted agents:** `dev-engineer` (coordinator/integrator role removed — integration check now done by dev-team-lead), `issue-refiner`, and `devops-investigator` have been removed; their investigative work is consolidated into the `researcher` subagent. (`researcher` is **not** deleted — it is a current, active subagent of `team-lead`.)
+**Deleted agents:** `dev-engineer` (coordinator/integrator role removed — integration check now done by dev-team-lead), `issue-refiner`, and `devops-investigator` have been removed. Their former intake and investigation work is now handled by the active `researcher` subagent (see the pipeline structure above — `researcher` is **not** deleted).
 
-**Post-edit stale-reference scan:** After changing an agent's behavior (e.g. `post-mortem-analyst` from auto-create to ask-first), grep all agent `.md` files under `opencode/.config/opencode/agents/` for stale references to the changed agent's old behavior. Flag any file that still references the old behavior and update it before considering the edit complete.
+**Post-edit stale-reference scan:** After changing an agent's behavior (e.g. `post-mortem-analyst` from auto-create to ask-first), run the stale-reference scanner:
+
+```bash
+./scripts/check-stale-agent-refs.sh "old behavior pattern"
+```
+
+This script greps all agent `.md` files under `opencode/.config/opencode/agents/` for stale references to the changed agent's old behavior. Exit 0 if clean, 1 with file list if stale. Flag any file that still references the old behavior and update it before considering the edit complete.
+
+**readme.html sync check:** `opencode/.config/opencode/agents/readme.html` is the hand-maintained staff chart. It lists agents on three surfaces — the folder-tree block (must list **every** agent), the `data-agent="..."` attributes on clickable buttons, and the JS `agents` object (blurbs for the clickable agents). Run the sync checker after **any** change that adds, removes, or renames an agent `.md`, and after any change to an agent's role:
+
+```bash
+./scripts/check-readme-sync.sh
+```
+
+Exit 0 means the folder tree lists all 27 agents with no stale references. Exit 1 names the drift. The on-demand auditors (`ai-security-auditor`, `context-drift-auditor`, `performance-auditor`, `seo-aeo-auditor`, `test-auditor`) and the ontology agents (`ontology-auditor`, `api-scanner`, `db-scanner`, `matrix-generator`, `socratic-questioner`, `ux-scanner`) are deliberately **not** clickable — they sit outside the team-lead chain — so they are not required on the button/JS surfaces. If you make one of them part of the dispatch flow, add it to those surfaces too.
 
 All inter-agent communication uses the handover protocol defined in `opencode/.config/opencode/skills/handover/SKILL.md`.
 
@@ -88,6 +104,14 @@ Secrets for LiteLLM auth stored at `~/.local/share/opencode/secrets/litellm-swap
 
 `opencode/.config/opencode/hooks.sh` bridges OpenCode lifecycle events to `cmux notify` for desktop notifications.
 
+## OpenCode plugins
+
+`opencode.json` `plugin:` array currently contains only `opencode-plugin-litellm@latest` and `{env:HOME}/.hindsight/coding-agents`. The v1 opentmux plugin (`opencode-agent-tmux`) was dropped in commit `1bb1c10` and must not be re-added.
+
+**Armed updater risk:** `node_modules/opentmux/dist/scripts/update-plugins.js` (installed as a dependency of the now-unused `opentmux` package) runs only when `OPENCODE_TMUX_UPDATE=1` is set in the environment — which it is not here, so the updater is effectively inert in this repo. However, its `ensurePluginEntry()` only recognizes the legacy name or a path ending in `/opentmux`; it never normalizes npm specs, so if opentmux is ever reinstalled or invoked with that env var set, it re-appends `opencode-agent-tmux` on every run.
+
+**Guard (non-committed, reversible):** a repo opt-out check has been added at the top of `main()` in `node_modules/opentmux/dist/scripts/update-plugins.js`. When `OPENCODE_TMUX_READD` is not set to `1`, the updater bails out early if `opencode-agent-tmux` is absent from `opencode.json` — so it cannot silently re-add the phantom entry. To opt back in, set `OPENCODE_TMUX_READD=1`. `node_modules/` is gitignored and not repo-managed; if you reinstall opentmux, re-apply the guard or set the env var.
+
 ## Tool call discipline
 
 These rules govern how tools are invoked across the repo to prevent silent failures, wasted cycles, and output thrash.
@@ -124,11 +148,11 @@ This rule is enforced in the workflow of every agent that dispatches `subagent()
 
 ### rtk find loop prevention
 
-`rtk find` filters and hides results by default. When the filtered output is uninformative, repeating the command produces identical filtered output indefinitely — a loop that wastes cycles without gaining information.
+See the `rtk-find-loop-prevention` skill at `opencode/.config/opencode/skills/rtk-find-loop-prevention/SKILL.md`. Load it when using `rtk find`:
 
-**Rule:** If `rtk find` returns filtered/hidden results **twice in a row**, stop repeating it. Switch to read-based directory exploration using the `Read` or `Glob` tools instead. The `Read`/`Glob` tools do not apply rtk's filter layer and will surface the actual files on disk.
-
-Do not run `rtk find` a third time after two consecutive filtered/hidden results. Break the loop by exploring the directory tree directly.
+```
+skill(name="rtk-find-loop-prevention")
+```
 
 ### General guidance
 

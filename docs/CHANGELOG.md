@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Port four OpenCode plugins from the v1 to the v2 plugin API (`@opencode/plugin` 2.0.26). `herdr-tui-session.js` drops the dead v1 `tui` entry (unreachable in v2, duplicated the `setup` logic) and hardens `requestOnce` against EPIPE on herdr socket writes. `herdr-agent-state.js` is ported v1→v2 (v1 event names → v2, `event` hook → `ctx.event.subscribe()` + `ctx.tool.hook` + `ctx.session.hook`, async factory → `export default { id, setup(ctx) }`). `paseo-terminal-activity.js` was already v2-clean; verified only. `rtk.js` is ported v1→v2, replacing the deleted v1 `plugins/rtk.ts` (`$` shell DSL → `export default { id, setup(ctx) }` with `ctx.tool.hook` and a `spawn`-based rewrite that handles rtk's exit-code-3-on-success).
+- Port four OpenCode plugins from the v1 to the v2 plugin API (`@opencode/plugin` 2.0.26). `herdr-tui-session.js` drops the dead v1 `tui` entry (unreachable in v2, duplicated the `setup` logic) and hardens `requestOnce` against EPIPE on herdr socket writes. `herdr-agent-state.js` is ported v1→v2 (v1 event names → v2, `event` hook → `ctx.event.subscribe()` + `ctx.tool.hook` + `ctx.session.hook`, async factory → `export default { id, setup(ctx) }`). `paseo-terminal-activity.js` was already v2-clean; verified only. `rtk.js` was ported v1→v2 then disabled (`e230b69`): the command-rewrite hook (`ctx.tool.hook("execute.before")` → `rtk rewrite`) conflicts with the opencode tool contract — rtk exits 3 on a *successful* rewrite, which the hook treated as failure and aborted every shell/bash tool call. `plugins/rtk.ts` is now an inert stub (`setup() {}`); the installed `rtk` binary is still used directly by the `flux-cli`/`k8s-cli`/`grafana-cli` skills, and the `rtk-find-loop-prevention` skill is unaffected.
 
 ## Removed
 
