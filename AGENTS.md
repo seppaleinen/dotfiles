@@ -54,6 +54,14 @@ Both new agents live in `opencode/.config/opencode/agents/` (shared across dev/d
 
 This script greps all agent `.md` files under `opencode/.config/opencode/agents/` for stale references to the changed agent's old behavior. Exit 0 if clean, 1 with file list if stale. Flag any file that still references the old behavior and update it before considering the edit complete.
 
+**readme.html sync check:** `opencode/.config/opencode/agents/readme.html` is the hand-maintained staff chart. It lists agents on three surfaces — the folder-tree block (must list **every** agent), the `data-agent="..."` attributes on clickable buttons, and the JS `agents` object (blurbs for the clickable agents). Run the sync checker after **any** change that adds, removes, or renames an agent `.md`, and after any change to an agent's role:
+
+```bash
+./scripts/check-readme-sync.sh
+```
+
+Exit 0 means the folder tree lists all 27 agents with no stale references. Exit 1 names the drift. The on-demand auditors (`ai-security-auditor`, `context-drift-auditor`, `performance-auditor`, `seo-aeo-auditor`, `test-auditor`) and the ontology agents (`ontology-auditor`, `api-scanner`, `db-scanner`, `matrix-generator`, `socratic-questioner`, `ux-scanner`) are deliberately **not** clickable — they sit outside the team-lead chain — so they are not required on the button/JS surfaces. If you make one of them part of the dispatch flow, add it to those surfaces too.
+
 All inter-agent communication uses the handover protocol defined in `opencode/.config/opencode/skills/handover/SKILL.md`.
 
 **Model tiers:** `team-lead` and orchestrators use `main_model` (reasoning). Worker agents (`backend-engineer`, `frontend-engineer`, `devops-engineer`) use `small_model` when the spec is clear.
