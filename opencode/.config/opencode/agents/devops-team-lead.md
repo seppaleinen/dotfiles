@@ -214,6 +214,18 @@ Stage 1 (`devops-architect`) may be omitted **only** when the task is a small, w
 - The justification must name the change class (e.g. "Helm value bump: `replicas` 1→3") and cite the Infra Findings that stand in for the architect's brief.
 - If the change is not clearly in the Fast-Path class, **do not skip** — dispatch `devops-architect` (the escape hatch: "when in doubt, run the full pipeline").
 
+### [SKIP_VERIFIED] marker (issue #8)
+
+If a lead skips `devops-verificator` (only allowed with a documented reason), the handover's STATUS block must include:
+
+```
+SKIP_VERIFIED: <reason>
+```
+
+Without this marker, the skip is invisible to `team-lead`'s Post-Dispatch Gate and the handover is rejected as `[BLOCK]`.
+
+**Note:** `devops-verificator` is **NEVER SKIPPABLE** per this pipeline — on the full path and on the Fast Path. A run that reaches the gate without a `devops-verificator` `[SUCCESS]` fails the gate unconditionally. The `SKIP_VERIFIED` marker exists for the dev pipeline (`dev-team-lead.md`), where `test-engineer` or `code-reviewer` may be skipped with explicit user acceptance; it is recorded here for cross-pipeline consistency.
+
 ### Gate execution
 
 1. Build the full pipeline trace (below) from the `rework-handling` `task_id` capture table. Every dispatch and every return is a line; nothing is inferred.

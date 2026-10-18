@@ -225,6 +225,33 @@ Once the dispatched agent returns, check the STATUS field:
 - `[BLOCK]` → present to user with full context
 - `[STUCK]` → report to the user which agent stalled and on what step, then offer re-dispatch (`task_id` resume) or hand back. Do NOT loop-re-dispatch silently.
 
+## Post-Dispatch Gate
+
+After any pipeline lead returns `[SUCCESS]`, run this gate **before** accepting the result. It is a hard stop — a failure here is a `[BLOCK]`, not a `[SUCCESS]`.
+
+### Gate checklist
+
+1. **Parse the handover.** Extract the `TRACE` line and `PIPELINE STAGE` field from the lead's handover. If either is missing or malformed, reject immediately: `[BLOCK]` with "incomplete handover — missing TRACE or PIPELINE STAGE field".
+
+2. **Verify mandatory stages.** Every mandatory stage must be recorded as **RAN** in the trace. A stage that was never dispatched, or that returned an empty/aborted result, is **MISSING** — not skipped, not assumed.
+
+   | Stage | Dev pipeline | DevOps pipeline | Mandatory? |
+   |---|---|---|---|
+   | Design | `dev-architect` | `devops-architect` | **Yes**, unless Fast Path with documented justification |
+   | Implement | `backend-engineer` / `frontend-engineer` | `devops-engineer` | **Yes** |
+   | Verify | `test-engineer` **or** `code-reviewer` (at least one) | `devops-verificator` | **Yes** — never skip |
+   | Security | `ai-security-auditor` | `ai-security-auditor` | **Yes** |
+
+3. **Fast Path skip of design.** If the design stage is marked SKIPPED (Fast Path), the handover must include a Fast-Path justification naming the change class and citing the Research Brief's findings. Without one: reject.
+
+4. **Skip of verification stage.** If the verification stage is marked SKIPPED, the handover must include a `SKIP_VERIFIED: <reason>` marker in the STATUS block. Without one: reject. With one: surface the skip to the user for explicit acceptance before proceeding. `devops-verificator` is never skippable per `devops-team-lead.md` — a skip here is a policy violation and is always a `[BLOCK]`.
+
+### Gate execution
+
+- If any mandatory stage is missing or invalid: return `[BLOCK]` with the gate trace, naming the missing stage and the exact dispatch needed to close it. Re-dispatch the pipeline lead with the gate trace appended.
+- Only when every row reads **OK** may the handover proceed to Step 3 (Synthesize & Report).
+- This gate runs **after** Step 2 (Evaluate Results) and **before** Step 3 (Synthesize & Report). It is the only path to `[SUCCESS]` acceptance.
+
 ## Step 3: Synthesize & Report
 
 After receiving the dispatched agent's handover, present a **user-facing summary** — NOT the raw handover protocol. Your response should include:
