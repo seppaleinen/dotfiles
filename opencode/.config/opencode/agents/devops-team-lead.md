@@ -191,9 +191,56 @@ subagent(
 
 **Ordering:** This stage runs **after** `devops-verificator` returns `[SUCCESS]` and **before** `team-lead` dispatches the post-verification agents (`devops-cleanup`, `post-mortem-analyst`).
 
+## Pre-Handover Gate (issue #7)
+
+Before any `[SUCCESS]` handover may leave this pipeline, run this gate. It is a **hard stop**, not a suggestion. The gate is the only path to `[SUCCESS]`; a failure here is a `[BLOCK]`.
+
+### Gate checklist
+
+Every mandatory stage must be recorded as **RAN** with a `task_id` from the `rework-handling` capture table. A stage that was never dispatched, or that returned an empty/aborted result, is **MISSING** — not skipped, not assumed.
+
+| # | Stage | Agent | Mandatory? | Evidence required |
+|---|---|---|---|---|
+| 1 | Design | `devops-architect` | **Yes**, unless Fast Path | Engineering Brief returned by the architect, or a written Fast-Path justification (see below) |
+| 2 | Implement | `devops-engineer` | **Yes** | Feature branch pushed; PR created (Step 3.5); merge commit SHA recorded |
+| 3 | Verify | `devops-verificator` | **YES — NEVER SKIP** | `[SUCCESS]` from `devops-verificator` against the **merged** commit SHA (pre-merge SHA is not valid evidence) |
+| 4 | Security | `ai-security-auditor` | **Yes** | `[SUCCESS]` or a documented, accepted finding from the auditor |
+
+### Fast-path justification
+
+Stage 1 (`devops-architect`) may be omitted **only** when the task is a small, well-defined change — a single manifest/Helm value bump or equivalent — and the Research Brief's Infra Findings already supply the reuse + cluster facts. When Fast Path is taken:
+
+- Record it explicitly in the gate trace as `Stage 1: SKIPPED (Fast Path) — justification: <one line>`.
+- The justification must name the change class (e.g. "Helm value bump: `replicas` 1→3") and cite the Infra Findings that stand in for the architect's brief.
+- If the change is not clearly in the Fast-Path class, **do not skip** — dispatch `devops-architect` (the escape hatch: "when in doubt, run the full pipeline").
+
+### Gate execution
+
+1. Build the full pipeline trace (below) from the `rework-handling` `task_id` capture table. Every dispatch and every return is a line; nothing is inferred.
+2. Check each mandatory stage against the evidence column above. A missing or invalid entry fails the gate.
+3. If any mandatory stage is missing or invalid: return `[BLOCK]` with the gate trace, naming the missing stage and the exact dispatch needed to close it. Do **not** emit `[SUCCESS]`.
+4. Only when every row reads **OK** may the handover proceed to Step 7.
+
+### Full pipeline trace
+
+The trace is emitted verbatim in every handover. It is the audit trail for this run.
+
+```
+PIPELINE TRACE
+  task_id: <id>
+  stage 1 (design):      <RAN|SKIPPED (Fast Path)>  agent=devops-architect  task_id=<id>  result=<Engineering Brief | Fast-Path justification>
+  stage 2 (implement):   <RAN>                       agent=devops-engineer   task_id=<id>  result=<branch, PR, merge SHA>
+  stage 3 (verify):      <RAN>                       agent=devops-verificator task_id=<id>  result=[SUCCESS] @ <merge SHA>
+  stage 4 (security):    <RAN>                       agent=ai-security-auditor task_id=<id> result=[SUCCESS] | findings accepted
+  stage 5 (docs):        <RAN|SKIPPED>                agent=docs              task_id=<id> result=<docs artifacts>
+  gate:                  <PASS|FAIL>  missing=<stage names>
+```
+
+`devops-verificator` is **NEVER SKIPPABLE** — on the full path and on the Fast Path. A run that reaches the gate without a `devops-verificator` `[SUCCESS]` fails the gate unconditionally, regardless of how confident any earlier stage was.
+
 ## Step 7: Return Result
 
-Present the result to the caller (user, `team-lead`, or pipeline lead) using the Handover Protocol.
+Present the result to the caller (user, `team-lead`, or pipeline lead) using the Handover Protocol. The Pre-Handover Gate must have returned `PASS`; include the full pipeline trace in the handover.
 
 ## Step 8: Post-Verification Agents (dispatch by `team-lead` after `[SUCCESS]`)
 
@@ -230,16 +277,17 @@ subagent(
 
 ## PIPELINE STAGE
 
-Include a **PIPELINE STAGE** field showing the full progression through this pipeline (cleanup + post-mortem are dispatched by `team-lead` after this pipeline returns, not by this lead):
+Include a **PIPELINE STAGE** field showing the full progression through this pipeline (cleanup + post-mortem are dispatched by `team-lead` after this pipeline returns, not by this lead). The Pre-Handover Gate runs after docs and before the handover; a gate failure is an early stop, not a `[SUCCESS]`.
 
 ```
-PIPELINE STAGE: design → implement → verify → docs [COMPLETE]
+PIPELINE STAGE: design → implement → verify → security → docs → gate [COMPLETE]
 ```
 
 Or on early stop:
 
 ```
 PIPELINE STAGE: design → implement [STOPPED: devops-verificator returned REWORK]
+PIPELINE STAGE: design → implement → verify → security → docs → gate [STOPPED: gate FAIL — <missing stage>]
 ```
 
 In your **SUMMARY**, mention which stage produced the final result.
