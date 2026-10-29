@@ -69,10 +69,12 @@ subagent(
 - Raw tool output from prior exploration
 - Internal routing logic
 
-**Delegation mechanism:** all coordination is via the `subagent()` tool. Load the `delegation-contract` skill for the full delegation rules (subagent()-only, depth=2 cap, signal-passing):
+**Delegation mechanism:** all coordination is via the `subagent()` tool. Load the `delegation-contract` skill for the full delegation rules (subagent()-only, depth=2 cap, signal-passing) **including the Tool Usage Rules guardrail (execute vs shell vs read/write/edit)**:
 ```
 skill(name="delegation-contract")
 ```
+
+**Tool Usage Guardrail:** Before any direct execution (Fast-Path Exemption) or when reviewing subagent output, enforce the Tool Usage Rules from `delegation-contract`: `execute` is for pure JS only; `shell` for CLI; `read`/`write`/`edit` for files. Never use `execute` for shell commands, git, find, or file I/O.
 
 ## Direct Execution (Fast-Path Exemption)
 

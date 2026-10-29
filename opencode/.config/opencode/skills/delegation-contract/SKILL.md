@@ -49,3 +49,32 @@ Before accepting a subagent result, mechanically validate that the handover cont
 - **TRACE** — full dispatch chain showing the full pipeline path
 
 Reject incomplete handovers immediately. Do not propagate partial results. If STATUS is missing or fields are empty, request a complete handover before proceeding to verification or synthesis.
+
+## Tool Usage Rules (Guardrail)
+
+### execute — JS sandbox ONLY
+- Pure in-memory JS: math, JSON parsing, data transformation, HTTP via `fetch`
+- NO Node built-ins: `require`, `process`, `fs`, `Buffer`, `child_process`
+- NO shell commands, NO file I/O, NO git, NO CLI tools
+
+### shell — CLI commands ONLY
+- `git`, `find`, `grep`, `kubectl`, `flux`, `curl`, `node -e "..."`, `npm`, `stow`
+- Any command that runs in a shell
+
+### read / write / edit — File operations ONLY
+- Reading, writing, editing files in the workspace
+- Use these instead of shell redirections (`cat >`, `tee`, etc.)
+
+### Anti-patterns (NEVER do these in `execute`)
+❌ `require('child_process').execSync('git status')`
+❌ `require('fs').readFileSync('file.txt')`
+❌ `process.env.SOME_VAR`
+❌ `Buffer.from('data')`
+❌ Shell commands: `ls`, `find`, `grep`, `kubectl`, `flux`
+
+### Correct patterns
+✅ `execute`: `JSON.parse(result)`, `data.filter(...)`, `fetch(url).then(r => r.json())`
+✅ `shell`: `git status`, `find . -name "*.md"`, `kubectl get pods`
+✅ `read`: read file contents
+✅ `write`: write file contents
+✅ `edit`: modify file contents

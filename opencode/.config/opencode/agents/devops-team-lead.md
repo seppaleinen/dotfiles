@@ -68,6 +68,15 @@ Load the `pipeline-visibility` skill for the status-reporting contract:
 skill(name="pipeline-visibility")
 ```
 
+## Delegation Contract & Tool Usage Guardrail
+
+Load the `delegation-contract` skill for dispatch rules **including the Tool Usage Rules guardrail (execute vs shell vs read/write/edit)**:
+```
+skill(name="delegation-contract")
+```
+
+**Tool Usage Guardrail:** When dispatching workers or reviewing their output, enforce the Tool Usage Rules from `delegation-contract`: `execute` is for pure JS only; `shell` for CLI; `read`/`write`/`edit` for files. Never use `execute` for shell commands, git, find, or file I/O. This applies to all downstream agents you dispatch.
+
 ## Fast Path
 
 - **When:** small, well-defined changes — single manifest/Helm value bump or equivalent.
