@@ -47,6 +47,9 @@ Receive (Research Brief — already refined)
 [Implement] — dispatch backend-engineer AND/OR frontend-engineer directly
     │
     ▼
+[Simplicity Audit] — dispatch code-simplicity-auditor (Critical blocks Test)
+    │
+    ▼
     [Test] — dispatch test-engineer (test-auditor optional before this)
     │
     ▼
@@ -87,6 +90,32 @@ skill(name="pipeline-visibility")
 Receive a task from `team-lead`, from the user, or as a **Research Brief** (file path or summary). The task has already been refined by the `researcher` subagent — it has objective, scope, and definition of done. There is no separate Investigate step and NO researcher dispatch.
 
 If the task is still vague (no clear objective, scope, or definition of done), return `[BLOCK]` and tell the caller to run it through `researcher` first. Do NOT dispatch raw, unrefined requirements downstream.
+
+### Step 1.5: Work-Tree Audit (issue #35)
+
+Immediately after receiving the Brief, inspect the working tree before any design or implementation dispatch:
+
+```
+git status --short
+git diff --stat
+git log --oneline -5
+```
+
+**Read-only. No consent required.** This runs before `## Consent Check` because it touches no files.
+
+1. **Extract expected deliverables** from the Research Brief / tracking issue — file paths, issue numbers, or artifact names the task says it will produce.
+2. **Compare against the `git status` output.** A deliverable is **present** if its path appears in the modified (` M`), added (`??`), or staged (`M `) rows.
+3. **Do NOT block on unrelated dirty files** (local notes, scratch files, other issues' work). Only deliverable paths from *this* brief matter.
+4. **Emit a signal** and branch:
+
+| Signal | Condition | Next step |
+|---|---|---|
+| `WORK_PRESENT` | ≥1 expected deliverable already in the working tree | Skip Design + Implement; go straight to **verify → test → lint → review → security → docs**. Verify the existing code against the contract, do NOT re-implement. |
+| `WORK_ABSENT` | No expected deliverable found | Proceed normally from `## Step 2: Design`. |
+
+**Overhead:** a single `git status --short` call when work is absent. If `git` is unavailable or the tree is not a repo, emit `WORK_ABSENT` and continue — the audit degrades gracefully, it never blocks.
+
+**Handover:** include the signal in the `PIPELINE STAGE` field (e.g. `audit:WORK_PRESENT → verify → test → lint → review [COMPLETE]`).
 
 ## Consent Check (direct path only)
 
@@ -138,6 +167,29 @@ subagent(
 **Do NOT pass:** The other half of the contract, the architect's internal reasoning, your own routing decisions.
 
 **Integration check (now performed here, previously by the removed integrator role):** After workers return, verify that the backend endpoint matches the frontend's fetch call, and that request/response shapes are consistent between the two halves. If there's a mismatch, forward the specific discrepancy to the responsible engineer for a targeted fix.
+
+## Step 3.5: Code Simplicity Audit (dispatch code-simplicity-auditor)
+
+Once implementation (and integration) looks correct, dispatch `code-simplicity-auditor` before testing:
+
+```
+subagent(
+  description="Audit simplicity for <feature>",
+  prompt="<changed files/diffs + original contract>",
+  agent="code-simplicity-auditor"
+)
+```
+
+**Pass:** Changed files/diffs, original contract, direct import graph for contextual window.
+**Do NOT pass:** Full conversation history, raw tool outputs.
+
+**Role:** Advisory read-only audit for unnecessary complexity, over-abstraction, duplication, and cleanup opportunities. Loads `kiss`, `ponytail`, `dry`, `yagni` skills.
+
+**Severity handling:**
+- **Critical** findings block progression to `test-engineer`. Route findings back to the responsible engineer(s) for a targeted fix.
+- **Warning/Nit** findings are advisory; proceed to test with findings attached.
+
+**Simplicity rework tracking:** Track with separate counter `SIMPLICITY_REWORK_COUNT: N`. Max 2 + escalation applies to this counter independently of global `REWORK_COUNT`. Re-run `code-simplicity-auditor` after fix lands before advancing to test.
 
 ## Step 4: Test (dispatch test-engineer)
 

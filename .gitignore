@@ -6,3 +6,7 @@ opencode/.config/opencode/openviking/
 opencode/.config/opencode/opencode-agent-tmux/update-state.json
 # opencode serve runtime password (regenerated on every start) — never commit
 opencode/.config/opencode/service.json
+# local dev plugins (not meant to be tracked)
+opencode/.config/opencode/plugins/eval/
+opencode/.config/opencode/plugins/hermes.js.disabled
+opencode/.config/opencode/plugins/src/
