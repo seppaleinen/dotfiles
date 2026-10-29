@@ -393,6 +393,7 @@
     <a href="#layout">Folders</a>
     <a href="#tree">Delegation flow</a>
     <a href="#approval">Approval Gate</a>
+    <a href="#loop">Loop Orchestrator</a>
     <a href="#handover">Handover</a>
     <a href="#outside">Outside this chain</a>
   </nav>
@@ -465,6 +466,7 @@
       <pre class="folders">agents/
   readme.html                 ← this overview (HTML, not an agent)
   team-lead.md                primary · default_agent
+  loop-orchestrator.md        opt-in loop agent · runs the queue unattended
   researcher.md               unified intake + investigation
   web-scout.md                internet identity · subagent of researcher
   docs.md                     ADRs · PR · changelog · shared by both pipelines
@@ -507,6 +509,7 @@
         <div class="col">
           <span class="note">You talk here</span>
           <button class="node lead" data-agent="team-lead" type="button"><span class="id">team-lead</span><span class="role">classify · dispatch lead</span></button>
+          <button class="node lead" data-agent="loop-orchestrator" type="button"><span class="id">loop-orchestrator</span><span class="role">run the queue unattended</span></button>
         </div>
         <span class="arrow" aria-hidden="true">→</span>
         <div class="col">
@@ -645,6 +648,56 @@
       </ol>
     </section>
 
+    <section id="loop">
+      <h2>Loop Orchestrator</h2>
+      <p>
+        <code>loop-orchestrator</code> is an opt-in primary agent that runs the queue unattended.
+        It sits above <code>team-lead</code> and dispatches it for each issue — it never writes code.
+        Start it with <code>opencode --agent loop-orchestrator</code> in any repo that has the agent.
+      </p>
+      <div class="grid-2">
+        <article class="card">
+          <span class="tag lead">Does</span>
+          <h3>Run the queue</h3>
+          <p>Picks open GitHub issues, ranks them (priority labels → bug labels → oldest first), and dispatches <code>team-lead</code> for each. Runs until the queue is empty, the budget is exhausted, or a task escalates.</p>
+        </article>
+        <article class="card">
+          <span class="tag support">Does not</span>
+          <h3>Ask you in chat</h3>
+          <p>Never blocks on user input mid-loop. When a task needs a decision, it comments on the GitHub issue and moves on. It only stops and reports to you on escalation (max reworks, stuck, or budget).</p>
+        </article>
+      </div>
+      <h3>How it works</h3>
+      <ol class="session">
+        <li>You start it: <code>opencode --agent loop-orchestrator</code>.</li>
+        <li>It presents the loop config (max wall clock, max tasks, selection policy) and asks for one approval.</li>
+        <li>It selects the next issue, skipping any with <code>wontfix</code>/<code>duplicate</code>/<code>waiting</code>/<code>needs-input</code> labels, or any whose last comment contains the agent marker.</li>
+        <li>It dispatches <code>team-lead</code> with the issue. The first task goes through the normal Approval Gate; subsequent tasks auto-run within budget.</li>
+        <li>On <code>[SUCCESS]</code>: runs <code>post-mortem-analyst</code>, lets <code>devops-cleanup</code> close the issue, comments on it, and continues.</li>
+        <li>On <code>[BLOCK]</code>: comments on the issue with what's needed, skips it, and continues.</li>
+        <li>On <code>[REWORK]</code> ×2 or <code>[STUCK]</code>: comments on the issue and stops, escalating to you.</li>
+        <li>After each task it checks budget: 3 hours wall clock or 10 tasks — whichever comes first.</li>
+      </ol>
+      <h3>Per-repo, not global</h3>
+      <p>
+        One loop per repo. Each repo's session has its own cwd, git context, and Hindsight knowledge pages.
+        To run loops across repos, start a separate <code>opencode --agent loop-orchestrator</code> session
+        in each repo (or a small launch script that does it for you).
+      </p>
+      <h3>State</h3>
+      <p>
+        The loop writes <code>.opencode/loop-state.json</code> after every task — tasks run, blocked issues,
+        post-mortem findings, and stop reason. This survives context compaction and lets you see what the
+        loop accomplished. Restart in the same repo to skip already-processed issues and continue.
+      </p>
+      <h3>Dry run</h3>
+      <p>
+        Say <em>"dry run"</em> or <em>"what would you pick"</em> and the orchestrator runs the selection
+        algorithm without dispatching <code>team-lead</code>. It prints a table of what it would process,
+        the config in effect, and the budget state.
+      </p>
+    </section>
+
     <section id="handover">
       <h2>How agents talk</h2>
       <p>Every specialist returns the handover protocol (signal, not the raw log dump). <code>team-lead</code> then translates that into a human summary and keeps a TRACE of the chain.</p>
@@ -747,6 +800,10 @@
       "docs": {
         title: "docs",
         blurb: "Technical documentation writer — ADRs, PR descriptions, changelogs, and user-facing docs. Dispatched by both pipeline leads after verification returns [SUCCESS]. Lives at top level as agents/docs.md, shared across pipelines."
+      },
+      "loop-orchestrator": {
+        title: "loop-orchestrator",
+        blurb: "Opt-in unattended loop agent. Runs up to 3 hours or 10 tasks (whichever comes first), dispatching team-lead for each GitHub issue in priority→bug→oldest order. Comments on GitHub instead of asking in chat, skips issues where the agent commented last, and runs post-mortem-analyst after each task. One repo per loop — start a separate session per repo."
       },
       "__approval-gate": {
         title: "Approval Gate",

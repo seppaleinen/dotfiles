@@ -135,8 +135,10 @@ Install copies **OKF bundle files only** — `catalog.yaml` and `README.md` stay
 
 | File | Purpose |
 |---|---|
-| `~/.agents/knowledge/registry.json` | Installed knowledge metadata + `install_path` + `profile` + `concepts` (user scope) |
-| `.agents/knowledge/registry.json` | Installed knowledge metadata + `install_path` + `profile` + `concepts` (project scope) |
+| `~/.agents/knowledge/registry.json` | Installed knowledge metadata + `install_path` + `profile` + `concepts_index` (user scope) |
+| `.agents/knowledge/registry.json` | Installed knowledge metadata + `install_path` + `profile` + `concepts_index` (project scope) |
+| `.agents/knowledge/concepts/<name>.json` | Concept list (`id`, `title`, `description`, `tags`) for one entry, beside each `registry.json` |
+| `.agents/knowledge/scope.yaml` | Repo scope for user-level knowledge (`all`, `none`, or a list of names); set with `aza-market config knowledge-scope` |
 | `{install_path}/index.md` | OKF bundle entry when present — skim for navigation |
 | `{install_path}/<concept>.md` | OKF concept files with YAML frontmatter |
 

@@ -1,61 +1,50 @@
 ---
 name: knowledge-lookup
 description: >-
-  Check whether org knowledge exists for the domain or technology in play
-  (security, a framework like Apollo, a platform, a business domain). Use at
-  the start of non-trivial work, when the knowledge-discovery rule nudges you,
-  when another skill defers here, or whenever you would otherwise rely on
-  general model knowledge for a domain that an org team might have documented.
+  Loads installed org knowledge (security requirements, platform conventions,
+  domain rules). Use when the task depends on an org standard the repository
+  and current context do not answer, or an instruction names a knowledge
+  entry or cites `[ref: <name>]`. Not for general programming work.
+compatibility: Catalog search requires the aza-market CLI.
 ---
 
 # Knowledge Lookup
 
-Find and load relevant org knowledge before relying on general model knowledge.
+Load only what the task needs. Stop as soon as you have enough.
 
-## Step 1 — Active set (installed)
+## Knowledge lists are exclusive
 
-Read the knowledge registry (user, then project if present; **project overrides user** on name collision):
+If your instructions list knowledge (`Knowledge: <paths or entry names>`), load only that: read paths directly and resolve names with Step 1. Do not browse the registry or search the catalog. `Knowledge: none` means load nothing.
 
-- `~/.agents/knowledge/registry.json`
-- `.agents/knowledge/registry.json` in the workspace repo
+When you delegate after loading knowledge, list the concept file paths you loaded under `Knowledge:` in the task packet and add "load no other org knowledge".
 
-For each entry, judge relevance from `tags`, `title`, and `description` against the current task.
+## Delegated agents
 
-### OKF bundles (`profile: bundle`)
+On a bounded task (for example one plan phase), use what the packet names. Run Steps 1–2 only for a concrete org-policy question the packet does not answer, and never Step 3. An agent whose task is to find the applicable guidance (for example a plan explorer) runs the full workflow.
 
-1. Read `{install_path}/index.md` when present — skim section headings and linked concept descriptions
-2. If the registry includes `concepts`, use `title`, `tags`, and `description` to pick matches without opening every file
-3. Load **only** the matched concept files under `{install_path}/`
-4. Follow cross-links one hop deep when a loaded concept references another
-5. Resolve OKF bundle-relative links: `/references/foo.md` → `{install_path}/references/foo.md`
+## Step 1 — Find entries
 
-### OKF handbooks (`profile: handbook`)
+Registries are `~/.agents/knowledge/registry.json` and `.agents/knowledge/registry.json` in the workspace. The project entry wins on a name collision.
 
-Read the concept file listed in `concepts` (or linked from `index.md` when present). For a single-concept handbook, load that file directly.
+- **Named entry** (or `[ref: <name>]`): use it directly, regardless of repo scope. If it is not installed, say so and consider Step 3.
+- **Otherwise:** if the workspace has `.agents/knowledge/scope.yaml`, its `user_knowledge` limits user-level entries (`none`, a list of names, or `all`; missing file means `all`). Project entries always apply. Match on `title`, `tags`, and `description`. If none fits, go to Step 3 or stop.
 
-## Step 2 — Available knowledge (catalog), only on a gap
+## Step 2 — Load concepts
 
-If nothing in the active set covers the domain, search the catalog:
+1. Pick concepts from the entry's `concepts_index` file. Read `{install_path}/index.md` only when there is none or you need the bundle's structure.
+2. Load only the matched `{install_path}/<id>.md` files, never catalog source paths.
+3. Follow cross-links one hop deep, only when needed. `/references/foo.md` resolves to `{install_path}/references/foo.md`.
+
+## Step 3 — Catalog search (judgment call)
+
+Search only when nothing installed covers the need and the user asks about an org standard, or the task clearly hinges on one and getting it wrong would matter. One search per topic per session:
 
 ```bash
-aza-market search --type knowledge --not-installed --tag <domain>
 aza-market search --type knowledge <free-text>
-aza-market search --type knowledge              # full library; ✓ marks installed
 ```
 
-If a relevant hit is **not installed**, tell the user and suggest:
+Suggest `aza-market install <name>` (`--project` for this repo only) for relevant hits. Do not auto-install.
 
-```bash
-aza-market install <name>            # user level
-aza-market install <name> --project  # this repo only
-```
+## Step 4 — Report and cite
 
-Do **not** auto-install. Do **not** read from marketplace catalog source paths — only installed files under `{install_path}/`.
-
-## Step 3 — Transparency
-
-State which knowledge you loaded (names + why), which concepts you skipped, and any suggested installs. If both the registry and catalog search come up empty, say so.
-
-## Step 4 — Citing loaded knowledge
-
-Tag claims backed by loaded knowledge with `[ref: <name>]` using the registry `name` (e.g. `[ref: ai-first]`). When no matching knowledge or repo doc applies, use `[via model]`.
+Name loaded entries in one line; say nothing about knowledge when none applied unless asked. Tag claims backed by loaded knowledge with `[ref: <name>]`. When you looked for knowledge on an org-standard question and found none, tag the related claim `[via model]`.

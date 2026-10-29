@@ -6,7 +6,7 @@
   "session": {
     "sidebar": "auto",
     "scrollbar": false,
-    "thinking": "show"
+    "thinking": "hide"
   },
   "animations": true,
   "plugins": ["./herdr-opencode"]

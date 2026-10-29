@@ -2,7 +2,7 @@
 // managed by herdr; reinstalling or updating the integration overwrites this file.
 // add custom hooks/plugins beside this file instead of editing it.
 // HERDR_INTEGRATION_ID=opencode
-// HERDR_INTEGRATION_VERSION=12
+// HERDR_INTEGRATION_VERSION=13
 
 import net from "node:net";
 
@@ -17,10 +17,10 @@ let reportedRootSessionID;
 const childSessions = new Map();
 const CHILD_EVENT_STATES = new Map([
   ["permission.asked", "blocked"],
-  ["form.created", "blocked"],
+  ["question.asked", "blocked"],
   ["permission.replied", "working"],
-  ["form.replied", "working"],
-  ["form.cancelled", "working"],
+  ["question.replied", "working"],
+  ["question.rejected", "working"],
 ]);
 
 function nextReportSeq() {
@@ -28,9 +28,9 @@ function nextReportSeq() {
   return reportSeq;
 }
 
-function sessionIDFromData(data) {
-  return typeof data?.sessionID === "string" && data.sessionID
-    ? data.sessionID
+function sessionIDFromProperties(properties) {
+  return typeof properties?.sessionID === "string" && properties.sessionID
+    ? properties.sessionID
     : undefined;
 }
 
@@ -86,11 +86,7 @@ function requestOnce(method, params) {
 
   return new Promise((resolve) => {
     const client = net.createConnection(socketEndpoint, () => {
-      try {
-        client.write(`${JSON.stringify(request)}\n`);
-      } catch {
-        finish();
-      }
+      client.write(`${JSON.stringify(request)}\n`);
     });
 
     const finish = () => {
@@ -122,41 +118,45 @@ function reportState(state, sessionID) {
   return request("pane.report_agent", params);
 }
 
-// V1 (1.18.29+) called server(). V2 calls setup(ctx) instead. Its shared server
-// cannot attribute sessions using its process environment: the pane-local TUI
-// owns both selection and lifecycle reporting there, including remote servers.
-export default {
-  id: "herdr.opencode",
-  setup(ctx) {
-    if (
-      process.env.HERDR_ENV !== "1" ||
-      !process.env.HERDR_SOCKET_PATH ||
-      !process.env.HERDR_PANE_ID
-    ) {
-      return;
-    }
+function ownsLocalLifecycle() {
+  const args = process.argv.slice(2);
+  const separator = args.indexOf("--");
+  if (separator !== -1) args.splice(separator);
+  if (args.some((arg) => arg === "--attach" || arg.startsWith("--attach="))) return false;
+  while (args[0] === "--print-logs" || args[0] === "--log-level" || args[0]?.startsWith("--log-level=")) {
+    args.splice(0, args[0] === "--log-level" ? 2 : 1);
+  }
+  // These local clients have no TUI plugin. Shared servers and the TUI worker
+  // cannot identify their attached panes; their lifecycle belongs to each TUI.
+  return args[0] === "run" ||
+    (!["serve", "web", "attach"].includes(args[0]) && args.includes("--mini"));
+}
 
-    ctx.session.hook("prompt", async ({ sessionID }) => {
+export const HerdrAgentStatePlugin = async () => {
+  if (
+    !ownsLocalLifecycle() ||
+    process.env.HERDR_ENV !== "1" ||
+    !process.env.HERDR_SOCKET_PATH ||
+    !process.env.HERDR_PANE_ID
+  ) {
+    return {};
+  }
+
+  return {
+    "chat.message": async ({ sessionID }) => {
       if (sessionID && childSessions.has(sessionID)) {
         return;
       }
       await reportState("working", sessionID);
-    });
-
-    const onToolTurn = async (e) => {
-      await reportState("working", e.sessionID);
-    };
-    ctx.tool.hook("execute.before", onToolTurn);
-    ctx.tool.hook("execute.after", onToolTurn);
-
-    const onEvent = async (event) => {
+    },
+    event: async ({ event }) => {
       const type = event?.type;
-      const data = event?.data ?? {};
-      const sessionID =
-        type === "form.created" ? sessionIDFromData(data.form) : sessionIDFromData(data);
+      const properties = event?.properties ?? {};
+      const sessionID = sessionIDFromProperties(properties);
 
-      if (data.sessionID && data.parentID) {
-        childSessions.set(data.sessionID, data.parentID);
+      const info = properties.info;
+      if (info?.id && info.parentID) {
+        childSessions.set(info.id, info.parentID);
       }
       if (sessionID && childSessions.has(sessionID)) {
         const state = CHILD_EVENT_STATES.get(type);
@@ -176,13 +176,13 @@ export default {
           // TUI plugin separately reports the root selected in this pane.
           reportedRootSessionID = sessionID;
           break;
-        case "session.renamed":
+        case "session.updated":
           if (sessionID && sessionID !== reportedRootSessionID) {
             await reportSession(sessionID);
           }
           break;
         case "session.status": {
-          const state = stateFromSessionStatus(data.status);
+          const state = stateFromSessionStatus(properties.status);
           if (state) {
             await reportState(state, sessionID);
           } else {
@@ -190,15 +190,17 @@ export default {
           }
           break;
         }
+        case "tool.execute.before":
+        case "tool.execute.after":
         case "permission.replied":
-        case "form.replied":
-        case "form.cancelled":
-        case "session.compaction.ended":
+        case "question.replied":
+        case "question.rejected":
+        case "session.compacted":
           await reportState("working", sessionID);
           break;
         case "permission.asked":
-        case "form.created":
-        case "session.execution.failed":
+        case "question.asked":
+        case "session.error":
           await reportState("blocked", sessionID);
           break;
         case "session.idle":
@@ -209,14 +211,14 @@ export default {
         default:
           break;
       }
-    };
+    },
+  };
+};
 
-    const controller = new AbortController();
-    void (async () => {
-      for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
-        await onEvent(event);
-      }
-    })().catch(() => {});
-    return () => controller.abort();
-  },
+// V1 local run/Mini retain their server hooks. V1/V2 full TUIs own both
+// selection and lifecycle, including when attached to a shared remote server.
+export default {
+  id: "herdr.opencode",
+  server: HerdrAgentStatePlugin,
+  setup() {},
 };
