@@ -221,7 +221,32 @@ Rework inside the approved scope needs no new approval — `## Rework Handling` 
 
 Load `rework-handling` for the mandatory `task_id` capture table and the empty-result validation rule. Both are enforced on every `subagent()` call.
 
-Once the dispatched agent returns, check the STATUS field:
+Load `delegation-contract` for the Handover Validation contract, including the empty-result detection and diagnostic-before-retry rule (issue #36).
+
+#### Empty-Result Validation (BEFORE STATUS check)
+
+Before reading the STATUS field, validate the result is non-empty and structurally complete. This check runs **first** — a result that fails it never reaches the STATUS dispatch table below.
+
+1. **Non-empty check.** The result body must contain at least one non-whitespace character. An empty string, a bare error envelope, or a result containing only a session-ID wrapper with no handover body is **EMPTY**.
+2. **Field-presence check.** The result must contain the required handover fields — **STATUS**, **TRACE**, and **PIPELINE STAGE** — before any STATUS value is read. Missing TRACE or PIPELINE STAGE is **INCOMPLETE** → reject as an incomplete handover and request a complete one before proceeding.
+3. **Log every empty result.** Record `sessionID`, the raw error/transport message, and a UTC timestamp. Surface this in the handover's TECHNICAL PAYLOAD so post-mortem can trace it.
+
+**On EMPTY or ABORTED result — diagnostic-before-retry:**
+
+Do NOT count a retry until the provider/transport diagnostic has been run:
+
+1. Run the diagnostic (issue #21 protocol):
+   - DNS: `dig +short litellm.labb.site`
+   - HTTP: `curl -sSf https://litellm.labb.site/v1/models > /dev/null` (or `opencode models` to verify the live daemon)
+2. **Both pass** → likely transient. Auto-retry once with `sessionID="$LAST_TASK_ID"` (per `rework-handling`). Counts toward max-2.
+3. **Either fails** → backend unavailable. **Do NOT retry.** Escalate to the user with the diagnostic output. Return `[STUCK]` with the diagnostic payload.
+4. **Diagnostic itself errors** (command unavailable or times out) → treat as failed: do NOT retry; escalate with the diagnostic error.
+
+This extends — not replaces — the Provider/Transport Diagnostic (issue #21) below, which already covers explicit transport errors. Empty results now trigger the same diagnostic gate before any retry is counted.
+
+#### STATUS Dispatch Table
+
+Once the result passes empty-result validation, check the STATUS field:
 - `[SUCCESS]` → proceed to Step 3 (synthesis)
 - `[REWORK]` → re-dispatch with `sessionID="$LAST_TASK_ID"` and error context appended (max 2 retries)
 - `[BLOCK]` → present to user with full context
@@ -247,6 +272,8 @@ After any pipeline lead returns `[SUCCESS]`, run this gate **before** accepting 
 3. **Fast Path skip of design.** If the design stage is marked SKIPPED (Fast Path), the handover must include a Fast-Path justification naming the change class and citing the Research Brief's findings. Without one: reject.
 
 4. **Skip of verification stage.** If the verification stage is marked SKIPPED, the handover must include a `SKIP_VERIFIED: <reason>` marker in the STATUS block. Without one: reject. With one: surface the skip to the user for explicit acceptance before proceeding. `devops-verificator` is never skippable per `devops-team-lead.md` — a skip here is a policy violation and is always a `[BLOCK]`.
+
+5. **Environment-stripping check for deferred-import scripts.** For any deliverable script that has deferred imports inside a try/except (e.g. `from sqlalchemy import create_engine` inside a try/except) and depends on optional dependencies (DBAPI drivers, cloud SDKs, LLM clients), run the script in a stripped environment (missing the optional dep) and verify the graceful path fires: exit code matches expectation, expected message on stdout, no traceback. Use `scripts/verify-graceful-exit.sh` (see below) or an equivalent in-process block. If the script lacks a graceful path for the missing dep, reject: `[BLOCK]` with the observed failure.
 
 ### Gate execution
 

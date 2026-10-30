@@ -32,10 +32,11 @@ If a dispatched agent returns empty, errors, or `[STUCK]`:
 Keep the **PIPELINE STAGE** field in your handover as the summary of record — it documents where the pipeline stopped and other tools read it:
 - Include a **PIPELINE STAGE** field showing which stages completed and where you stopped:
   ```
-  PIPELINE STAGE: design → implement → test → review [COMPLETE]
+  PIPELINE STAGE: stack:typescript → design → implement → test → lint → review [COMPLETE]
   ```
   Or on early stop:
   ```
-  PIPELINE STAGE: design → implement [STOPPED: test-engineer returned REWORK]
+  PIPELINE STAGE: stack:rust → design → implement [STOPPED: test-engineer returned REWORK]
   ```
+- The `stack:<language>` prefix MUST appear when the pipeline has completed (or attempted) stack context detection. If unknown, use `stack:unknown(inferred)`.
 - In your **SUMMARY**, mention which stage produced the final result.
