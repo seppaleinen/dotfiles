@@ -132,14 +132,17 @@
       "package": "@opencode/ai/providers/openai-compatible",
       "settings": {
         "apiKey": "heybaby",
-        "baseURL": "http://localhost:8081/v1"
+        "baseURL": "https://infermesh.labb.site/v1"
       },
       "models": {
         "qwen3.8-27b-gsq-rco": {
           "name": "qwen3.8-27b-gsq-rco"
         },
-        "qwen3-8b": {
-          "name": "qwen3-8b"
+        "ornith-1.5-35b-a3b-gsq-rco": {
+          "name": "ornith-1.5-35b-a3b-gsq-rco"
+        },
+        "openai/gpt-oss-20b": {
+          "name": "openai/gpt-oss-20b"
         }
       }
     },
@@ -154,8 +157,11 @@
         "ornith-1.5-35b-a3b-gsq-rco": {
           "name": "ornith-1.5-35b-a3b-gsq-rco"
         },
-        "swift-1.5-qwen3.8-27b-gsq-rco": {
-          "name": "swift-1.5-qwen3.8-27b-gsq-rco"
+        "swift-1.5-qwen3.8-27b-splash": {
+          "name": "swift-1.5-qwen3.8-27b-splash"
+        },
+        "swift-1.5-qwen3.8-27b-rco-dwq-mlx": {
+          "name": "swift-1.5-qwen3.8-27b-rco-dwq-mlx"
         }
       }
     },
