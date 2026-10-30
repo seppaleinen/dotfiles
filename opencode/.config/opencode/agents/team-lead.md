@@ -275,6 +275,10 @@ After any pipeline lead returns `[SUCCESS]`, run this gate **before** accepting 
 
 5. **Environment-stripping check for deferred-import scripts.** For any deliverable script that has deferred imports inside a try/except (e.g. `from sqlalchemy import create_engine` inside a try/except) and depends on optional dependencies (DBAPI drivers, cloud SDKs, LLM clients), run the script in a stripped environment (missing the optional dep) and verify the graceful path fires: exit code matches expectation, expected message on stdout, no traceback. Use `scripts/verify-graceful-exit.sh` (see below) or an equivalent in-process block. If the script lacks a graceful path for the missing dep, reject: `[BLOCK]` with the observed failure.
 
+6. **Verify working tree clean (issue #37).**
+   - Extract `WORKING_TREE_CLEAN` and `LAST_COMMIT` from the handover.
+   - If `WORKING_TREE_CLEAN` is false and `LAST_COMMIT` is missing or does not match the task deliverables → reject with `[BLOCK]`: "uncommitted changes — commit and push before reporting SUCCESS".
+
 ### Gate execution
 
 - If any mandatory stage is missing or invalid: return `[BLOCK]` with the gate trace, naming the missing stage and the exact dispatch needed to close it. Re-dispatch the pipeline lead with the gate trace appended.

@@ -240,6 +240,7 @@ Every mandatory stage must be recorded as **RAN** with a `task_id` from the `rew
 | 2 | Implement | `devops-engineer` | **Yes** | Feature branch pushed; PR created (Step 3.5); merge commit SHA recorded |
 | 3 | Verify | `devops-verificator` | **YES — NEVER SKIP** | `[SUCCESS]` from `devops-verificator` against the **merged** commit SHA (pre-merge SHA is not valid evidence) |
 | 4 | Security | `ai-security-auditor` | **Yes** | `[SUCCESS]` or a documented, accepted finding from the auditor |
+| 5 | Working tree clean | — | **Yes** | `git status --short` is empty or commit SHA recorded in handover (`LAST_COMMIT`) |
 
 ### Fast-path justification
 

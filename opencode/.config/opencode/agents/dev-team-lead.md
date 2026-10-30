@@ -216,6 +216,10 @@ subagent(
 **Pass to each worker:** Only the portion of the contract relevant to them.
 **Do NOT pass:** The other half of the contract, the architect's internal reasoning, your own routing decisions.
 
+### Frontend-Engineer Context Checklist (issue #28)
+
+When dispatching `frontend-engineer`, the prompt MUST include a `## Context Checklist` section completed from the project's `docs/frontend-engineer-brief-checklist.md`. Verify each section (tech stack specifics, component patterns, project conventions, asset/manifest conventions, accessibility, communication contracts) is either filled in with concrete values from the codebase or explicitly marked `N/A` with reason. A dispatch without this section is an incomplete brief — return `[BLOCK]` until it is completed.
+
 **Integration check (now performed here, previously by the removed integrator role):** After workers return, verify that the backend endpoint matches the frontend's fetch call, and that request/response shapes are consistent between the two halves. If there's a mismatch, forward the specific discrepancy to the responsible engineer for a targeted fix.
 
 ## Step 3.5: Code Simplicity Audit (dispatch code-simplicity-auditor)
@@ -363,9 +367,21 @@ subagent(
 
 **Ordering:** This stage runs **after** `code-reviewer` returns `[SUCCESS]` and **before** `team-lead` dispatches the post-verification agents (`devops-cleanup`, `post-mortem-analyst`).
 
+## Step 7b: Commit & Push (issue #37)
+
+Before returning `[SUCCESS]`, ensure the working tree is clean or changes are committed and pushed:
+
+1. Run `git status --short` and `git diff --stat`.
+2. If the working tree is dirty and the changes match the task deliverables:
+   - Stage files (do NOT stage unrelated changes)
+   - Commit with conventional format: `<type>(<scope>): <description>`
+   - Push to the feature branch
+3. Record `LAST_COMMIT: <sha>` in the handover Technical Payload.
+4. If the tree is dirty with unrelated changes, return `[BLOCK]` with the dirty file list.
+
 ## Step 8: Return Result
 
-Once `docs` returns, present the result to the caller (user, `team-lead`, or pipeline lead) using the Handover Protocol.
+Once `docs` returns and the working tree is clean/committed, present the result to the caller (user, `team-lead`, or pipeline lead) using the Handover Protocol.
 
 ## Step 9: Post-Verification Agents (dispatch by `team-lead` after `[SUCCESS]`)
 
