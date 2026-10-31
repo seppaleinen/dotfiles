@@ -269,6 +269,21 @@ After any pipeline lead returns `[SUCCESS]`, run this gate **before** accepting 
    | Verify | `test-engineer` **or** `code-reviewer` (at least one) | `devops-verificator` | **Yes** — never skip |
    | Security | `ai-security-auditor` | `ai-security-auditor` | **Yes** |
 
+2b. **PIPELINE STAGE ↔ TRACE consistency check (issue #41).** Every stage name listed in the `PIPELINE STAGE` field must have a matching agent entry in the `TRACE` line, and every agent in TRACE must correspond to a stage in PIPELINE STAGE. This is a mechanical cross-reference — an agent claiming a stage ran without dispatching it is a handover integrity violation.
+
+   **How to check:**
+   - Extract stage names from PIPELINE STAGE (e.g. `design → implement → verify → security`)
+   - Extract agent names from TRACE (e.g. `team-lead → dev-team-lead → dev-architect → backend-engineer → test-engineer → code-reviewer → ai-security-auditor`)
+   - Map each stage to its expected agent(s):
+     - `design` → `dev-architect` (or `devops-architect`)
+     - `implement` → `backend-engineer` / `frontend-engineer` (or `devops-engineer`)
+     - `verify` → `test-engineer` / `code-reviewer` (or `devops-verificator`)
+     - `security` → `ai-security-auditor`
+     - `docs` → `docs`
+   - **If a stage appears in PIPELINE STAGE but its agent is absent from TRACE** → `[BLOCK]`: "handover integrity violation: stage `<stage>` claimed in PIPELINE STAGE but `<agent>` not dispatched in TRACE"
+   - **If an agent appears in TRACE but its stage is absent from PIPELINE STAGE** → `[BLOCK]`: "handover integrity violation: `<agent>` dispatched in TRACE but no matching stage in PIPELINE STAGE"
+   - `team-lead` and `dev-team-lead` / `devops-team-lead` are routing agents, not pipeline stages — they are exempt from this check.
+
 3. **Fast Path skip of design.** If the design stage is marked SKIPPED (Fast Path), the handover must include a Fast-Path justification naming the change class and citing the Research Brief's findings. Without one: reject.
 
 4. **Skip of verification stage.** If the verification stage is marked SKIPPED, the handover must include a `SKIP_VERIFIED: <reason>` marker in the STATUS block. Without one: reject. With one: surface the skip to the user for explicit acceptance before proceeding. `devops-verificator` is never skippable per `devops-team-lead.md` — a skip here is a policy violation and is always a `[BLOCK]`.

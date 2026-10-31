@@ -21,6 +21,27 @@ Receive the merge commit SHA (post-merge, on `main`) and resource info from `dev
 
 ## Workflow
 
+### 0. Cluster Reachability Check (issue #42)
+
+Before running any cluster checks, verify the cluster is reachable from this environment:
+
+```
+kubectl cluster-info
+kubectl get nodes
+```
+
+- **If reachable:** proceed to check 1.
+- **If unreachable:** emit a structured `[BLOCK]` with reason `cluster_unreachable`:
+
+```
+STATUS: [BLOCK]
+REASON: cluster_unreachable
+ENDPOINT: <cluster API endpoint, e.g. https://192.168.1.95:6443>
+ERROR: <the actual error — connection refused, timeout, TLS handshake failure, etc.>
+```
+
+Do NOT attempt retries or fall back to alternative endpoints. The reachability failure is an environmental constraint, not a pipeline defect — surface it and let `devops-team-lead` decide whether to defer verification or proceed.
+
 ### 1. Check Flux Reconciliation
 
 ```
@@ -107,6 +128,7 @@ Return `[BLOCK]` if:
 - The cluster is in a degraded state
 - Multiple services are affected
 - Data integrity is at risk
+- **Cluster unreachable** (issue #42): emit `REASON: cluster_unreachable` with the endpoint and error. This is an environmental constraint, not a pipeline defect — surface it for `devops-team-lead` to decide.
 
 ### opencode service lifecycle (issue #25)
 

@@ -166,25 +166,26 @@ The feature branch pushed by `devops-engineer` is NOT verified against the live 
 
 ## Step 4: Verify (dispatch devops-verificator)
 
-If the implementation succeeded, call `devops-verificator`:
+After merge is confirmed on `main`, dispatch `devops-verificator` with the merge commit SHA:
 
 ```
 subagent(
   description="Verify cluster state for <task>",
-  prompt="<merge commit SHA and resource info>",
+  prompt="<merge commit SHA from git rev-parse main + resource info>",
   agent="devops-verificator"
 )
 ```
 
-If `devops-verificator` returns `[REWORK]` with diagnostic findings:
-- Forward the root cause analysis and evidence to `devops-engineer` for targeted fixes.
-- Do NOT re-dispatch to `devops-architect` unless the issue is architectural.
-- Max 2 verification cycles before escalating.
+**Pass:** The merge commit SHA (must be on `main`), resource info from the engineering brief.
+**Do NOT pass:** Pre-merge SHAs, raw kubectl dumps.
 
-### CI/Deploy Verification (Optional)
+**Cluster unreachable handling (issue #42):** If `devops-verificator` returns `[BLOCK]` with reason `cluster_unreachable`, this is an environmental constraint, not a pipeline defect. Offer two options:
+- **Defer:** "Cluster unreachable from this environment (endpoint: `<url>`). Should we mark verification as deferred and close the issue with a note for manual follow-up?"
+- **Proceed anyway:** "Verification blocked due to cluster unreachable. Should we proceed to security review and docs, noting that cluster verification was not performed?"
 
-- After verification passes, may optionally check CI/deployment (Flux reconciliation, GitHub Actions, cluster apply status); route failures back to `devops-engineer`.
-- **Must NOT block handover:** if CI/deploy tooling is unavailable or slow, return `[SUCCESS]` anyway; report CI/deploy status in the handover as informational, not a gate.
+**If `[REWORK]`:** Forward findings to `devops-engineer` for targeted fixes. Do NOT re-dispatch to `devops-architect` unless the issue is architectural. Max 2 verification cycles before escalating.
+
+**CI/Deploy Verification (Optional)** is informational only.
 
 ## Step 5: Security (dispatch `ai-security-auditor`)
 
@@ -252,15 +253,11 @@ Stage 1 (`devops-architect`) may be omitted **only** when the task is a small, w
 
 ### [SKIP_VERIFIED] marker (issue #8)
 
-If a lead skips `devops-verificator` (only allowed with a documented reason), the handover's STATUS block must include:
+**Note:** `devops-verificator` is **NEVER SKIPPABLE** per this pipeline — on the full path and on the Fast Path. A run that reaches the gate without a `devops-verificator` result fails the gate unconditionally.
 
-```
-SKIP_VERIFIED: <reason>
-```
+The `SKIP_VERIFIED` marker exists for the dev pipeline (`dev-team-lead.md`), where `test-engineer` or `code-reviewer` may be skipped with explicit user acceptance; it is recorded here for cross-pipeline consistency but should not be used in this pipeline.
 
-Without this marker, the skip is invisible to `team-lead`'s Post-Dispatch Gate and the handover is rejected as `[BLOCK]`.
-
-**Note:** `devops-verificator` is **NEVER SKIPPABLE** per this pipeline — on the full path and on the Fast Path. A run that reaches the gate without a `devops-verificator` `[SUCCESS]` fails the gate unconditionally. The `SKIP_VERIFIED` marker exists for the dev pipeline (`dev-team-lead.md`), where `test-engineer` or `code-reviewer` may be skipped with explicit user acceptance; it is recorded here for cross-pipeline consistency.
+**Cluster unreachable exception (issue #42):** `devops-verificator` may return `[BLOCK]` with reason `cluster_unreachable`. This is an environmental constraint, not a pipeline defect. The gate trace must record this and allow the lead to defer or proceed with user consent.
 
 ### Gate execution
 
