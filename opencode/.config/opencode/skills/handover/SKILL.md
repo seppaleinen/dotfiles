@@ -71,5 +71,26 @@ TRACE: team-lead → dev-team-lead → dev-architect → backend-engineer [SUCCE
 
 This field must be present for the handover to be complete.
 
-### 6. IMPORTANT NOTES (Optional)
+### 6. FAST_PATH_SKIP (Optional but recommended for Fast Path)
+
+When a stage is skipped via Fast Path, document it with structured fields:
+
+```
+FAST_PATH_SKIP:
+  skip_reason: <why the stage was skipped>
+  change_class: <scope of the change>
+  evidence_reference: <pointer to design/research that justifies the skip>
+```
+
+**Example:**
+```
+FAST_PATH_SKIP:
+  skip_reason: Single manifest update, design covered in Infra Findings
+  change_class: config tweak — Helm value change only
+  evidence_reference: Research Brief Infra Findings section 3.2
+```
+
+This documentation is critical for handover integrity validation and post-mortem analysis.
+
+### 7. IMPORTANT NOTES (Optional)
 Anything the next agent MUST know that doesn't fit above. Keep it brief.
