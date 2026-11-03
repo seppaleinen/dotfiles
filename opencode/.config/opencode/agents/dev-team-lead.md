@@ -49,18 +49,13 @@ Receive (Research Brief — already refined)
     │
     ▼
 [Design] — dispatch dev-architect for contracts
-     │
-     ▼
-[Plan Audit] — dispatch plan-auditor (contract only, no code; produces
-    spec-derived acceptance tests + gap report). Mandatory on full pipeline;
-    skippable on Fast Path (see Fast Path below).
     │
     ▼
 [Plan Audit] — dispatch plan-auditor (contract only, no code; produces
     spec-derived acceptance tests + gap report). Mandatory on full pipeline;
     skippable on Fast Path (see Fast Path below).
-     │
-     ▼
+    │
+    ▼
 [Implement] — dispatch backend-engineer AND/OR frontend-engineer directly
     │
     ▼
@@ -106,9 +101,8 @@ skill(name="delegation-contract")
 
 - **When:** small, well-defined fixes — single-file/small diff, clear objective and DoD.
 - **May skip:** `dev-architect` (design stage) and `plan-auditor`. Note `researcher` never re-runs here.
-- **Must run:** engineer (`backend-engineer`/`frontend-engineer`) → then `test-engineer` **OR** `code-reviewer` (at least one verification stage, mandatory).
-  - On Fast Path, `adversarial-tester` MAY be skipped, but is recommended for boundary-sensitive areas.
-- **May skip:** `test-auditor` (diagnostic-only, optional), `ai-security-auditor` (gate, optional on fast path), `docs` (documentation stage).
+- **Must run:** engineer (`backend-engineer`/`frontend-engineer`) → then `test-engineer` **OR** `code-reviewer` (at least one verification stage, mandatory). `adversarial-tester` MAY be skipped on Fast Path, but is recommended for boundary-sensitive areas.
+- **May skip:** `code-simplicity-auditor` (diagnostic-only, optional), `ai-security-auditor` (gate, optional on fast path), `docs` (documentation stage).
 - **Golden rule:** *May skip design, never skip verification.*
 - **Escape hatch:** when in doubt whether a task qualifies as "small", run the full pipeline from `## Step 2`.
 - **Fast Path governs pipeline stages, not consent** — `## Consent Check` still applies on the direct path.
@@ -189,6 +183,12 @@ Read-only work stays free: diagnosis, reading files, listing options. Do NOT run
 
 ## Step 2: Design (dispatch dev-architect)
 
+Load the `contract-analysis` skill to help dispatch `dev-architect` with clear contract requirements:
+
+```
+skill(name="contract-analysis")
+```
+
 ```
 subagent(
   description="Design contracts for <feature>",
@@ -200,7 +200,35 @@ subagent(
 **Pass:** The Research Brief (refined requirements, research findings), known constraints.
 **Do NOT pass:** Full conversation history, raw tool outputs.
 
-## Step 3: Implement (dispatch engineers)
+## Step 3: Plan Audit (dispatch plan-auditor)
+
+Load the `test-generation` skill for contract-to-test mapping:
+
+```
+skill(name="test-generation")
+```
+
+```
+subagent(
+  description="Audit contracts for <feature>",
+  prompt="<the architecture contract + test-generation skill context>",
+  agent="plan-auditor"
+)
+```
+
+**Pass:** The architecture contract from `dev-architect`, the `test-generation` skill context.
+**Do NOT pass:** Full conversation history, raw tool outputs.
+
+**Role:** Audit the contract for gaps and unspecified transitions, produce acceptance tests and gap report. Uses `contract-analysis` and `test-generation` skills.
+
+**Retention measurement (issue #44):** Track findings classified as:
+```
+FINDINGS_CLASSIFIED: gaps=<n> unspecified_transitions=<n> high_severity=<n> confirmed_by_lead=<n>
+```
+
+After 3-5 pipeline runs, if `high_severity=0`, the stage is a candidate for demotion to optional.
+
+## Step 4: Implement (dispatch engineers)
 
 ### Dispatch result hygiene
 
@@ -211,7 +239,7 @@ Once the architect returns a contract, dispatch `backend-engineer` AND/OR `front
 - If the contract spans only backend: dispatch `backend-engineer`.
 - If it spans only frontend: dispatch `frontend-engineer`.
 - If it genuinely spans both, dispatch BOTH in parallel in a single message, passing each only the appropriate half of the contract.
-- If it spans neither (no code changed): skip Step 3/4 and go straight to review.
+- If it spans neither (no code changed): skip Step 4/5 and go straight to review.
 
 ```
 subagent(
@@ -236,7 +264,7 @@ When dispatching `frontend-engineer`, the prompt MUST include a `## Context Chec
 
 **Integration check (now performed here, previously by the removed integrator role):** After workers return, verify that the backend endpoint matches the frontend's fetch call, and that request/response shapes are consistent between the two halves. If there's a mismatch, forward the specific discrepancy to the responsible engineer for a targeted fix.
 
-## Step 3.5: Code Simplicity Audit (dispatch code-simplicity-auditor)
+## Step 5: Code Simplicity Audit (dispatch code-simplicity-auditor)
 
 Once implementation (and integration) looks correct, dispatch `code-simplicity-auditor` before testing:
 
@@ -259,7 +287,7 @@ subagent(
 
 **Simplicity rework tracking:** Track with separate counter `SIMPLICITY_REWORK_COUNT: N`. Max 2 + escalation applies to this counter independently of global `REWORK_COUNT`. Re-run `code-simplicity-auditor` after fix lands before advancing to test.
 
-## Step 4: Test (dispatch test-engineer AND adversarial-tester in parallel)
+## Step 6: Test (dispatch test-engineer AND adversarial-tester in parallel)
 
 Once implementation (and integration) looks correct, dispatch both `test-engineer` and `adversarial-tester` simultaneously:
 
@@ -285,35 +313,7 @@ Both must return `[SUCCESS]` before proceeding to lint. If either returns `[REWO
 
 **Note:** `plan-auditor` (Step 3) may also produce spec-derived acceptance tests. Those are stored separately; `test-engineer` imports/regenerates them if needed. Do NOT merge test files between `plan-auditor` and `test-engineer` without explicit coordination.
 
-After `test-engineer` returns `[SUCCESS]`, run the lint gate before code review. The command comes from the language skill loaded in `## Step 1.6` — do not hardcode a specific linter.
-
-```
-$ LINT_CMD
-```
-
-**Examples by language** (set by the loaded skill):
-
-| Language | `LINT_CMD` |
-|----------|-----------|
-| TypeScript | `pnpm lint` (ESLint) |
-| Python | `ruff check .` (or `uv tool run ruff check .`) |
-| Rust | `cargo clippy --all-targets --all-features -- -D warnings` |
-| Go | `golangci-lint run` |
-
-**Pass:** The command string from the language skill. Do not pass full conversation history or raw tool outputs beyond the lint result.
-
-**Role:** Catch dead code, unused imports/variables, syntax errors, and other lint violations. Config paths come from the language skill (e.g. `.eslintrc`, `pyproject.toml` → `[tool.ruff]`, `Cargo.toml`, `.golangci.yml`).
-
-**Ordering:** This stage runs **after** `test-engineer` returns `[SUCCESS]` and **before** `code-reviewer`.
-
-**On findings:**
-- If lint passes (no errors): proceed to code review.
-- If lint fails: fix the violations in the source files, then re-run `LINT_CMD`. Include the lint output in the handover.
-- Only proceed to code review once lint passes.
-
-**Fallback:** if `LINT_CMD` is not set (unknown stack with no skill), attempt `make lint` if a `Makefile` exists, or skip with a `SKIP_VERIFIED: "no LINT_CMD for stack <language>"` marker in the STATUS block. Surface the skip to the user for explicit acceptance.
-
-## Step 4b: Lint (run `LINT_CMD` from the loaded language skill)
+## Step 7: Lint (run `LINT_CMD` from the loaded language skill)
 
 After both `test-engineer` AND `adversarial-tester` return `[SUCCESS]`, run the lint gate before code review. The command comes from the language skill loaded in `## Step 1.6` — do not hardcode a specific linter.
 
@@ -343,7 +343,7 @@ $ LINT_CMD
 
 **Fallback:** if `LINT_CMD` is not set (unknown stack with no skill), attempt `make lint` if a `Makefile` exists, or skip with a `SKIP_VERIFIED: "no LINT_CMD for stack <language>"` marker in the STATUS block. Surface the skip to the user for explicit acceptance.
 
-## Step 5: Review (dispatch code-reviewer)
+## Step 8: Review (dispatch code-reviewer)
 
 Once `test-engineer` returns, dispatch `code-reviewer`:
 
@@ -363,7 +363,7 @@ subagent(
 - After review passes, may optionally verify CI/deployment (check CI runs, smoke-test deployed app); coordinate fixes back through the responsible worker.
 - **Must NOT block handover:** if CI/deploy tooling is unavailable or slow, return `[SUCCESS]` anyway; report CI/deploy status in the handover as informational, not a gate.
 
-## Step 6: Security (dispatch `ai-security-auditor`)
+## Step 9: Security (dispatch `ai-security-auditor`)
 
 After `code-reviewer` returns `[SUCCESS]`, dispatch `ai-security-auditor` for a dedicated vulnerability pass before docs:
 
@@ -384,7 +384,7 @@ subagent(
 
 **On findings:** Return `[REWORK]` with the specific vulnerability locations and forward to the responsible engineer for a targeted fix. Re-run `code-reviewer` after the fix lands.
 
-## Step 7: Docs (dispatch `docs`)
+## Step 10: Docs (dispatch `docs`)
 
 Once verification returns `[SUCCESS]`, dispatch `docs` to produce documentation artifacts before the post-verification stage:
 
@@ -416,8 +416,11 @@ Before presenting the final result, verify the handover integrity:
 - Extract agent names from TRACE (e.g. `team-lead → dev-team-lead → dev-architect → backend-engineer → test-engineer → code-reviewer → ai-security-auditor`)
 - Map each stage to its expected agent(s):
   - `design` → `dev-architect`
+  - `plan-audit` → `plan-auditor`
   - `implement` → `backend-engineer` / `frontend-engineer`
-  - `verify` → `test-engineer` / `code-reviewer`
+  - `test` → `test-engineer` / `adversarial-tester`
+  - `lint` → (system stage, no agent)
+  - `review` → `code-reviewer`
   - `security` → `ai-security-auditor`
   - `docs` → `docs`
 - `team-lead` and `dev-team-lead` are routing agents, not pipeline stages — they are exempt from this check.
@@ -430,19 +433,7 @@ Before presenting the final result, verify the handover integrity:
 - All checks must pass for the handover to proceed.
 - A `[BLOCK]` return here is NOT a `[SUCCESS]` — surface it to the caller.
 
-## Step 7b: Commit & Push (issue #37)
-
-Before returning `[SUCCESS]`, ensure the working tree is clean or changes are committed and pushed:
-
-1. Run `git status --short` and `git diff --stat`.
-2. If the working tree is dirty and the changes match the task deliverables:
-   - Stage files (do NOT stage unrelated changes)
-   - Commit with conventional format: `<type>(<scope>): <description>`
-   - Push to the feature branch
-3. Record `LAST_COMMIT: <sha>` in the handover Technical Payload.
-4. If the tree is dirty with unrelated changes, return `[BLOCK]` with the dirty file list.
-
-## Step 8: Return Result
+## Step 11: Return Result
 
 Once `docs` returns and the working tree is clean/committed, present the result to the caller (user, `team-lead`, or pipeline lead) using the Handover Protocol.
 
