@@ -45,7 +45,21 @@ REWORK_COUNT: N | KILLED_BY_RESTART: M
 - `KILLED_BY_RESTART`: Number of times a subagent was cancelled by an external opencode service restart (per `rework-handling` skill). Independent of REWORK_COUNT.
 
 ### 2. SUMMARY
+
 A high-level, one-paragraph description of what was achieved or why it failed. The downstream agent should understand the outcome without reading anything else.
+
+#### TLDR (issue #54)
+
+A brief summary for quick understanding of review outcomes:
+
+```
+TLDR: <30-word summary of approval status, key changes, and next action>
+```
+
+**Examples:**
+- `TLDR: Approved. 3 nit fixes recommended. Ready to merge after addressing comments.`
+- `TLDR: REWORK. Missing error handling in 2 functions. Add try/catch before re-review.`
+- `TLDR: [BLOCK] Critical security issue found. Hardcoded secret in config.yaml line 42.`
 
 ### 3. RATIONALE
 The "why" behind decisions, changes, or failures. This is critical for the next agent to understand intent.
