@@ -6,9 +6,11 @@ permission:
   task:
     "*": deny
     "dev-architect": allow
+    "plan-auditor": allow
     "backend-engineer": allow
     "frontend-engineer": allow
     "test-engineer": allow
+    "adversarial-tester": allow
     "code-reviewer": allow
     "code-simplicity-auditor": allow
     "ai-security-auditor": allow
@@ -47,15 +49,26 @@ Receive (Research Brief — already refined)
     │
     ▼
 [Design] — dispatch dev-architect for contracts
+     │
+     ▼
+[Plan Audit] — dispatch plan-auditor (contract only, no code; produces
+    spec-derived acceptance tests + gap report). Mandatory on full pipeline;
+    skippable on Fast Path (see Fast Path below).
     │
     ▼
+[Plan Audit] — dispatch plan-auditor (contract only, no code; produces
+    spec-derived acceptance tests + gap report). Mandatory on full pipeline;
+    skippable on Fast Path (see Fast Path below).
+     │
+     ▼
 [Implement] — dispatch backend-engineer AND/OR frontend-engineer directly
     │
     ▼
 [Simplicity Audit] — dispatch code-simplicity-auditor (Critical blocks Test)
     │
     ▼
-    [Test] — dispatch test-engineer (test-auditor optional before this)
+    [Test] — dispatch test-engineer AND adversarial-tester in PARALLEL
+    (test-auditor optional before this)
     │
     ▼
     [Lint] — run LINT_CMD from the loaded language skill (issue #40)
@@ -92,8 +105,9 @@ skill(name="delegation-contract")
 ## Fast Path
 
 - **When:** small, well-defined fixes — single-file/small diff, clear objective and DoD.
-- **May skip:** `dev-architect` (design stage). Note `researcher` never re-runs here.
+- **May skip:** `dev-architect` (design stage) and `plan-auditor`. Note `researcher` never re-runs here.
 - **Must run:** engineer (`backend-engineer`/`frontend-engineer`) → then `test-engineer` **OR** `code-reviewer` (at least one verification stage, mandatory).
+  - On Fast Path, `adversarial-tester` MAY be skipped, but is recommended for boundary-sensitive areas.
 - **May skip:** `test-auditor` (diagnostic-only, optional), `ai-security-auditor` (gate, optional on fast path), `docs` (documentation stage).
 - **Golden rule:** *May skip design, never skip verification.*
 - **Escape hatch:** when in doubt whether a task qualifies as "small", run the full pipeline from `## Step 2`.
@@ -245,39 +259,31 @@ subagent(
 
 **Simplicity rework tracking:** Track with separate counter `SIMPLICITY_REWORK_COUNT: N`. Max 2 + escalation applies to this counter independently of global `REWORK_COUNT`. Re-run `code-simplicity-auditor` after fix lands before advancing to test.
 
-## Step 4: Test (dispatch test-engineer)
+## Step 4: Test (dispatch test-engineer AND adversarial-tester in parallel)
 
-Once implementation (and integration) looks correct, call `test-engineer`:
+Once implementation (and integration) looks correct, dispatch both `test-engineer` and `adversarial-tester` simultaneously:
 
 ```
 subagent(
-  description="Test <feature>",
+  description="Verify <feature>",
   prompt="<the implementation + expected behavior>",
   agent="test-engineer"
 )
-```
 
-If the contract spans neither backend nor frontend (no code changed), this step is on a case-by-case basis.
-
-### Test-Audit (Optional, dispatch `test-auditor`)
-
-`test-auditor` is a **diagnostic-only** pass — it finds missing test cases, weak assertions, and structural gaps, but does **not** implement or fix anything. It produces a gap matrix and TODO list.
-
-Dispatch it **before** `test-engineer` when the test suite is new or suspected weak:
-
-```
 subagent(
-  description="Audit test quality for <feature>",
-  prompt="<existing tests + production code>",
-  agent="test-auditor"
+  description="Adversarial test for <feature>",
+  prompt="<the implementation + contract>",
+  agent="adversarial-tester"
 )
 ```
 
-**Do NOT pass:** Full conversation history, raw tool outputs.
+Both dispatch the test framework and test files to the project's test location, using distinct naming conventions to avoid collision:
+- `test-engineer` uses the project's standard test patterns (e.g. `*.test.ts`, `tests/unit/`)
+- `adversarial-tester` uses distinct naming (e.g. `*.adversarial.test.ts`, `tests/adversarial/`)
 
-**Routing rule:** `test-auditor` diagnoses; `test-engineer` implements. Never dispatch `test-auditor` to fix gaps — forward its TODO list to `test-engineer` instead.
+Both must return `[SUCCESS]` before proceeding to lint. If either returns `[REWORK]` with defects, the lead routes them back to the responsible engineer(s).
 
-## Step 4b: Lint (run `LINT_CMD` from the loaded language skill)
+**Note:** `plan-auditor` (Step 3) may also produce spec-derived acceptance tests. Those are stored separately; `test-engineer` imports/regenerates them if needed. Do NOT merge test files between `plan-auditor` and `test-engineer` without explicit coordination.
 
 After `test-engineer` returns `[SUCCESS]`, run the lint gate before code review. The command comes from the language skill loaded in `## Step 1.6` — do not hardcode a specific linter.
 
@@ -299,6 +305,36 @@ $ LINT_CMD
 **Role:** Catch dead code, unused imports/variables, syntax errors, and other lint violations. Config paths come from the language skill (e.g. `.eslintrc`, `pyproject.toml` → `[tool.ruff]`, `Cargo.toml`, `.golangci.yml`).
 
 **Ordering:** This stage runs **after** `test-engineer` returns `[SUCCESS]` and **before** `code-reviewer`.
+
+**On findings:**
+- If lint passes (no errors): proceed to code review.
+- If lint fails: fix the violations in the source files, then re-run `LINT_CMD`. Include the lint output in the handover.
+- Only proceed to code review once lint passes.
+
+**Fallback:** if `LINT_CMD` is not set (unknown stack with no skill), attempt `make lint` if a `Makefile` exists, or skip with a `SKIP_VERIFIED: "no LINT_CMD for stack <language>"` marker in the STATUS block. Surface the skip to the user for explicit acceptance.
+
+## Step 4b: Lint (run `LINT_CMD` from the loaded language skill)
+
+After both `test-engineer` AND `adversarial-tester` return `[SUCCESS]`, run the lint gate before code review. The command comes from the language skill loaded in `## Step 1.6` — do not hardcode a specific linter.
+
+```
+$ LINT_CMD
+```
+
+**Examples by language** (set by the loaded skill):
+
+| Language | `LINT_CMD` |
+|----------|-----------|
+| TypeScript | `pnpm lint` (ESLint) |
+| Python | `ruff check .` (or `uv tool run ruff check .`) |
+| Rust | `cargo clippy --all-targets --all-features -- -D warnings` |
+| Go | `golangci-lint run` |
+
+**Pass:** The command string from the language skill. Do not pass full conversation history or raw tool outputs beyond the lint result.
+
+**Role:** Catch dead code, unused imports/variables, syntax errors, and other lint violations. Config paths come from the language skill (e.g. `.eslintrc`, `pyproject.toml` → `[tool.ruff]`, `Cargo.toml`, `.golangci.yml`).
+
+**Ordering:** This stage runs **after** both `test-engineer` and `adversarial-tester` return `[SUCCESS]` and **before** `code-reviewer`.
 
 **On findings:**
 - If lint passes (no errors): proceed to code review.
