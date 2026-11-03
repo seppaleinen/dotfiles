@@ -474,9 +474,11 @@
   post-mortem-analyst.md      post-verification analysis
   dev-team-lead.md            software pipeline lead
   dev-architect.md            design · CONTRACT
+   plan-auditor.md             pre-implementation · spec gaps + acceptance tests
   backend-engineer.md         API / data
   frontend-engineer.md        UI / client
   test-engineer.md            test + verify
+   adversarial-tester.md       adversarial test suite · breakage hunting
   code-reviewer.md            quality gate
   code-simplicity-auditor.md  on-demand · simplicity audit
   devops-team-lead.md         infra pipeline lead
@@ -547,6 +549,11 @@
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
+              <span class="note">1b Plan Audit</span>
+              <button class="node dev" data-agent="plan-auditor" type="button"><span class="id">plan-auditor</span><span class="role">spec gaps · acceptance tests</span></button>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="col">
               <span class="note">2 Implement</span>
               <button class="node dev" data-agent="backend-engineer" type="button"><span class="id">backend-engineer</span><span class="role">API / data</span></button>
               <button class="node dev" data-agent="frontend-engineer" type="button"><span class="id">frontend-engineer</span><span class="role">UI / client</span></button>
@@ -556,6 +563,8 @@
             <div class="col">
               <span class="note">3 Test</span>
               <button class="node dev" data-agent="test-engineer" type="button"><span class="id">test-engineer</span><span class="role">then verify</span></button>
+              <button class="node dev" data-agent="adversarial-tester" type="button"><span class="id">adversarial-tester</span><span class="role">breakage hunting</span></button>
+              <span class="badge">parallel</span>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
             <div class="col">
@@ -773,6 +782,14 @@
       "test-engineer": {
         title: "test-engineer",
         blurb: "Verifies feature correctness through automated tests and manual simulation. Called by dev-team-lead after implementation lands."
+      },
+      "plan-auditor": {
+        title: "plan-auditor",
+        blurb: "Pre-implementation spec auditor. Reads the CONTRACT only (never code), generates spec-derived acceptance tests, and produces a gap report of unspecified behaviors. Runs before backend/frontend engineers."
+      },
+      "adversarial-tester": {
+        title: "adversarial-tester",
+        blurb: "Adversarial test writer. Runs in parallel with test-engineer after implementation; reads code and actively tries to break it — boundaries, negative paths, state corruption, races. Inverted mindset from verification."
       },
       "code-reviewer": {
         title: "code-reviewer",

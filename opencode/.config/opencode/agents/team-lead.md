@@ -91,7 +91,7 @@ Do NOT dispatch `dev-team-lead` or `devops-team-lead` for purely administrative 
 
 After verification returns `[SUCCESS]` from `code-reviewer` (dev) or `devops-verificator` (devops), you MAY dispatch the post-verification agents:
 
-- **For dev pipeline**: `team-lead → dev-team-lead → dev-architect → backend-engineer/frontend-engineer → test-engineer → code-reviewer` → `[SUCCESS]` → **dispatch `devops-cleanup` and `post-mortem-analyst`**
+- **For dev pipeline**: `team-lead → dev-team-lead → dev-architect → plan-auditor → backend-engineer/frontend-engineer → test-engineer ∥ adversarial-tester → code-reviewer` → `[SUCCESS]` → **dispatch `devops-cleanup` and `post-mortem-analyst`**
 - **For devops pipeline**: `team-lead → devops-team-lead → devops-architect → devops-engineer → devops-verificator` → `[SUCCESS]` → **dispatch `devops-cleanup` and `post-mortem-analyst`**
 
 Dispatch pattern:
@@ -265,19 +265,23 @@ After any pipeline lead returns `[SUCCESS]`, run this gate **before** accepting 
    | Stage | Dev pipeline | DevOps pipeline | Mandatory? |
    |---|---|---|---|
    | Design | `dev-architect` | `devops-architect` | **Yes**, unless Fast Path with documented justification |
+   | Plan Audit | `plan-auditor` | — | **Conditional** (measurement #44): mandatory in full pipeline, skippable on Fast Path with justification |
    | Implement | `backend-engineer` / `frontend-engineer` | `devops-engineer` | **Yes** |
    | Verify | `test-engineer` **or** `code-reviewer` (at least one) | `devops-verificator` | **Yes** — never skip |
+   | Adversarial Test | `adversarial-tester` | — | **Conditional** (measurement #44): mandatory in full pipeline, skippable on Fast Path with justification |
    | Security | `ai-security-auditor` | `ai-security-auditor` | **Yes** |
 
 2b. **PIPELINE STAGE ↔ TRACE consistency check (issue #41).** Every stage name listed in the `PIPELINE STAGE` field must have a matching agent entry in the `TRACE` line, and every agent in TRACE must correspond to a stage in PIPELINE STAGE. This is a mechanical cross-reference — an agent claiming a stage ran without dispatching it is a handover integrity violation.
 
    **How to check:**
-   - Extract stage names from PIPELINE STAGE (e.g. `design → implement → verify → security`)
-   - Extract agent names from TRACE (e.g. `team-lead → dev-team-lead → dev-architect → backend-engineer → test-engineer → code-reviewer → ai-security-auditor`)
+   - Extract stage names from PIPELINE STAGE (e.g. `design → plan-audit → implement → verify → adversarial-test → security`)
+   - Extract agent names from TRACE (e.g. `team-lead → dev-team-lead → dev-architect → plan-auditor → backend-engineer → test-engineer → adversarial-tester → code-reviewer → ai-security-auditor`)
    - Map each stage to its expected agent(s):
      - `design` → `dev-architect` (or `devops-architect`)
+     - `plan-audit` → `plan-auditor`
      - `implement` → `backend-engineer` / `frontend-engineer` (or `devops-engineer`)
      - `verify` → `test-engineer` / `code-reviewer` (or `devops-verificator`)
+     - `adversarial-test` → `adversarial-tester`
      - `security` → `ai-security-auditor`
      - `docs` → `docs`
    - **If a stage appears in PIPELINE STAGE but its agent is absent from TRACE** → `[BLOCK]`: "handover integrity violation: stage `<stage>` claimed in PIPELINE STAGE but `<agent>` not dispatched in TRACE"
