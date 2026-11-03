@@ -57,12 +57,19 @@ The core deliverable:
 - **Logs/Errors:** Only diagnostic output relevant to the outcome
 - **Metadata:** Branch names, commit SHAs, component names, namespaces
 
-### 5. TRACE (Optional but recommended)
-A single-line call chain showing the dispatch path for debugging:
+### 5. TRACE (Mandatory)
+
+A single-line call chain showing the dispatch path for debugging and handover validation:
+
 ```
 TRACE: team-lead → dev-team-lead → dev-architect → backend-engineer [SUCCESS]
 ```
-Append the status at the end. This gives full observability into which agents were invoked and where failures occurred.
+
+**Mandatory validation (issue #50):** Every stage name in `PIPELINE STAGE` must have a matching agent in TRACE, and every agent in TRACE must correspond to a stage. `team-lead` and pipeline leads (`dev-team-lead`/`devops-team-lead`) are routing agents, not stages.
+
+**Required format:** Agents separated by `→`, status at end (e.g., `[SUCCESS]`, `[REWORK]`, `[BLOCK]`). If a stage was skipped or blocked, record it in the trace (e.g., `→ SKIPPED (Fast Path)`, `→ [BLOCK]`).
+
+This field must be present for the handover to be complete.
 
 ### 6. IMPORTANT NOTES (Optional)
 Anything the next agent MUST know that doesn't fit above. Keep it brief.

@@ -348,9 +348,24 @@ subagent(
 
 **On findings:** Return `[REWORK]` with the specific vulnerability locations and forward to the responsible engineer for a targeted fix. Re-run `code-reviewer` after the fix lands.
 
-## Step 8: Return Result
+## Step 7: Docs (dispatch `docs`)
 
-Once `docs` returns and the working tree is clean/committed, present the result to the caller using the Handover Protocol.
+Once verification returns `[SUCCESS]`, dispatch `docs` to produce documentation artifacts before the post-verification stage:
+
+```
+subagent(
+  description="Write docs for <feature>",
+  prompt="<implemented code + review result [SUCCESS] + original contract>",
+  agent="docs"
+)
+```
+
+**Pass:** The implemented code / diffs, the review result, and the original contract (for ADR context).
+**Do NOT pass:** Internal pipeline routing, architect's reasoning, full conversation history.
+
+**Role:** ADRs (Architecture Decision Records), PR descriptions, changelogs. The `docs` agent lives at `opencode/.config/opencode/agents/docs.md` and is shared across both pipelines.
+
+**Ordering:** This stage runs **after** `code-reviewer` returns `[SUCCESS]` and **before** `team-lead` dispatches the post-verification agents (`devops-cleanup`, `post-mortem-analyst`).
 
 ## Pre-Handover Gate (issue #50)
 
@@ -379,23 +394,6 @@ Before presenting the final result, verify the handover integrity:
 - All checks must pass for the handover to proceed.
 - A `[BLOCK]` return here is NOT a `[SUCCESS]` — surface it to the caller.
 
-Once the reviewer returns `[SUCCESS]`, dispatch `docs` to produce documentation artifacts before the post-verification stage:
-
-```
-subagent(
-  description="Write docs for <feature>",
-  prompt="<implemented code + review result [SUCCESS] + original contract>",
-  agent="docs"
-)
-```
-
-**Pass:** The implemented code / diffs, the review result, and the original contract (for ADR context).
-**Do NOT pass:** Internal pipeline routing, architect's reasoning, full conversation history.
-
-**Role:** ADRs (Architecture Decision Records), PR descriptions, changelogs. The `docs` agent lives at `opencode/.config/opencode/agents/docs.md` and is shared across both pipelines.
-
-**Ordering:** This stage runs **after** `code-reviewer` returns `[SUCCESS]` and **before** `team-lead` dispatches the post-verification agents (`devops-cleanup`, `post-mortem-analyst`).
-
 ## Step 7b: Commit & Push (issue #37)
 
 Before returning `[SUCCESS]`, ensure the working tree is clean or changes are committed and pushed:
@@ -412,7 +410,7 @@ Before returning `[SUCCESS]`, ensure the working tree is clean or changes are co
 
 Once `docs` returns and the working tree is clean/committed, present the result to the caller (user, `team-lead`, or pipeline lead) using the Handover Protocol.
 
-## Step 9: Post-Verification Agents (dispatch by `team-lead` after `[SUCCESS]`)
+## Post-Verification Agents (dispatch by `team-lead` after `[SUCCESS]`)
 
 After verification returns `[SUCCESS]` from `code-reviewer`, `team-lead` dispatches both of the following agents directly at `subagent_depth: 2`:
 
