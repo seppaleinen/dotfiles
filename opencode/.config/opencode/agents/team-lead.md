@@ -10,6 +10,7 @@ permission:
     "devops-team-lead": allow
     "devops-cleanup": allow
     "post-mortem-analyst": allow
+    "session-compactor": allow
 ---
 
 # Role
@@ -91,8 +92,8 @@ Do NOT dispatch `dev-team-lead` or `devops-team-lead` for purely administrative 
 
 After verification returns `[SUCCESS]` from `code-reviewer` (dev) or `devops-verificator` (devops), you MAY dispatch the post-verification agents:
 
-- **For dev pipeline**: `team-lead → dev-team-lead → dev-architect → plan-auditor → backend-engineer/frontend-engineer → test-engineer ∥ adversarial-tester → code-reviewer` → `[SUCCESS]` → **dispatch `devops-cleanup` and `post-mortem-analyst`**
-- **For devops pipeline**: `team-lead → devops-team-lead → devops-architect → devops-engineer → devops-verificator` → `[SUCCESS]` → **dispatch `devops-cleanup` and `post-mortem-analyst`**
+- **For dev pipeline**: `team-lead → dev-team-lead → dev-architect → plan-auditor → backend-engineer/frontend-engineer → test-engineer ∥ adversarial-tester → code-reviewer` → `[SUCCESS]` → **dispatch `devops-cleanup`, `post-mortem-analyst`, and `session-compactor`**
+- **For devops pipeline**: `team-lead → devops-team-lead → devops-architect → devops-engineer → devops-verificator` → `[SUCCESS]` → **dispatch `devops-cleanup`, `post-mortem-analyst`, and `session-compactor`**
 
 Dispatch pattern:
 ```
@@ -106,6 +107,12 @@ subagent(
   description="Post-verification analysis: <issue number>",
   prompt="Verification result [SUCCESS]; session ID for export (`opencode export <sessionID>` is the primary source — do NOT paste the conversation body); git history summary; agent timeline",
   agent="post-mortem-analyst"
+)
+
+subagent(
+  description="Compact session for fresh start: <issue number>",
+  prompt="Verification result [SUCCESS]; post-mortem findings summary; user preference on session compaction; session ID (if provided for export)",
+  agent="session-compactor"
 )
 ```
 
@@ -121,7 +128,7 @@ The new agents live in `opencode/.config/opencode/agents/` and follow the same h
 
 ## Important Note
 
-These new stages (devops-cleanup and post-mortem-analyst) are dispatched **after** verification returns `[SUCCESS]`. They are NOT part of the original pipeline leads and are dispatched directly by `team-lead` at the same depth level as the pipeline leads (subagent_depth: 2).
+These new stages (devops-cleanup, post-mortem-analyst, and session-compactor) are dispatched **after** verification returns `[SUCCESS]`. They are NOT part of the original pipeline leads and are dispatched directly by `team-lead` at the same depth level as the pipeline leads (subagent_depth: 2).
 
 ## Mixed Task Dispatch
 
