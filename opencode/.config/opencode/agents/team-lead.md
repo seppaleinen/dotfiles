@@ -304,7 +304,26 @@ After any pipeline lead returns `[SUCCESS]`, run this gate **before** accepting 
 - Only when every row reads **OK** may the handover proceed to Step 3 (Synthesize & Report).
 - This gate runs **after** Step 2 (Evaluate Results) and **before** Step 3 (Synthesize & Report). It is the only path to `[SUCCESS]` acceptance.
 
-## Step 3: Synthesize & Report
+## Post-Verification Gate (issue #51)
+
+After post-verification agents (`devops-cleanup`, `post-mortem-analyst`) return, validate their handovers before synthesis. These agents perform potentially destructive actions (issue closing, branch deletion) and their handovers require pre-acceptance validation.
+
+### Gate checklist
+
+1. **Parse the handover.** Extract the `TRACE` line and `PIPELINE STAGE` field. Missing traces: `[BLOCK]` with "incomplete handover — missing TRACE or PIPELINE STAGE field".
+
+2. **TRACE present.** The handover must contain a `TRACE` line showing the dispatch chain. Missing TRACE: `[BLOCK]`.
+
+3. **PIPELINE STAGE consistency.** Verify stages match dispatched agents:
+   - `cleanup` → `devops-cleanup`
+   - `analysis` → `post-mortem-analyst`
+   - `team-lead` is routing agent, exempt from stage check.
+
+4. **STATUS validation.** Must be `[SUCCESS]` or documented `[REWORK]`/`[BLOCK]`. Missing or invalid: `[BLOCK]`.
+
+### Gate execution
+- All checks must pass for handover acceptance.
+- A `[BLOCK]` return here prevents destructive actions from being accepted.
 
 After receiving the dispatched agent's handover, present a **user-facing summary** — NOT the raw handover protocol. Your response should include:
 

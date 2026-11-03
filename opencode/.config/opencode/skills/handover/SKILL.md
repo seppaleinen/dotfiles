@@ -45,7 +45,21 @@ REWORK_COUNT: N | KILLED_BY_RESTART: M
 - `KILLED_BY_RESTART`: Number of times a subagent was cancelled by an external opencode service restart (per `rework-handling` skill). Independent of REWORK_COUNT.
 
 ### 2. SUMMARY
+
 A high-level, one-paragraph description of what was achieved or why it failed. The downstream agent should understand the outcome without reading anything else.
+
+#### TLDR (issue #54)
+
+A brief summary for quick understanding of review outcomes:
+
+```
+TLDR: <30-word summary of approval status, key changes, and next action>
+```
+
+**Examples:**
+- `TLDR: Approved. 3 nit fixes recommended. Ready to merge after addressing comments.`
+- `TLDR: REWORK. Missing error handling in 2 functions. Add try/catch before re-review.`
+- `TLDR: [BLOCK] Critical security issue found. Hardcoded secret in config.yaml line 42.`
 
 ### 3. RATIONALE
 The "why" behind decisions, changes, or failures. This is critical for the next agent to understand intent.
@@ -57,12 +71,40 @@ The core deliverable:
 - **Logs/Errors:** Only diagnostic output relevant to the outcome
 - **Metadata:** Branch names, commit SHAs, component names, namespaces
 
-### 5. TRACE (Optional but recommended)
-A single-line call chain showing the dispatch path for debugging:
+### 5. TRACE (Mandatory)
+
+A single-line call chain showing the dispatch path for debugging and handover validation:
+
 ```
 TRACE: team-lead → dev-team-lead → dev-architect → backend-engineer [SUCCESS]
 ```
-Append the status at the end. This gives full observability into which agents were invoked and where failures occurred.
 
-### 6. IMPORTANT NOTES (Optional)
+**Mandatory validation (issue #50):** Every stage name in `PIPELINE STAGE` must have a matching agent in TRACE, and every agent in TRACE must correspond to a stage. `team-lead` and pipeline leads (`dev-team-lead`/`devops-team-lead`) are routing agents, not stages.
+
+**Required format:** Agents separated by `→`, status at end (e.g., `[SUCCESS]`, `[REWORK]`, `[BLOCK]`). If a stage was skipped or blocked, record it in the trace (e.g., `→ SKIPPED (Fast Path)`, `→ [BLOCK]`).
+
+This field must be present for the handover to be complete.
+
+### 6. FAST_PATH_SKIP (Optional but recommended for Fast Path)
+
+When a stage is skipped via Fast Path, document it with structured fields:
+
+```
+FAST_PATH_SKIP:
+  skip_reason: <why the stage was skipped>
+  change_class: <scope of the change>
+  evidence_reference: <pointer to design/research that justifies the skip>
+```
+
+**Example:**
+```
+FAST_PATH_SKIP:
+  skip_reason: Single manifest update, design covered in Infra Findings
+  change_class: config tweak — Helm value change only
+  evidence_reference: Research Brief Infra Findings section 3.2
+```
+
+This documentation is critical for handover integrity validation and post-mortem analysis.
+
+### 7. IMPORTANT NOTES (Optional)
 Anything the next agent MUST know that doesn't fit above. Keep it brief.

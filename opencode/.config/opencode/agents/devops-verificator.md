@@ -116,6 +116,8 @@ Look for: replication issues, WAL failures, connection limits.
 ### On Success:
 Return `[SUCCESS]` with confirmation that all resources reconciled.
 
+**TLDR:** One-sentence summary of verification outcome (e.g., `TLDR: All resources reconciled successfully on commit <SHA>. Cluster healthy.`)
+
 ### On Failure:
 Return `[REWORK]` with:
 - **Failed checks:** Which specific check(s) failed
