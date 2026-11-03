@@ -348,7 +348,36 @@ subagent(
 
 **On findings:** Return `[REWORK]` with the specific vulnerability locations and forward to the responsible engineer for a targeted fix. Re-run `code-reviewer` after the fix lands.
 
-## Step 7: Docs (dispatch `docs`)
+## Step 8: Return Result
+
+Once `docs` returns and the working tree is clean/committed, present the result to the caller using the Handover Protocol.
+
+## Pre-Handover Gate (issue #50)
+
+Before presenting the final result, verify the handover integrity:
+
+### 1. Parse the handover. Extract the `TRACE` line and `PIPELINE STAGE` field from the handover. If either is missing or malformed, reject immediately: `[BLOCK]` with "incomplete handover — missing TRACE or PIPELINE STAGE field".
+
+### 2. PIPELINE STAGE ↔ TRACE consistency check. Every stage name listed in the `PIPELINE STAGE` field must have a matching agent entry in the `TRACE` line, and every agent in TRACE must correspond to a stage in PIPELINE STAGE.
+
+**How to check:**
+- Extract stage names from PIPELINE STAGE (e.g. `design → implement → verify → security`)
+- Extract agent names from TRACE (e.g. `team-lead → dev-team-lead → dev-architect → backend-engineer → test-engineer → code-reviewer → ai-security-auditor`)
+- Map each stage to its expected agent(s):
+  - `design` → `dev-architect`
+  - `implement` → `backend-engineer` / `frontend-engineer`
+  - `verify` → `test-engineer` / `code-reviewer`
+  - `security` → `ai-security-auditor`
+  - `docs` → `docs`
+- `team-lead` and `dev-team-lead` are routing agents, not pipeline stages — they are exempt from this check.
+- **If a stage appears in PIPELINE STAGE but its agent is absent from TRACE** → `[BLOCK]`: "handover integrity violation: stage `<stage>` claimed in PIPELINE STAGE but `<agent>` not dispatched in TRACE"
+- **If an agent appears in TRACE but its stage is absent from PIPELINE STAGE** → `[BLOCK]`: "handover integrity violation: `<agent>` dispatched in TRACE but no matching stage in PIPELINE STAGE"
+
+### 3. Fast Path skip of design. If the design stage is marked SKIPPED (Fast Path), the handover must include a Fast-Path justification naming the change class and citing the Research Brief's findings. Without one: reject.
+
+### Gate execution
+- All checks must pass for the handover to proceed.
+- A `[BLOCK]` return here is NOT a `[SUCCESS]` — surface it to the caller.
 
 Once the reviewer returns `[SUCCESS]`, dispatch `docs` to produce documentation artifacts before the post-verification stage:
 

@@ -243,6 +243,23 @@ Every mandatory stage must be recorded as **RAN** with a `task_id` from the `rew
 | 4 | Security | `ai-security-auditor` | **Yes** | `[SUCCESS]` or a documented, accepted finding from the auditor |
 | 5 | Working tree clean | — | **Yes** | `git status --short` is empty or commit SHA recorded in handover (`LAST_COMMIT`) |
 
+### 2b. PIPELINE STAGE ↔ TRACE consistency check (issue #50)
+
+Every stage name listed in the `PIPELINE STAGE` field must have a matching agent entry in the `TRACE` line, and every agent in TRACE must correspond to a stage in PIPELINE STAGE.
+
+**How to check:**
+- Extract stage names from PIPELINE STAGE (e.g. `design → implement → verify → security`)
+- Extract agent names from TRACE (e.g. `team-lead → devops-team-lead → devops-architect → devops-engineer → devops-verificator → ai-security-auditor`)
+- Map each stage to its expected agent(s):
+  - `design` → `devops-architect`
+  - `implement` → `devops-engineer`
+  - `verify` → `devops-verificator`
+  - `security` → `ai-security-auditor`
+  - `docs` → `docs`
+- `team-lead` and `devops-team-lead` are routing agents, not pipeline stages — they are exempt from this check.
+- **If a stage appears in PIPELINE STAGE but its agent is absent from TRACE** → `[BLOCK]`: "handover integrity violation: stage `<stage>` claimed in PIPELINE STAGE but `<agent>` not dispatched in TRACE"
+- **If an agent appears in TRACE but its stage is absent from PIPELINE STAGE** → `[BLOCK]`: "handover integrity violation: `<agent>` dispatched in TRACE but no matching stage in PIPELINE STAGE"
+
 ### Fast-path justification
 
 Stage 1 (`devops-architect`) may be omitted **only** when the task is a small, well-defined change — a single manifest/Helm value bump or equivalent — and the Research Brief's Infra Findings already supply the reuse + cluster facts. When Fast Path is taken:
