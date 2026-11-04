@@ -41,6 +41,23 @@ Must be `[SUCCESS]` or documented `[REWORK]`/`[BLOCK]`.
 
 - **If missing or invalid:** `[BLOCK]`
 
+### 5. Working tree clean (issue #37)
+Before destructive actions (cleanup), verify the working tree is clean using the noise-filter script:
+
+```bash
+./scripts/filter-worktree-noise.sh
+```
+
+This filters out herdr/opencode-managed changes (herdr-tui-session.js, herdr-agent-state.js, untracked skill/plugin directories, .gitignore, node_modules). Only actual task deliverables should block SUCCESS.
+
+For `devops-cleanup`, this check should run before Gate #1 (branch-vs-main equivalence):
+
+```
+gate-preparation:
+  Run ./scripts/filter-worktree-noise.sh --verbose
+  If filtered changes exist → [BLOCK] with "uncommitted task deliverables"
+```
+
 ### 5. Destructive action verification (devops-cleanup only)
 When cleanup is involved, verify:
 

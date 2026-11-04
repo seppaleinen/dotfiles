@@ -13,6 +13,14 @@ Orchestrates the cleanup phase after pipeline verification. Ensures branch delet
 
 Load this when dispatching `devops-cleanup`. It documents the landing→deletion dependency explicitly.
 
+Before dispatching, ensure the working tree is clean of task deliverables:
+
+```bash
+./scripts/filter-worktree-noise.sh
+```
+
+If this returns exit 1 (uncommitted changes), investigate what's present and ensure it's part of the current task before proceeding.
+
 ## Dispatch Rules
 
 ### General cleanup prompt
