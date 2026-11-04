@@ -84,7 +84,14 @@ After verification returns `[SUCCESS]` from `code-reviewer` (dev) or `devops-ver
 
 **DevOps pipeline:** `team-lead → devops-team-lead → devops-architect → devops-engineer → devops-verificator` → `[SUCCESS]` → **`devops-cleanup`, `post-mortem-analyst`, `session-compactor`**
 
-**See `post-verification-gate` skill** for validation rules and `cleanup-dispatch-contract` skill for deletion dependency.
+Before dispatching post-verification agents, load the required skills:
+
+```
+skill(name="post-verification-gate")
+skill(name="cleanup-dispatch-contract")
+```
+
+See the skills for validation rules and dispatch templates.
 
 ## Follow-up Handling
 
@@ -121,11 +128,16 @@ STOP and re-approve if implementation reveals:
 
 ## Step 2: Evaluate Results
 
-Validate dispatch results:
+Before acting on any subagent result, load required skills:
 
-1. **Empty-result validation** (see `delegation-contract` skill)
-2. **TRACE/PIPELINE STAGE consistency** (see `trace-validation` skill)
-3. **Status dispatch** (see `status-dispatch` skill)
+```
+skill(name="delegation-contract")
+skill(name="rework-handling")
+skill(name="trace-validation")
+skill(name="status-dispatch")
+```
+
+Then validate dispatch results using the skills' logic.
 
 ## Step 3: Synthesize & Report
 

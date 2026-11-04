@@ -183,3 +183,37 @@ skill(name="rtk-find-loop-prevention")
 - Pipeline pattern: return a `[RESTART_NEEDED]` handover instead of performing the restart in-session; verification is a fresh step afterward.
 - Hard rule for: `devops-team-lead`, `devops-engineer`, `devops-verificator`, `devops-cleanup`.
 - Guard script: `/tmp/oc-service-guard.sh` — run it before any service command to abort early if the current process tree descends from `opencode serve`.
+
+## Skill Integration Pattern
+
+When extracting duplicated logic into a skill, follow this pattern:
+
+1. **Extract** — Move the logic into `opencode/.config/opencode/skills/<skill-name>/SKILL.md`
+2. **Load** — In agents that use the skill, add `skill(name="<skill-name>")` at the point of use
+3. **Remove duplicate** — Delete inline logic that was extracted
+
+**Example:**
+
+After creating the `trace-validation` skill, the pipeline leads should load it:
+
+```
+## Pre-Handover Gate
+
+Load the trace-validation skill before validating handovers:
+
+  skill(name="trace-validation")
+```
+
+Then remove duplicate inline validation logic (e.g., the ~50 lines of PIPELINE STAGE ↔ TRACE consistency checks in `dev-team-lead.md` and `devops-team-lead.md`).
+
+**Why this pattern matters:**
+- Skills provide a single source of truth
+- Inline logic can become stale if not updated everywhere
+- The `skill(name="...")` pattern is established and consistent with existing skills (`delegation-contract`, `rework-handling`, `pipeline-visibility`, `handover`)
+- Documentation lives in the skill file, not scattered across agent .md files
+
+**When to extract a skill:**
+- Logic repeated in 3+ places
+- Validation rules used by multiple agents
+- Dispatch patterns that vary only by agent name
+- Gate checklists that should be consistent across pipelines
