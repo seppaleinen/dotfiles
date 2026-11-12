@@ -1,0 +1,167 @@
+[
+  {
+    "id": "accessibility-app-level",
+    "type": "Frontend Reference",
+    "title": "App-Level Accessibility",
+    "description": "WCAG cheatsheet for PWA templates — buttons, forms, headings, screen reader patterns.",
+    "tags": [
+      "accessibility",
+      "a11y",
+      "wcag",
+      "pwa"
+    ]
+  },
+  {
+    "id": "api-communication",
+    "type": "Frontend Reference",
+    "title": "API Communication",
+    "description": "httpResource patterns for PWA — service/component split, parameterized URLs, caching, mutations.",
+    "tags": [
+      "api",
+      "http",
+      "httpResource",
+      "angular",
+      "signals"
+    ]
+  },
+  {
+    "id": "architecture",
+    "type": "Frontend Reference",
+    "title": "PWA Architecture",
+    "description": "Avanza Bank PWA stack — Angular 19+, signals, Mint components, shared code, naming, and agent instructions.",
+    "tags": [
+      "architecture",
+      "pwa",
+      "angular",
+      "mint"
+    ]
+  },
+  {
+    "id": "error-handling",
+    "type": "Frontend Reference",
+    "title": "Error Handling",
+    "description": "PWA error handling — HTTP errors, user feedback, recovery, Mint error UI components.",
+    "tags": [
+      "error-handling",
+      "http",
+      "angular",
+      "mint"
+    ]
+  },
+  {
+    "id": "file-organization",
+    "type": "Frontend Reference",
+    "title": "File Organization",
+    "description": "Creating and moving files in PWA — folder structure, naming, Git rename detection, standalone vs module-declared.",
+    "tags": [
+      "files",
+      "organization",
+      "angular",
+      "git"
+    ]
+  },
+  {
+    "id": "forms",
+    "type": "Frontend Reference",
+    "title": "Forms",
+    "description": "Reactive forms, Mint form integration, validation patterns, and accessibility for PWA forms.",
+    "tags": [
+      "forms",
+      "validation",
+      "angular",
+      "mint"
+    ]
+  },
+  {
+    "id": "html-style",
+    "type": "Frontend Reference",
+    "title": "HTML Style",
+    "description": "PWA HTML template conventions — Mint utility classes, self-closing tags, Swedish copy, @if rules.",
+    "tags": [
+      "html",
+      "templates",
+      "angular",
+      "mint"
+    ]
+  },
+  {
+    "id": "pages",
+    "type": "Frontend Reference",
+    "title": "Page Templates",
+    "description": "create-page script, base/sub/flow page setup, flow page configuration and navigation.",
+    "tags": [
+      "pages",
+      "flow-page",
+      "pwa",
+      "angular"
+    ]
+  },
+  {
+    "id": "routing",
+    "type": "Frontend Reference",
+    "title": "Routing",
+    "description": "Angular routing in PWA — lazy loading, guards, resolvers, navigation, URL conventions.",
+    "tags": [
+      "routing",
+      "angular",
+      "navigation"
+    ]
+  },
+  {
+    "id": "rxjs",
+    "type": "Frontend Reference",
+    "title": "RxJS Best Practices",
+    "description": "Avoid nested subscribes, always clean up with takeUntilDestroyed, common operator selection.",
+    "tags": [
+      "rxjs",
+      "angular",
+      "typescript"
+    ]
+  },
+  {
+    "id": "scss-style",
+    "type": "Frontend Reference",
+    "title": "SCSS Style",
+    "description": "PWA SCSS conventions — Mint Foundation usage, responsive design, accessibility in layout.",
+    "tags": [
+      "scss",
+      "styling",
+      "mint-foundation"
+    ]
+  },
+  {
+    "id": "state-management",
+    "type": "Frontend Reference",
+    "title": "State Management",
+    "description": "Signal-first state management in Angular — inputs, computed, effects, immutability, and service patterns.",
+    "tags": [
+      "state-management",
+      "signals",
+      "angular",
+      "typescript"
+    ]
+  },
+  {
+    "id": "testing",
+    "type": "Frontend Reference",
+    "title": "Testing",
+    "description": "PWA unit, component, and integration test patterns — signals, HTTP mocking, DOM interactions.",
+    "tags": [
+      "testing",
+      "angular",
+      "jest",
+      "vitest"
+    ]
+  },
+  {
+    "id": "typescript-style",
+    "type": "Frontend Reference",
+    "title": "TypeScript Style",
+    "description": "PWA TypeScript conventions — strict typing, OnPush, control flow, inject(), computed values.",
+    "tags": [
+      "typescript",
+      "angular",
+      "style"
+    ]
+  }
+]

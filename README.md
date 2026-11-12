@@ -48,6 +48,37 @@ source ~/.zshrc
 | `stow -n -t ~ <name>` | Dry run (preview without creating) |
 | `stow -t ~ <name> --verbose=1` | Check for existing conflicts |
 
+## Loop Orchestrator
+
+The `loop-orchestrator` agent runs the GitHub issue queue unattended — up to 3 hours or 10 tasks, whichever comes first. It dispatches `team-lead` for each issue, comments on GitHub instead of asking in chat, and runs `post-mortem-analyst` after each task.
+
+**Start it:**
+```bash
+opencode mini --agent loop-orchestrator --model freellmapi
+```
+
+Then type `dry run` (to preview) or `start the loop` (to run).
+
+**What it does:**
+- Picks open issues in priority→bug→oldest order, skipping `wontfix`/`duplicate`/`waiting`/`needs-input`
+- Skips issues where the agent commented last (avoids re-processing its own work)
+- Asks for one approval on the loop config, then runs autonomously within budget
+- Comments on issues when blocked, instead of stopping the loop
+- Stops on: queue empty, 3 hours elapsed, 10 tasks done, or max reworks reached
+
+**Dry run first:**
+```bash
+opencode --agent loop-orchestrator
+# Then say: "dry run"
+```
+This shows what the loop would pick without dispatching anything.
+
+**Config:** `opencode/.config/opencode/loop-config.json` — max wall clock, max tasks, label tiers, skip labels.
+
+**State:** `.opencode/loop-state.json` tracks tasks run, blocked issues, and stop reason. Restart in the same repo to continue where it left off.
+
+**One repo per loop.** Start a separate session in each repo you want to loop.
+
 ## Important
 
 1. **The source of truth is this repo.** Always edit files here, not through the symlink path at `~/.config/`.

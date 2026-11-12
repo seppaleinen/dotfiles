@@ -68,6 +68,15 @@ Load the `pipeline-visibility` skill for the status-reporting contract:
 skill(name="pipeline-visibility")
 ```
 
+## Delegation Contract & Tool Usage Guardrail
+
+Load the `delegation-contract` skill for dispatch rules **including the Tool Usage Rules guardrail (execute vs shell vs read/write/edit)**:
+```
+skill(name="delegation-contract")
+```
+
+**Tool Usage Guardrail:** When dispatching workers or reviewing their output, enforce the Tool Usage Rules from `delegation-contract`: `execute` is for pure JS only; `shell` for CLI; `read`/`write`/`edit` for files. Never use `execute` for shell commands, git, find, or file I/O. This applies to all downstream agents you dispatch.
+
 ## Fast Path
 
 - **When:** small, well-defined changes — single manifest/Helm value bump or equivalent.
@@ -81,6 +90,32 @@ skill(name="pipeline-visibility")
 Receive a task from `team-lead`, from the user, or as a **Research Brief** (file path or summary). The task has already been refined by the `researcher` subagent — the brief's Infra Findings contain the reuse + cluster facts. There is no separate Investigate step and NO investigator dispatch. Identify the target namespace, application name, and infrastructure category.
 
 If the task is still vague (no clear objective, namespace/app, or definition of done), return `[BLOCK]` and tell the caller to run it through `researcher` first. Do NOT dispatch downstream on raw requirements.
+
+### Step 1.5: Work-Tree Audit (issue #35)
+
+Immediately after receiving the Brief, inspect the working tree before any design or implementation dispatch:
+
+```
+git status --short
+git diff --stat
+git log --oneline -5
+```
+
+**Read-only. No consent required.** This runs before `## Consent Check` because it touches no files.
+
+1. **Extract expected deliverables** from the Research Brief / tracking issue — manifest paths, Helm chart files, issue numbers, or artifact names the task says it will produce.
+2. **Compare against the `git status` output.** A deliverable is **present** if its path appears in the modified (` M`), added (`??`), or staged (`M `) rows.
+3. **Do NOT block on unrelated dirty files** (local notes, scratch files, other issues' work). Only deliverable paths from *this* brief matter.
+4. **Emit a signal** and branch:
+
+| Signal | Condition | Next step |
+|---|---|---|
+| `WORK_PRESENT` | ≥1 expected deliverable already in the working tree | Skip Design + Implement; go straight to **verify → security → docs**. Verify the existing manifests against the engineering brief, do NOT re-implement. |
+| `WORK_ABSENT` | No expected deliverable found | Proceed normally from `## Step 2: Design`. |
+
+**Overhead:** a single `git status --short` call when work is absent. If `git` is unavailable or the tree is not a repo, emit `WORK_ABSENT` and continue — the audit degrades gracefully, it never blocks.
+
+**Handover:** include the signal in the `PIPELINE STAGE` field (e.g. `audit:WORK_PRESENT → verify → security → docs → gate [COMPLETE]`).
 
 ## Consent Check (direct path only)
 
@@ -131,25 +166,26 @@ The feature branch pushed by `devops-engineer` is NOT verified against the live 
 
 ## Step 4: Verify (dispatch devops-verificator)
 
-If the implementation succeeded, call `devops-verificator`:
+After merge is confirmed on `main`, dispatch `devops-verificator` with the merge commit SHA:
 
 ```
 subagent(
   description="Verify cluster state for <task>",
-  prompt="<merge commit SHA and resource info>",
+  prompt="<merge commit SHA from git rev-parse main + resource info>",
   agent="devops-verificator"
 )
 ```
 
-If `devops-verificator` returns `[REWORK]` with diagnostic findings:
-- Forward the root cause analysis and evidence to `devops-engineer` for targeted fixes.
-- Do NOT re-dispatch to `devops-architect` unless the issue is architectural.
-- Max 2 verification cycles before escalating.
+**Pass:** The merge commit SHA (must be on `main`), resource info from the engineering brief.
+**Do NOT pass:** Pre-merge SHAs, raw kubectl dumps.
 
-### CI/Deploy Verification (Optional)
+**Cluster unreachable handling (issue #42):** If `devops-verificator` returns `[BLOCK]` with reason `cluster_unreachable`, this is an environmental constraint, not a pipeline defect. Offer two options:
+- **Defer:** "Cluster unreachable from this environment (endpoint: `<url>`). Should we mark verification as deferred and close the issue with a note for manual follow-up?"
+- **Proceed anyway:** "Verification blocked due to cluster unreachable. Should we proceed to security review and docs, noting that cluster verification was not performed?"
 
-- After verification passes, may optionally check CI/deployment (Flux reconciliation, GitHub Actions, cluster apply status); route failures back to `devops-engineer`.
-- **Must NOT block handover:** if CI/deploy tooling is unavailable or slow, return `[SUCCESS]` anyway; report CI/deploy status in the handover as informational, not a gate.
+**If `[REWORK]`:** Forward findings to `devops-engineer` for targeted fixes. Do NOT re-dispatch to `devops-architect` unless the issue is architectural. Max 2 verification cycles before escalating.
+
+**CI/Deploy Verification (Optional)** is informational only.
 
 ## Step 5: Security (dispatch `ai-security-auditor`)
 
@@ -205,6 +241,17 @@ Every mandatory stage must be recorded as **RAN** with a `task_id` from the `rew
 | 2 | Implement | `devops-engineer` | **Yes** | Feature branch pushed; PR created (Step 3.5); merge commit SHA recorded |
 | 3 | Verify | `devops-verificator` | **YES — NEVER SKIP** | `[SUCCESS]` from `devops-verificator` against the **merged** commit SHA (pre-merge SHA is not valid evidence) |
 | 4 | Security | `ai-security-auditor` | **Yes** | `[SUCCESS]` or a documented, accepted finding from the auditor |
+| 5 | Working tree clean | — | **Yes** | `git status --short` is empty or commit SHA recorded in handover (`LAST_COMMIT`) |
+
+### 2b. PIPELINE STAGE ↔ TRACE consistency check (issue #50)
+
+See `trace-validation` skill for the full validation logic and expected agent mappings.
+
+Load the skill before this gate:
+
+```
+skill(name="trace-validation")
+```
 
 ### Fast-path justification
 
@@ -216,15 +263,11 @@ Stage 1 (`devops-architect`) may be omitted **only** when the task is a small, w
 
 ### [SKIP_VERIFIED] marker (issue #8)
 
-If a lead skips `devops-verificator` (only allowed with a documented reason), the handover's STATUS block must include:
+**Note:** `devops-verificator` is **NEVER SKIPPABLE** per this pipeline — on the full path and on the Fast Path. A run that reaches the gate without a `devops-verificator` result fails the gate unconditionally.
 
-```
-SKIP_VERIFIED: <reason>
-```
+The `SKIP_VERIFIED` marker exists for the dev pipeline (`dev-team-lead.md`), where `test-engineer` or `code-reviewer` may be skipped with explicit user acceptance; it is recorded here for cross-pipeline consistency but should not be used in this pipeline.
 
-Without this marker, the skip is invisible to `team-lead`'s Post-Dispatch Gate and the handover is rejected as `[BLOCK]`.
-
-**Note:** `devops-verificator` is **NEVER SKIPPABLE** per this pipeline — on the full path and on the Fast Path. A run that reaches the gate without a `devops-verificator` `[SUCCESS]` fails the gate unconditionally. The `SKIP_VERIFIED` marker exists for the dev pipeline (`dev-team-lead.md`), where `test-engineer` or `code-reviewer` may be skipped with explicit user acceptance; it is recorded here for cross-pipeline consistency.
+**Cluster unreachable exception (issue #42):** `devops-verificator` may return `[BLOCK]` with reason `cluster_unreachable`. This is an environmental constraint, not a pipeline defect. The gate trace must record this and allow the lead to defer or proceed with user consent.
 
 ### Gate execution
 

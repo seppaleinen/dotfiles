@@ -29,7 +29,7 @@ The agent pipeline is defined in `opencode/.config/opencode/agents/`. Default ag
 **Pipeline structure (flat 2-level tree):**
 - `researcher` (subagent, auto-dispatched by `team-lead`) — grills the user, does web/source/GitOps investigation, writes a **Research Brief** to a file
 - `team-lead` → routes a Research Brief to `dev-team-lead` or `devops-team-lead`
-- `dev-team-lead` → `dev-architect` → `backend-engineer` / `frontend-engineer` → `test-engineer` → `code-reviewer` → **`devops-cleanup` & `post-mortem-analyst`**
+- `dev-team-lead` → `dev-architect` → `plan-auditor` → `backend-engineer` / `frontend-engineer` → `test-engineer` ∥ `adversarial-tester` → `code-reviewer` → **`devops-cleanup` & `post-mortem-analyst`**
 - `devops-team-lead` → `devops-architect` → `devops-engineer` → `devops-verificator` → **`devops-cleanup` & `post-mortem-analyst`**
 - `web-scout` (subagent of researcher) → identifies upstream repos/charts/images
 
@@ -61,6 +61,22 @@ This script greps all agent `.md` files under `opencode/.config/opencode/agents/
 ```
 
 Exit 0 means the folder tree lists all 27 agents with no stale references. Exit 1 names the drift. The on-demand auditors (`ai-security-auditor`, `context-drift-auditor`, `performance-auditor`, `seo-aeo-auditor`, `test-auditor`) and the ontology agents (`ontology-auditor`, `api-scanner`, `db-scanner`, `matrix-generator`, `socratic-questioner`, `ux-scanner`) are deliberately **not** clickable — they sit outside the team-lead chain — so they are not required on the button/JS surfaces. If you make one of them part of the dispatch flow, add it to those surfaces too.
+
+**Measurement framework (issue #44):**
+
+The new testing agents (`plan-auditor` and `adversarial-tester`) include a retention measurement framework based on the `FINDINGS_CLASSIFIED` handover line format:
+
+- **`plan-auditor`:** Tracks gaps and unspecified transitions in the architecture contract before implementation:
+  ```
+  FINDINGS_CLASSIFIED: gaps=<n> unspecified_transitions=<n> high_severity=<n> confirmed_by_lead=<n>
+  ```
+
+- **`adversarial-tester`:** Tracks defects found during adversarial testing:
+  ```
+  FINDINGS_CLASSIFIED: probes=<n> defects=<n> critical=<n> high=<n> duplicate_of_test_engineer=<n>
+  ```
+
+After 3-5 pipeline runs, the lead and user review whether each agent's findings led to prevented rework. If `high_severity=0` (for plan-auditor) or `defects=0` (for adversarial-tester) across runs, the stage is a candidate for demotion to optional or merge into `test-engineer`.
 
 All inter-agent communication uses the handover protocol defined in `opencode/.config/opencode/skills/handover/SKILL.md`.
 
@@ -167,3 +183,37 @@ skill(name="rtk-find-loop-prevention")
 - Pipeline pattern: return a `[RESTART_NEEDED]` handover instead of performing the restart in-session; verification is a fresh step afterward.
 - Hard rule for: `devops-team-lead`, `devops-engineer`, `devops-verificator`, `devops-cleanup`.
 - Guard script: `/tmp/oc-service-guard.sh` — run it before any service command to abort early if the current process tree descends from `opencode serve`.
+
+## Skill Integration Pattern
+
+When extracting duplicated logic into a skill, follow this pattern:
+
+1. **Extract** — Move the logic into `opencode/.config/opencode/skills/<skill-name>/SKILL.md`
+2. **Load** — In agents that use the skill, add `skill(name="<skill-name>")` at the point of use
+3. **Remove duplicate** — Delete inline logic that was extracted
+
+**Example:**
+
+After creating the `trace-validation` skill, the pipeline leads should load it:
+
+```
+## Pre-Handover Gate
+
+Load the trace-validation skill before validating handovers:
+
+  skill(name="trace-validation")
+```
+
+Then remove duplicate inline validation logic (e.g., the ~50 lines of PIPELINE STAGE ↔ TRACE consistency checks in `dev-team-lead.md` and `devops-team-lead.md`).
+
+**Why this pattern matters:**
+- Skills provide a single source of truth
+- Inline logic can become stale if not updated everywhere
+- The `skill(name="...")` pattern is established and consistent with existing skills (`delegation-contract`, `rework-handling`, `pipeline-visibility`, `handover`)
+- Documentation lives in the skill file, not scattered across agent .md files
+
+**When to extract a skill:**
+- Logic repeated in 3+ places
+- Validation rules used by multiple agents
+- Dispatch patterns that vary only by agent name
+- Gate checklists that should be consistent across pipelines

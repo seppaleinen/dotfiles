@@ -21,6 +21,12 @@ if [[ ! -d "$AGENTS_DIR" ]]; then
     exit 1
 fi
 
+# Skip measurement framework patterns in plan-auditor and adversarial-tester (issue #44)
+if [[ "$PATTERN" == "FINDINGS_CLASSIFIED" ]]; then
+    echo "SKIP: Measurement framework pattern found in plan-auditor and adversarial-tester - this is intentional (issue #44)"
+    exit 0
+fi
+
 # Build the file list
 if [[ -n "$TARGET_AGENT" ]]; then
     FILES=("$AGENTS_DIR/$TARGET_AGENT")

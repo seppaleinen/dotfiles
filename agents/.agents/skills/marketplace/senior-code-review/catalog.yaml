@@ -1,0 +1,9 @@
+title: Senior Code Review
+tags: [review, quality, intent, code-review, senior-code-review, mr-review]
+scope: public
+status: stable
+dependencies:
+  components:
+    - name: knowledge-lookup
+      type: skill
+      team: TeamAIP

@@ -2,21 +2,20 @@
 
 ## What does it do?
 
-Finds and loads relevant org knowledge from the marketplace catalog before relying on general model knowledge. Browses the installed **active set** via `registry.json`, searches the **available** catalog when there is a gap, loads matching OKF knowledge (`index.md` + concepts), and suggests install when relevant knowledge is not yet installed.
+Lets agents answer from your org's installed knowledge (security requirements, platform conventions, business-domain rules) when a task depends on it, instead of guessing from general model knowledge. It loads only the parts that match the task, respects which knowledge your repo allows, and tells you which knowledge it used.
 
 ## Problems it solves
 
-- Agents relying on general model knowledge when org-specific reference exists
-- Inconsistent browse/search steps duplicated across workflow skills
-- Missing transparency about which knowledge was loaded, skipped, or suggested
+- Agents answering org-policy questions from general model knowledge when your org has documented the answer
+- Agents pulling in unrelated org knowledge, wasting context on tasks that don't need it
+- Not knowing which org knowledge shaped an answer
+- Not knowing that relevant org knowledge exists but isn't installed
 
 ## Example prompts
 
 - "Check if we have org knowledge for Apollo before implementing this"
 - "What security policies apply to this change?"
-- "Look up org reference for this domain before continuing"
-
-Agents also load this skill when the **knowledge-discovery** rule nudges on non-trivial domain work.
+- "Follow the java-platform knowledge for this change"
 
 ## Requirements
 

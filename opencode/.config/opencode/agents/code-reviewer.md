@@ -80,7 +80,8 @@ The handover protocol includes a change-inventory listing files claimed to be mo
 Return using the Handover Protocol:
 
 - **Status:** `[SUCCESS]` if all checks pass, `[REWORK]` with specific issues, `[BLOCK]` for critical security findings.
-- **Summary:** One-line verdict.
+- **TLDR:** One-sentence summary of review outcome for quick understanding.
+- **Summary:** One-line verdict with TLDR prefix.
 - **Rationale:** List of findings by severity (Critical / Warning / Nit).
 - **Technical Payload:**
   - `findings`: Array of `{severity, file, line, description, suggestion}`

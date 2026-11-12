@@ -8,6 +8,7 @@ permission:
   "gh pr merge": "allow"
   "git branch -D": "allow"
   "git push origin --delete": "allow"
+  "scripts/filter-worktree-noise.sh": "allow"
   "task": "deny"
   "todowrite": "deny"
 ---
@@ -26,6 +27,16 @@ Receive from `team-lead`:
 
 ## Workflow
 
+### Preparation — Working tree noise filter (issue #37)
+
+Before any gates, run the working tree noise filter to detect actual task deliverables:
+
+```
+./scripts/filter-worktree-noise.sh
+```
+
+This filters out herdr/opencode-managed changes. If any filtered changes remain, report **BLOCK** with the list of uncommitted task deliverables.
+
 ### Gate #1 — Full branch-vs-main tree equivalence (issue #29) — runs FIRST, before any other gate
 
 Deletion is the destructive half of cleanup. It must not run until all branch content has landed on main. Run this check **before** issue closing or any other gate:
@@ -40,8 +51,20 @@ git ls-tree -r --name-only <branch> | while read f; do git cat-file -e "main:$f"
 
 **Landing → deletion dependency:** branch deletion is gated on gate #1 passing. Issue closing and hygiene checks are parallel-safe and may proceed independently — keep them separate from the deletion path so parallelism is preserved where safe.
 
+### Gate #2 — Verify push before issue closing (issue #37)
+
+Before closing the issue, verify the branch content has been pushed to the remote:
+
+```
+git ls-remote origin <branch>
+```
+
+- If the branch exists on `origin` with a matching SHA → proceed to issue closing.
+- If the branch is not on `origin` → **BLOCK**: "Branch not pushed to origin — push before closing issue".
+
 1. **Ask user**: "Do you want to perform post-verification cleanup? This will close the working issue and delete the branch if applicable."
 2. **If yes**:
+   - Run Gate #2: `git ls-remote origin <branch>` — must return a SHA
    - Close the working issue via `gh issue close`
    - If there is a branch:
      - Check if the PR is merged via `gh pr merge --status`

@@ -171,15 +171,15 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/mattpocock/skills.git",
       "skillPath": "skills/engineering/wayfinder/SKILL.md",
-      "skillFolderHash": "8ec0462658381bd1606d3f9db14ffc67df6a2a43",
+      "skillFolderHash": "25da74eadc3e388b2f2a2cc716f3d44b2fb9dfe0",
       "pluginName": "mattpocock-skills",
       "installedAt": "2026-09-23T16:09:46.233Z",
-      "updatedAt": "2026-09-23T16:09:46.233Z"
+      "updatedAt": "2026-10-30T09:33:37.599Z"
     },
     "flux-topology": {
-      "source": "seppaleinen/flux-topology-mcp",
+      "source": "seppaleinen/flux-topology",
       "sourceType": "github",
-      "sourceUrl": "https://github.com/seppaleinen/flux-topology-mcp.git",
+      "sourceUrl": "https://github.com/seppaleinen/flux-topology.git",
       "skillPath": "skills/flux-topology/SKILL.md",
       "skillFolderHash": "551f6253c79b09319eeffde2d7dac3ec730138c0",
       "installedAt": "2026-09-28T18:02:56.896Z",
@@ -195,6 +195,7 @@
     "codex",
     "cursor",
     "droid",
+    "fx",
     "gemini-cli",
     "github-copilot",
     "kilo",

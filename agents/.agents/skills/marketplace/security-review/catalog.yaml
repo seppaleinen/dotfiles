@@ -1,0 +1,12 @@
+title: Security Review
+tags: [security, appsec, review, security-review]
+scope: public
+status: stable
+dependencies:
+  components:
+    - name: security-guidelines
+      type: knowledge
+      team: TeamAppSec
+    - name: knowledge-lookup
+      type: skill
+      team: TeamAIP

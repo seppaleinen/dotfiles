@@ -1,0 +1,9 @@
+{
+  "maxWallMinutes": 180,
+  "maxTasks": 10,
+  "priorityLabels": ["critical", "P1", "priority/high", "urgent"],
+  "bugLabels": ["bug"],
+  "skipLabels": ["wontfix", "duplicate", "waiting", "needs-input"],
+  "agentMarker": "🤖 **Loop Orchestrator**",
+  "description": "Configuration for loop-orchestrator agent. All settings are optional and will use these defaults if not specified."
+}
