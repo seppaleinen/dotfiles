@@ -88,6 +88,13 @@ models:
       -c 65536 --cache-type-k q8_0 --cache-type-v q8_0 --no-mmap --mlock
       --flash-attn on --parallel 1 --jinja
 
+  ornith-1.5-35b:
+    concurrencyLimit: 2
+    cmd: ${llama-bin} --port ${PORT} -m ${models_dir}/ornith-1.5-35b/Ornith-1.5-35B-A3B-GSQ-RCO-3bit.gguf
+      -ngl all -ngld all -b 2048 -ub 2048
+      -c 120000 --cache-type-k q8_0 --cache-type-v q8_0
+      --flash-attn on --parallel 2 --jinja
+
   gpt-oss-20b:
     concurrencyLimit: 4
     cmd: >-
