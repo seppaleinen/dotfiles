@@ -8,6 +8,7 @@ permission:
   "gh pr merge": "allow"
   "git branch -D": "allow"
   "git push origin --delete": "allow"
+  "scripts/filter-worktree-noise.sh": "allow"
   "task": "deny"
   "todowrite": "deny"
 ---
@@ -25,6 +26,16 @@ Receive from `team-lead`:
 - PR status (if any)
 
 ## Workflow
+
+### Preparation — Working tree noise filter (issue #37)
+
+Before any gates, run the working tree noise filter to detect actual task deliverables:
+
+```
+./scripts/filter-worktree-noise.sh
+```
+
+This filters out herdr/opencode-managed changes. If any filtered changes remain, report **BLOCK** with the list of uncommitted task deliverables.
 
 ### Gate #1 — Full branch-vs-main tree equivalence (issue #29) — runs FIRST, before any other gate
 

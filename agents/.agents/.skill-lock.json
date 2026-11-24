@@ -177,9 +177,9 @@
       "updatedAt": "2026-10-30T09:33:37.599Z"
     },
     "flux-topology": {
-      "source": "seppaleinen/flux-topology-mcp",
+      "source": "seppaleinen/flux-topology",
       "sourceType": "github",
-      "sourceUrl": "https://github.com/seppaleinen/flux-topology-mcp.git",
+      "sourceUrl": "https://github.com/seppaleinen/flux-topology.git",
       "skillPath": "skills/flux-topology/SKILL.md",
       "skillFolderHash": "551f6253c79b09319eeffde2d7dac3ec730138c0",
       "installedAt": "2026-09-28T18:02:56.896Z",

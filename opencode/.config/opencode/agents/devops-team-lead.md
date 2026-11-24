@@ -245,20 +245,13 @@ Every mandatory stage must be recorded as **RAN** with a `task_id` from the `rew
 
 ### 2b. PIPELINE STAGE ↔ TRACE consistency check (issue #50)
 
-Every stage name listed in the `PIPELINE STAGE` field must have a matching agent entry in the `TRACE` line, and every agent in TRACE must correspond to a stage in PIPELINE STAGE.
+See `trace-validation` skill for the full validation logic and expected agent mappings.
 
-**How to check:**
-- Extract stage names from PIPELINE STAGE (e.g. `design → implement → verify → security`)
-- Extract agent names from TRACE (e.g. `team-lead → devops-team-lead → devops-architect → devops-engineer → devops-verificator → ai-security-auditor`)
-- Map each stage to its expected agent(s):
-  - `design` → `devops-architect`
-  - `implement` → `devops-engineer`
-  - `verify` → `devops-verificator`
-  - `security` → `ai-security-auditor`
-  - `docs` → `docs`
-- `team-lead` and `devops-team-lead` are routing agents, not pipeline stages — they are exempt from this check.
-- **If a stage appears in PIPELINE STAGE but its agent is absent from TRACE** → `[BLOCK]`: "handover integrity violation: stage `<stage>` claimed in PIPELINE STAGE but `<agent>` not dispatched in TRACE"
-- **If an agent appears in TRACE but its stage is absent from PIPELINE STAGE** → `[BLOCK]`: "handover integrity violation: `<agent>` dispatched in TRACE but no matching stage in PIPELINE STAGE"
+Load the skill before this gate:
+
+```
+skill(name="trace-validation")
+```
 
 ### Fast-path justification
 

@@ -472,6 +472,7 @@
   docs.md                     ADRs · PR · changelog · shared by both pipelines
   devops-cleanup.md           post-verification cleanup
   post-mortem-analyst.md      post-verification analysis
+  session-compactor.md        session archival + fresh start for new tasks
   dev-team-lead.md            software pipeline lead
   dev-architect.md            design · CONTRACT
    plan-auditor.md             pre-implementation · spec gaps + acceptance tests
@@ -581,6 +582,7 @@
               <span class="note">6 Post-Verification</span>
               <button class="node support" data-agent="devops-cleanup" type="button"><span class="id">devops-cleanup</span><span class="role">close issue + branch</span></button>
               <button class="node support" data-agent="post-mortem-analyst" type="button"><span class="id">post-mortem-analyst</span><span class="role">improvement proposals</span></button>
+              <button class="node support" data-agent="session-compactor" type="button"><span class="id">session-compactor</span><span class="role">archive + fresh start</span></button>
             </div>
           </div>
         </article>
@@ -618,6 +620,7 @@
               <span class="note">5 Post-Verification</span>
               <button class="node support" data-agent="devops-cleanup" type="button"><span class="id">devops-cleanup</span><span class="role">close issue + branch</span></button>
               <button class="node support" data-agent="post-mortem-analyst" type="button"><span class="id">post-mortem-analyst</span><span class="role">improvement proposals</span></button>
+              <button class="node support" data-agent="session-compactor" type="button"><span class="id">session-compactor</span><span class="role">archive + fresh start</span></button>
             </div>
           </div>
         </article>
@@ -628,7 +631,7 @@
         <p>Click any node. Results return to the parent, then to <code>team-lead</code>, then to you.</p>
       </div>
 
-      <p>Dispatch goes through <code>subagent(agent=...)</code> and is capped at two layers from <code>team-lead</code> by <code>experimental.subagent_depth: 2</code> in <code>opencode.json</code>. Software: <code>team-lead → dev-team-lead → backend-engineer</code> is the deepest chain. Infra: <code>team-lead → devops-team-lead → devops-engineer</code> is the deepest. The post-verification agents (<code>devops-cleanup</code>, <code>post-mortem-analyst</code>) are dispatched directly by <code>team-lead</code> at that same depth. Rework does not restart the call chain: the pipeline lead resumes the failed child session with <code>sessionID=</code> plus the error context.</p>
+      <p>Dispatch goes through <code>subagent(agent=...)</code> and is capped at two layers from <code>team-lead</code> by <code>experimental.subagent_depth: 2</code> in <code>opencode.json</code>. Software: <code>team-lead → dev-team-lead → backend-engineer</code> is the deepest chain. Infra: <code>team-lead → devops-team-lead → devops-engineer</code> is the deepest. The post-verification agents (<code>devops-cleanup</code>, <code>post-mortem-analyst</code>, <code>session-compactor</code>) are dispatched directly by <code>team-lead</code> at that same depth. Rework does not restart the call chain: the pipeline lead resumes the failed child session with <code>sessionID=</code> plus the error context.</p>
     </section>
 
     <section id="approval">
@@ -683,7 +686,7 @@
         <li>It presents the loop config (max wall clock, max tasks, selection policy) and asks for one approval.</li>
         <li>It selects the next issue, skipping any with <code>wontfix</code>/<code>duplicate</code>/<code>waiting</code>/<code>needs-input</code> labels, or any whose last comment contains the agent marker.</li>
         <li>It dispatches <code>team-lead</code> with the issue. The first task goes through the normal Approval Gate; subsequent tasks auto-run within budget.</li>
-        <li>On <code>[SUCCESS]</code>: runs <code>post-mortem-analyst</code>, lets <code>devops-cleanup</code> close the issue, comments on it, and continues.</li>
+        <li>On <code>[SUCCESS]</code>: runs <code>post-mortem-analyst</code>, <code>session-compactor</code>, lets <code>devops-cleanup</code> close the issue, comments on it, and continues.</li>
         <li>On <code>[BLOCK]</code>: comments on the issue with what's needed, skips it, and continues.</li>
         <li>On <code>[REWORK]</code> ×2 or <code>[STUCK]</code>: comments on the issue and stops, escalating to you.</li>
         <li>After each task it checks budget: 3 hours wall clock or 10 tasks — whichever comes first.</li>
@@ -814,6 +817,10 @@
       "post-mortem-analyst": {
         title: "post-mortem-analyst",
         blurb: "Post-verification workflow analyst. Dispatched by team-lead after [SUCCESS]. Reviews the full workflow and git history for errors, dead ends, and rework loops; proposes improvements and asks which to track as issues. Never creates issues or PRs without explicit request."
+      },
+      "session-compactor": {
+        title: "session-compactor",
+        blurb: "Post-verification session compaction. Dispatched by team-lead after [SUCCESS]. Archives the detailed session for future reference and leaves the session clean for new tasks. Asks the user before proceeding."
       },
       "docs": {
         title: "docs",
