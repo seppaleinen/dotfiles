@@ -20,102 +20,474 @@
     "servers": {}
   },
   "permissions": [
-    { "action": "external_directory", "resource": "*", "effect": "ask" },
-    { "action": "external_directory", "resource": "~/workspace/personal/**", "effect": "allow" },
-    { "action": "external_directory", "resource": "~/.config/opencode/**", "effect": "allow" },
-    { "action": "external_directory", "resource": "/tmp/**", "effect": "allow" },
-    { "action": "shell", "resource": "*", "effect": "ask" },
-    { "action": "shell", "resource": "cp*", "effect": "allow" },
-    { "action": "shell", "resource": "chmod*", "effect": "allow" },
-    { "action": "shell", "resource": "chown*", "effect": "allow" },
-    { "action": "shell", "resource": "mv*", "effect": "allow" },
-    { "action": "shell", "resource": "rm*", "effect": "allow" },
-    { "action": "shell", "resource": "mkdir*", "effect": "allow" },
-    { "action": "shell", "resource": "stow*", "effect": "allow" },
-    { "action": "shell", "resource": "sops*", "effect": "allow" },
-    { "action": "shell", "resource": "age*", "effect": "allow" },
-    { "action": "shell", "resource": "set*", "effect": "allow" },
-    { "action": "shell", "resource": "export*", "effect": "allow" },
-    { "action": "shell", "resource": "source*", "effect": "allow" },
-    { "action": "shell", "resource": "zsh -n*", "effect": "allow" },
-    { "action": "shell", "resource": "bash -n*", "effect": "allow" },
-    { "action": "shell", "resource": "yaml*", "effect": "allow" },
-    { "action": "shell", "resource": "cmp*", "effect": "allow" },
-    { "action": "shell", "resource": "awk*", "effect": "allow" },
-    { "action": "shell", "resource": "basename*", "effect": "allow" },
-    { "action": "shell", "resource": "cat*", "effect": "allow" },
-    { "action": "shell", "resource": "cut*", "effect": "allow" },
-    { "action": "shell", "resource": "date*", "effect": "allow" },
-    { "action": "shell", "resource": "df*", "effect": "allow" },
-    { "action": "shell", "resource": "diff*", "effect": "allow" },
-    { "action": "shell", "resource": "dirname*", "effect": "allow" },
-    { "action": "shell", "resource": "du*", "effect": "allow" },
-    { "action": "shell", "resource": "echo*", "effect": "allow" },
-    { "action": "shell", "resource": "env*", "effect": "allow" },
-    { "action": "shell", "resource": "file*", "effect": "allow" },
-    { "action": "shell", "resource": "find*", "effect": "allow" },
-    { "action": "shell", "resource": "flux-local*", "effect": "allow" },
-    { "action": "shell", "resource": "gh*", "effect": "allow" },
-    { "action": "shell", "resource": "git*", "effect": "allow" },
-    { "action": "shell", "resource": "grep*", "effect": "allow" },
-    { "action": "shell", "resource": "head*", "effect": "allow" },
-    { "action": "shell", "resource": "hostname*", "effect": "allow" },
-    { "action": "shell", "resource": "id*", "effect": "allow" },
-    { "action": "shell", "resource": "jq*", "effect": "allow" },
-    { "action": "shell", "resource": "kubectl*", "effect": "allow" },
-    { "action": "shell", "resource": "la*", "effect": "allow" },
-    { "action": "shell", "resource": "ll*", "effect": "allow" },
-    { "action": "shell", "resource": "ls*", "effect": "allow" },
-    { "action": "shell", "resource": "pnpm*", "effect": "allow" },
-    { "action": "shell", "resource": "printenv*", "effect": "allow" },
-    { "action": "shell", "resource": "printf*", "effect": "allow" },
-    { "action": "shell", "resource": "ps*", "effect": "allow" },
-    { "action": "shell", "resource": "pwd*", "effect": "allow" },
-    { "action": "shell", "resource": "readlink*", "effect": "allow" },
-    { "action": "shell", "resource": "realpath*", "effect": "allow" },
-    { "action": "shell", "resource": "rg*", "effect": "allow" },
-    { "action": "shell", "resource": "sed*", "effect": "allow" },
-    { "action": "shell", "resource": "sort*", "effect": "allow" },
-    { "action": "shell", "resource": "source .venv/bin/activate", "effect": "allow" },
-    { "action": "shell", "resource": "stat*", "effect": "allow" },
-    { "action": "shell", "resource": "tail*", "effect": "allow" },
-    { "action": "shell", "resource": "tr*", "effect": "allow" },
-    { "action": "shell", "resource": "tree*", "effect": "allow" },
-    { "action": "shell", "resource": "turbo*", "effect": "allow" },
-    { "action": "shell", "resource": "type*", "effect": "allow" },
-    { "action": "shell", "resource": "uname*", "effect": "allow" },
-    { "action": "shell", "resource": "uniq*", "effect": "allow" },
-    { "action": "shell", "resource": "wc*", "effect": "allow" },
-    { "action": "shell", "resource": "which*", "effect": "allow" },
-    { "action": "shell", "resource": "whoami*", "effect": "allow" },
-    { "action": "shell", "resource": "xargs*", "effect": "allow" },
-    { "action": "shell", "resource": "act*", "effect": "allow" },
-    { "action": "shell", "resource": "*eslint*", "effect": "allow" },
-    { "action": "shell", "resource": "*python*", "effect": "allow" },
-    { "action": "shell", "resource": "uv*", "effect": "allow" },
-    { "action": "shell", "resource": "uuidgen*", "effect": "allow" },
-    { "action": "shell", "resource": "pgrep*", "effect": "allow" },
-    { "action": "shell", "resource": "sleep*", "effect": "allow" },
-    { "action": "shell", "resource": "graft*", "effect": "allow" },
-    { "action": "shell", "resource": "flate*", "effect": "allow" },
-    { "action": "shell", "resource": "alembic*", "effect": "allow" },
-    { "action": "shell", "resource": "ruff*", "effect": "allow" },
-    { "action": "shell", "resource": "rtk*", "effect": "allow" },
-    { "action": "shell", "resource": "docker*", "effect": "allow" },
-    { "action": "shell", "resource": "flux*", "effect": "ask" },
-    { "action": "shell", "resource": "helm*", "effect": "ask" },
-    { "action": "shell", "resource": "kubectl apply*", "effect": "ask" },
-    { "action": "shell", "resource": "kubectl delete*", "effect": "ask" },
-    { "action": "shell", "resource": "kubectl drain*", "effect": "ask" },
-    { "action": "shell", "resource": "kubectl edit*", "effect": "ask" },
-    { "action": "shell", "resource": "kubectl patch*", "effect": "ask" },
-    { "action": "edit", "resource": "*", "effect": "allow" },
-    { "action": "read", "resource": "*", "effect": "allow" },
-    { "action": "webfetch", "resource": "*", "effect": "allow" },
-    { "action": "write", "resource": "*", "effect": "ask" }
+    {
+      "action": "external_directory",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/workspace/personal/**",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/.config/opencode/**",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/tmp/**",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "cp*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "chmod*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "chown*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "mv*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "rm*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "mkdir*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "stow*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "sops*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "age*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "set*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "export*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "source*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "zsh -n*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "bash -n*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "yaml*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "cmp*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "awk*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "basename*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "cat*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "cut*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "date*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "df*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "diff*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "dirname*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "du*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "echo*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "env*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "file*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "find*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "flux-local*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "gh*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "git*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "grep*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "head*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "hostname*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "id*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "jq*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "la*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "ll*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "ls*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "pnpm*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "printenv*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "printf*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "ps*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "pwd*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "readlink*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "realpath*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "rg*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "sed*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "sort*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "source .venv/bin/activate",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "stat*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "tail*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "tr*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "tree*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "turbo*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "type*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "uname*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "uniq*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "wc*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "which*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "whoami*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "xargs*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "act*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "*eslint*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "*python*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "uv*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "uuidgen*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "pgrep*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "sleep*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "graft*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "flate*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "alembic*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "ruff*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "rtk*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "docker*",
+      "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "flux*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "helm*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl apply*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl delete*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl drain*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl edit*",
+      "effect": "ask"
+    },
+    {
+      "action": "shell",
+      "resource": "kubectl patch*",
+      "effect": "ask"
+    },
+    {
+      "action": "edit",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "read",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "webfetch",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "write",
+      "resource": "*",
+      "effect": "ask"
+    }
   ],
   "plugins": [
-    "opencode-plugin-litellm@latest",
+    "opencode-plugin-litellm@1.11.0",
     "{env:HOME}/.hindsight/coding-agents"
   ],
   "providers": {
@@ -131,7 +503,7 @@
       "name": "Infermesh",
       "package": "@opencode/ai/providers/openai-compatible",
       "settings": {
-        "apiKey": "heybaby",
+        "apiKey": "${env:INFERMESH_API_KEY}",
         "baseURL": "https://infermesh.labb.site/v1"
       },
       "models": {
@@ -159,9 +531,6 @@
         },
         "swift-1.5-qwen3.8-27b-splash": {
           "name": "swift-1.5-qwen3.8-27b-splash"
-        },
-        "swift-1.5-qwen3.8-27b-rco-dwq-mlx": {
-          "name": "swift-1.5-qwen3.8-27b-rco-dwq-mlx"
         }
       }
     },
